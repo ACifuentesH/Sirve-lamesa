@@ -1,0 +1,87 @@
+<div class="game-container">
+  <!-- Header -->
+  <header class="game-header">
+    <h1 class="font-title">{{ getNombreEscenario() }}</h1>
+    <div class="participante-info">
+      <span class="font-text">{{ authService.getParticipante()?.nombres }}</span>
+    </div>
+  </header>
+
+  <!-- Mensajes -->
+  <div class="mensajes-container">
+    <div class="mensaje-exito font-text" *ngIf="mensajeExito">
+      {{ mensajeExito }}
+    </div>
+    <div class="mensaje-error font-text" *ngIf="mensajeError">
+      {{ mensajeError }}
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="game-content" *ngIf="!juegoCompletado">
+    <!-- Panel izquierdo: Ingredientes -->
+    <aside class="ingredientes-panel">
+      <h2 class="font-title">Ingredientes</h2>
+      <app-ingredientes
+        [ingredientes]="ingredientes"
+        [escenarioActual]="escenarioActual">
+      </app-ingredientes>
+    </aside>
+
+    <!-- Centro: Plato -->
+    <main class="plato-section">
+      <div class="personaje-actual-info" *ngIf="personajeActual">
+        <h3 class="font-title">Sirviendo a:</h3>
+        <p class="font-text">{{ personajeActual.nombre }}</p>
+      </div>
+
+      <app-plato-drop-zone
+        [ingredientesEnPlato]="ingredientesEnPlato"
+        (ingredienteAgregado)="onIngredienteAgregado($event)"
+        (ingredienteEliminado)="onIngredienteEliminado($event)"
+        (cantidadActualizada)="onCantidadActualizada($event)"
+        (platoServido)="onPlatoServido($event)">
+      </app-plato-drop-zone>
+    </main>
+
+    <!-- Panel derecho: Personajes -->
+    <aside class="personajes-panel">
+      <h2 class="font-title">Personajes</h2>
+      <app-personajes
+        [personajes]="personajes"
+        [personajeActual]="personajeActual"
+        (personajeSeleccionado)="onPersonajeSeleccionado($event)">
+      </app-personajes>
+    </aside>
+  </div>
+
+  <!-- Pantalla de juego completado -->
+  <div class="juego-completado" *ngIf="juegoCompletado">
+    <div class="completado-content">
+      <h1 class="font-title">¡Felicidades!</h1>
+      <p class="font-text">Has completado el juego exitosamente</p>
+      <p class="font-text">Gracias por participar en nuestro estudio</p>
+      <div class="loading-spinner" *ngIf="enviandoDecisiones"></div>
+    </div>
+  </div>
+
+  <!-- Indicador de progreso -->
+  <div class="progreso-container">
+    <div class="progreso-escenarios">
+      <div class="escenario-item"
+           [class.activo]="escenarioActual === 'desayuno'"
+           [class.completado]="escenarioActual !== 'desayuno'">
+        <span class="font-text">Desayuno</span>
+      </div>
+      <div class="escenario-item"
+           [class.activo]="escenarioActual === 'almuerzo'"
+           [class.completado]="escenarioActual === 'cena'">
+        <span class="font-text">Almuerzo</span>
+      </div>
+      <div class="escenario-item"
+           [class.activo]="escenarioActual === 'cena'">
+        <span class="font-text">Cena</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+Objetivo 
+Simular una situación en la que un usuario (el participante) sirva comida a otras personas (sujetos sintéticos), observando si existen diferencias de porcionamiento según variables sociodemográficas.
+
+
+Mecánica del Juego: “Sirve la mesa”
+
+Antes de interactuar con el juego, el investigador mide peso y altura para calcular el índice de masa corporal (IMC) de cada usuario.
+
+Operación del sistema
+
+A) Bienvenida
+-El sistema al iniciar da la bienvenida y explica el propósito del juego sin dar detalles acerca de lo que se pretende medir.
+-El sistema presenta formato de consentimiento informado (garantías éticas de la investigación).
+-El sistema solicita algunos datos sociodemográficos del usuario: Edad, sexo (M o F), lugar de nacimiento, lugar de residencia, ocupación, nivel socioeconómico (escala Graffar modificada), EAT-26 (instrumento psicológico)
+
+B) Escenario del juego
+-Un entorno visual (tipo ilustración o 3D simple) como un restaurante.
+-Tres (3) escenarios de alimentación (desayuno, almuerzo y cena)
+-Cinco (5) personajes sintéticos tanto masculinos como femeninos: 
+niño (de entre 6 a 11 años), niña (de entre 6 a 11 años)
+adolescente hombre (de entre 12 a 17 años), adolescente mujer (de entre 12 a 17 años)
+adulto joven hombre (de entre 18 a 25), adulto joven mujer (de entre 18 a 25)
+adulto hombre (de entre 30-50 años), adulto mujer (de entre 30-50 años), 
+-Un menú de opciones de alimentación (anexo)
+
+C) Operación del juego
+-El sistema presentará una de tres (3) situaciones de alimentación (desayuno, almuerzo, cena) para el grupo de personajes sintéticos.
+-El sistema solicitará que el usuario elija un menú y proporcione las porciones que considere necesarias para alimentar a cada personaje sintético.
+	- Las porciones deben ser configurables, permitiendo al usuario decidir, por ejemplo, si un plato de pabellón tendrá más arroz que carne, o bien, en cada plato configurar cuanta proteína, carbohidratos o fibra se servirá. 
+
+Ejemplo de Uso: Almuerzo, adulto mujer (de entre 30-50 años)
+Pabellón Criollo:
+Componentes: Carne mechada, arroz, caraotas negras, plátano frito.
+El usuario puede ajustar las porciones, por ejemplo:
+60% arroz 🡪Peso en gramos
+20% carne mechada 🡪Peso en gramos
+10% caraotas negras 🡪 Peso en gramos
+10% plátano frito 🡪Peso en gramos
+-El usuario podrá elegir cuánto servir en cada plato (el tamaño o la cantidad) arrastrando porciones (visualmente atractivas). 
+-Puede tener una “barra de porción” o simplemente arrastrar ítems como arroz, proteínas, verduras, etc.
+-Al completar la tarea, el sistema proporcionará una recompensa como estímulo visual-auditivo y pasará a la siguiente actividad.
+-El sistema concluirá agradeciendo la participación del usuario en el juego.
+
+D) Datos a registrar
+-Cantidad de comida servida en cada ración de porcionamiento según cada personaje sintético.
+-Cantidad de comida total servida por género y edad del comensal (personajes sintéticos). 
+-Distribución de tipos de alimentos por género y edad del comensal (¿se da más proteína a los hombres?, ¿más verdura a las mujeres?). 
+-Tiempo dedicado a cada decisión de porcionamiento alimentario.
+-Orden en que se sirve (¿sirve primero a hombres, adultos, niños, mujeres?).
+
+Herramientas Tecnológicas Sugeridas 
+
+Opción 1: WebApp (recomendado para facilidad de acceso) 
+Frontend: React.js o Vue.js (o Flutter Web) 
+Backend: Firebase (base de datos en tiempo real + auth + analytics)
+Visuales: Ilustraciones vectoriales animadas (tipo Lottie o SVG), o assets 2D simples para comida y personas.
+
+Opción 2: App móvil 
+Igual lógica pero empaquetada para Android/iOS. 
+Flutter sería ideal si se busca multiplataforma con alta fidelidad.
+
+Opción 3: Plataforma experimental online 
+Usar herramientas tipo Gorilla.sc , Labvanced , o PsyToolkit para facilitar la recolección de datos bajo formato de experimento psicológico, sin desarrollar desde cero.
+
+Equipo de Desarrollo
+
+1 desarrollador frontend 
+1 diseñador UI/UX o ilustrador
+1 experto en UX research / psicometría
+
+
+
+
+
+
+
+
+
+
+
+ANEXO
+Modelo de menú (selección basada en el menú del restaurante El Solar del Este, Las Mercedes)
+
+Desayuno. 
+
+Arepas:
+Rellenos de queso (blanco, amarillo, guayanés, de mano, telita), de jamón, de perico (huevos revueltos con tomate y cebolla), de carne mechada, pernil, carne molida, de salchicha, de caraotas 
+🡪Al menos UN relleno por arepa (puede incluir dos o más)
+Empanadas:
+De carne mechada, De carne molida, De pollo, De queso, De cazón, De pabellón (carne mechada, caraotas, plátano), De chorizo, De atún
+Cachapas:
+Con queso de mano, Con jamón y queso blanco, Con jamón y queso amarillo, Con queso Telita, Con pernil
+Sándwich: 
+De Jamón y Queso amarillo, De queso, De Pernil, De Pollo, De atún. 
+Usualmente se acompañan de lechuga, tomate y mayonesa.
+Pastelitos: (rellenos de carne, pollo o queso)
+Cachitos (croisants rellenos de jamón, jamón y queso, pavo y queso crema)
+
+Bebidas:
+Café (negro, con leche, marrón)
+Jugos:  de naranja, de guayaba, de lechosa (papaya), de melón, de mango, de parchita, de patilla, de fresa, de mora.
+Refresco: Pepsi, Coca- Cola, Malta, Colita, Naranja, 7up, Chinotto
+
+
+Almuerzo
+1) Sopas (Entradas)
+Sopa de Res: Con trozos de carne de res, papas, zanahorias y otras verduras.
+Sancocho: Caldo sustancioso con carne (res, pollo o pescado), yuca, plátano, maíz y otras verduras.
+Crema de Auyama: Crema suave hecha de auyama, a menudo servida con un toque de crema o queso.
+2) Carnes
+Pabellón Criollo: Carne mechada servida con arroz blanco, caraotas negras y plátano frito.
+Asado Negro: Carne de res cocida lentamente en una salsa dulce y oscura, servida con arroz y plátano.
+Parrilla Mixta: Variedad de carnes a la parrilla, como chorizo, morcilla y res, servidas con guarniciones.
+3) Aves (Solo Pollo)
+Pollo a la Brasa: Pollo marinado y asado, acompañado de ensalada y papas fritas o yuca.
+Pollo al Horno: Pollo cocido al horno con hierbas y especias, servido con arroz y vegetales.
+Pollo en Salsa de Champiñones: Pechuga de pollo cocida en una cremosa salsa de champiñones, acompañada de puré de papas.
+Cordon Bleu de Pollo: Pechuga de pollo rellena de jamón y queso, empanizada y frita, servida con una guarnición de puré de papas o ensalada.
+4) Pescados
+Filete de Merluza a la Plancha: Merluza cocida a la plancha con limón y hierbas, servida con arroz y ensalada.
+Trucha al Ajillo: Trucha cocida con ajo y perejil, acompañada de papas al vapor.
+Pargo entero frito: servido con tostones (plátanos fritos) y ensalada.
+Mero en Salsa Verde: Filete de mero cocido en una salsa verde de perejil y ajo, acompañado de arroz.
+5) Ensaladas
+Ensalada César con Pollo: Lechuga romana, pollo a la parrilla, crutones y aderezo César.
+Ensalada mixta de Aguacate y Tomate: Aguacate, tomate, cebolla y cilantro, aderezados con limón y aceite de oliva.
+6) Pastas
+Pasta al Pesto: Pasta con una salsa de albahaca, piñones, ajo, queso parmesano y aceite de oliva.
+Pasta Alfredo: Pasta en una cremosa salsa de mantequilla, crema y queso parmesano, a veces con pollo o champiñones.
+Pasta a la Carbonara: Pasta con una salsa de huevo, queso parmesano, panceta o tocino, y pimienta negra.
+Lasagna o pasticho: Capas de pasta intercaladas con carne molida, salsa de tomate, bechamel y queso.
+Pasta con Mariscos: Pasta servida con una variedad de mariscos como camarones, mejillones y calamares, en una salsa de vino blanco o tomate.
+Pasta Boloñesa: Pasta con una rica salsa de carne molida, tomate, cebolla y especias.
+Raviolis: Pasta rellena de queso, espinacas, carne o setas, servida con salsa de tomate o crema.
+Fettuccine con Salsa de Champiñones: Fettuccine en una salsa cremosa de champiñones y ajo.
+
+Cena
+Dado que en la cultura urbana de Caracas las preferencias para la cena son muy variables, lo conveniente es presentar un menú compuesto por los platos tanto del desayuno como del almuerzo.

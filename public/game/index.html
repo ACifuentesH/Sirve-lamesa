@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sirve la Mesa - Juego</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .instructions {
+            background: rgba(52, 152, 219, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .instructions h2 {
+            color: #3498db;
+            margin-top: 0;
+        }
+
+        .instructions ol {
+            text-align: left;
+            display: inline-block;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+        }
+
+        #game-canvas {
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            display: none;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="info-box">
+            <h1>🍽️ Sirve la Mesa</h1>
+            
+            <p>Esta es la página donde se cargará el juego exportado desde Godot.</p>
+            
+            <div class="instructions">
+                <h2>📋 Instrucciones para integrar el juego</h2>
+                <ol>
+                    <li>Exporta tu proyecto de Godot desde <code>shity ass prueba/</code> como HTML5</li>
+                    <li>Copia todos los archivos exportados a esta carpeta (<code>public/game/</code>)</li>
+                    <li>Renombra o ajusta este archivo <code>index.html</code> con el HTML generado por Godot</li>
+                    <li>Asegúrate de que el juego use las APIs del backend (ver <code>docs/INTEGRACION_GODOT.md</code>)</li>
+                </ol>
+            </div>
+
+            <p style="margin-top: 30px; font-size: 0.9em; opacity: 0.7;">
+                Para más información sobre la integración, consulta la documentación en <code>/docs/INTEGRACION_GODOT.md</code>
+            </p>
+        </div>
+
+        <!-- Aquí se cargará el canvas del juego de Godot -->
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- 
+    Cuando exportes desde Godot, este archivo será reemplazado con el index.html generado.
+    El export de Godot incluirá automáticamente los scripts necesarios.
+    -->
+</body>
+</html>
+

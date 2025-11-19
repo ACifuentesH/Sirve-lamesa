@@ -1,0 +1,202 @@
+.plato-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.plato-drop-zone {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed transparent;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+
+  &.cdk-drop-list-dragging {
+    border-color: var(--color-rosa);
+    background: rgba(255, 123, 172, 0.1);
+  }
+}
+
+.plato-imagen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 0;
+}
+
+.ingredientes-en-plato {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 20px;
+  width: 80%;
+}
+
+.ingrediente-item {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--color-azul-claro);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ingrediente-mini {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.ingrediente-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.nombre {
+  font-weight: bold;
+  color: var(--color-verde);
+  font-size: 0.9em;
+}
+
+.cantidad-control {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cantidad-input {
+  width: 70px;
+  padding: 5px;
+  border: 2px solid var(--color-azul-claro);
+  border-radius: 5px;
+  font-size: 0.9em;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-azul);
+  }
+}
+
+.unidad {
+  font-size: 0.85em;
+  color: var(--color-azul);
+}
+
+.btn-eliminar {
+  background: var(--color-naranja);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1em;
+
+  &:hover {
+    background: var(--color-rosa);
+    transform: scale(1.1);
+  }
+}
+
+.mensaje-vacio {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: var(--color-azul);
+  opacity: 0.6;
+
+  p {
+    font-size: 1.2em;
+  }
+}
+
+.plato-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cantidad-total {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  .label {
+    font-weight: bold;
+    color: var(--color-verde);
+    font-size: 1.1em;
+  }
+
+  .value {
+    font-size: 1.3em;
+    color: var(--color-azul);
+    font-weight: bold;
+  }
+}
+
+.btn-servir {
+  background: var(--color-rosa);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 40px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  &:hover:not(:disabled) {
+    background: var(--color-naranja);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(239, 111, 60, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Scrollbar personalizada para ingredientes
+.ingredientes-en-plato {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-azul-claro);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-azul);
+    border-radius: 4px;
+  }
+}

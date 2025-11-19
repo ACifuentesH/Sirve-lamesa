@@ -1,0 +1,70 @@
+/* Global Styles */
+
+// Importar fuentes custom
+@font-face {
+  font-family: 'Rocket Raccoon';
+  src: url('./assets/fonts/Rocket Raccoon Free.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gildsley';
+  src: url('./assets/fonts/Gildsley DEMO.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+// Variables de colores del proyecto
+:root {
+  --color-verde: #25533F;
+  --color-azul: #52A5CE;
+  --color-azul-claro: #B8CEE8;
+  --color-rosa: #FF7BAC;
+  --color-naranja: #EF6F3C;
+  --color-blanco: #FFFFFF;
+  --color-fondo: #F8F8F8;
+}
+
+// Reset CSS
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--color-blanco);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+// Clases utilitarias
+.font-title {
+  font-family: 'Rocket Raccoon', sans-serif;
+}
+
+.font-text {
+  font-family: 'Gildsley', sans-serif;
+}
+
+// Scrollbar personalizada
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-azul-claro);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-azul);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-verde);
+}

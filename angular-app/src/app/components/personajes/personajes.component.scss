@@ -1,0 +1,146 @@
+.personajes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.personaje-card {
+  background: white;
+  border: 3px solid var(--color-azul-claro);
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-azul);
+      transform: translateX(5px);
+      box-shadow: 0 3px 10px rgba(82, 165, 206, 0.3);
+    }
+  }
+
+  &.pendiente {
+    opacity: 0.8;
+  }
+
+  &.activo,
+  &.en_curso {
+    border-color: var(--color-rosa);
+    background: linear-gradient(135deg, #FFF5F9 0%, #FFFFFF 100%);
+    transform: translateX(10px);
+    box-shadow: 0 5px 15px rgba(255, 123, 172, 0.3);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--color-rosa);
+    }
+  }
+
+  &.servido {
+    border-color: var(--color-verde);
+    opacity: 0.7;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--color-verde);
+    }
+  }
+}
+
+.personaje-imagen-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+
+.personaje-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--color-azul-claro);
+}
+
+.estado-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(37, 83, 63, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-icon {
+  color: white;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.personaje-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.personaje-nombre {
+  font-size: 0.95em;
+  font-weight: bold;
+  color: var(--color-verde);
+  margin: 0 0 5px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.personaje-estado {
+  font-size: 0.85em;
+  color: var(--color-azul);
+  margin: 0;
+
+  &.servido {
+    color: var(--color-verde);
+    font-weight: bold;
+  }
+}
+
+// Responsive
+@media (max-width: 400px) {
+  .personaje-card {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .personaje-imagen-container {
+    width: 50px;
+    height: 50px;
+  }
+
+  .personaje-nombre {
+    font-size: 0.9em;
+  }
+
+  .personaje-estado {
+    font-size: 0.8em;
+  }
+}

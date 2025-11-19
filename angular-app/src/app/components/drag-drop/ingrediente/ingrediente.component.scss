@@ -1,0 +1,83 @@
+.ingrediente {
+  width: 120px;
+  padding: 10px;
+  margin: 5px;
+  background: white;
+  border: 2px solid var(--color-azul-claro);
+  border-radius: 10px;
+  cursor: move;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(82, 165, 206, 0.3);
+    border-color: var(--color-azul);
+  }
+}
+
+.ingrediente-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.ingrediente-imagen {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.ingrediente-nombre {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: var(--color-verde);
+  text-align: center;
+}
+
+.ingrediente-porcion {
+  font-size: 0.8em;
+  color: var(--color-azul);
+}
+
+// CDK Drag states
+.cdk-drag-dragging {
+  opacity: 0.5;
+}
+
+.drag-placeholder {
+  background: var(--color-azul-claro);
+  border: 2px dashed var(--color-azul);
+  border-radius: 10px;
+  opacity: 0.5;
+  height: 140px;
+  width: 120px;
+}
+
+.drag-preview {
+  background: white;
+  border: 2px solid var(--color-rosa);
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+}
+
+.preview-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+
+  img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+  }
+
+  span {
+    font-size: 0.9em;
+    color: var(--color-verde);
+    font-weight: bold;
+  }
+}

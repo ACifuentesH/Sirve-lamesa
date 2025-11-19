@@ -1,0 +1,38 @@
+{
+  "name": "sirve-la-mesa",
+  "version": "1.0.0",
+  "description": "Sistema backend para el juego de investigación 'Sirve la Mesa' - Estudio de porcionamiento de alimentos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "dev:angular": "cd angular-app && npm start",
+    "build:angular": "cd angular-app && npm run build:prod",
+    "postinstall": "cd angular-app && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "keywords": [
+    "godot",
+    "postgresql",
+    "research",
+    "game",
+    "psychology",
+    "food",
+    "portioning"
+  ],
+  "author": "Equipo Sirve la Mesa",
+  "license": "MIT"
+}
