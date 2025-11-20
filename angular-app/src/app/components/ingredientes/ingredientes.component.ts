@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { Ingrediente } from '../../services/game-data.service';
@@ -14,6 +14,7 @@ import { IngredienteComponent } from '../drag-drop/ingrediente/ingrediente.compo
 export class IngredientesComponent implements OnInit {
   @Input() ingredientes: Ingrediente[] = [];
   @Input() escenarioActual: 'desayuno' | 'almuerzo' | 'cena' = 'desayuno';
+  @Output() ingredienteSeleccionado = new EventEmitter<Ingrediente>();
 
   categoriaSeleccionada = 'todos';
   ingredientesFiltrados: Ingrediente[] = [];
@@ -51,5 +52,9 @@ export class IngredientesComponent implements OnInit {
   onIngredienteArrastrado(ingrediente: Ingrediente): void {
     // Este evento se puede usar para analytics o feedback visual
     console.log('Ingrediente arrastrado:', ingrediente.nombre);
+  }
+
+  onIngredienteSeleccionado(ingrediente: Ingrediente): void {
+    this.ingredienteSeleccionado.emit(ingrediente);
   }
 }

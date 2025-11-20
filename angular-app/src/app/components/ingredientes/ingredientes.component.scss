@@ -1,127 +1,94 @@
 .ingredientes-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   height: 100%;
 }
 
-// Filtros de categoría
-.categorias-filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--color-azul-claro);
+.tabs-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
-.categoria-btn {
-  background: white;
-  border: 2px solid var(--color-azul-claro);
-  border-radius: 20px;
-  padding: 8px 16px;
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 0 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab-button {
+  padding: 10px 20px;
+  background: #FFFFFF;
+  border: 3px solid #25533F;
+  border-radius: 25px;
+  font-family: 'Gildsley', sans-serif;
+  font-size: 1em;
+  font-weight: bold;
+  color: #25533F;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.9em;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &.active {
+    background: #52A5CE;
+    color: #FFFFFF;
+    border-color: #52A5CE;
+  }
 
   &:hover {
-    border-color: var(--color-azul);
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(82, 165, 206, 0.3);
-  }
-
-  &.activo {
-    background: var(--color-azul);
-    color: white;
-    border-color: var(--color-azul);
-
-    .icono {
-      transform: scale(1.2);
-    }
-  }
-
-  .icono {
-    font-size: 1.2em;
-    transition: transform 0.3s ease;
-  }
-
-  .nombre {
-    font-weight: bold;
+    background: #F8F8F8;
+    border-color: #52A5CE;
   }
 }
 
-// Lista de ingredientes
-.ingredientes-list {
+.menu-section {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 10px;
-  overflow-y: auto;
-  padding: 10px 5px;
-  align-content: start;
-
-  // Scrollbar personalizada
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: var(--color-azul-claro);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-azul);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--color-verde);
-  }
-}
-
-// Mensaje vacío
-.no-ingredientes {
-  flex: 1;
+  background: transparent;
+  padding: 10px 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-azul);
-  opacity: 0.6;
+  flex-direction: column;
+  overflow: hidden;
 
-  p {
-    font-size: 1.1em;
-    text-align: center;
+  &.empty {
+    align-items: center;
+    justify-content: center;
   }
 }
 
-// Responsive
-@media (max-width: 992px) {
-  .ingredientes-list {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    max-height: 250px;
-  }
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 15px;
+  padding: 10px 0;
+  overflow: visible;
+  justify-items: center;
+}
+
+.no-ingredientes {
+  text-align: center;
+  color: #25533F;
+  font-weight: bold;
+  padding: 20px;
 }
 
 @media (max-width: 600px) {
-  .categorias-filter {
-    gap: 5px;
+  .food-grid {
+    gap: 15px;
+    padding: 10px 15px;
   }
 
-  .categoria-btn {
-    padding: 6px 12px;
-    font-size: 0.85em;
-
-    .icono {
-      font-size: 1em;
-    }
-  }
-
-  .ingredientes-list {
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 8px;
+  .tab-button {
+    font-size: 0.9em;
+    padding: 8px 16px;
   }
 }

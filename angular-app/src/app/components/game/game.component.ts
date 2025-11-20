@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -25,6 +25,7 @@ import { IngredientesComponent } from '../ingredientes/ingredientes.component';
 })
 export class GameComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  @ViewChild(PlatoDropZoneComponent) platoDropZoneComponent?: PlatoDropZoneComponent;
 
   // Estado del juego
   escenarioActual: 'desayuno' | 'almuerzo' | 'cena' = 'desayuno';
@@ -103,17 +104,22 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   onIngredienteAgregado(ingredienteEnPlato: IngredienteEnPlato): void {
-    this.ingredientesEnPlato.push(ingredienteEnPlato);
+    this.ingredientesEnPlato = [...this.ingredientesEnPlato, ingredienteEnPlato];
   }
 
   onIngredienteEliminado(index: number): void {
-    this.ingredientesEnPlato.splice(index, 1);
+    this.ingredientesEnPlato = this.ingredientesEnPlato.filter((_, i) => i !== index);
   }
 
-  onCantidadActualizada(evento: { index: number, cantidad: number }): void {
-    if (this.ingredientesEnPlato[evento.index]) {
-      this.ingredientesEnPlato[evento.index].cantidad = evento.cantidad;
+  onIngredienteSeleccionado(ingrediente: Ingrediente): void {
+    const nuevo = this.platoDropZoneComponent?.crearIngredienteEnPlato(ingrediente);
+    if (nuevo) {
+      this.ingredientesEnPlato = [...this.ingredientesEnPlato, nuevo];
     }
+  }
+
+  onLimpiarPlato(): void {
+    this.limpiarPlato();
   }
 
   onPlatoServido(componentesServidos: ComponenteServido[]): void {

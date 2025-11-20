@@ -1,51 +1,60 @@
-<div class="plato-container">
-  <div class="plato-drop-zone"
-       cdkDropList
-       [cdkDropListData]="ingredientesEnPlato"
-       (cdkDropListDropped)="onDrop($event)">
+<div class="scene-wrapper">
+  <div class="scene-container">
+    <div class="table-scene">
+      <div class="table-container">
+        <div class="table-with-mantel">
+          <img [src]="mesaImagen" alt="Mesa" class="mesa-image">
+          <img [src]="mantelImagen" alt="Mantel" class="mantel-image">
 
-    <img [src]="platoImagen" alt="Plato" class="plato-imagen">
+          <div class="plate-container" id="plate-container" [class.drag-over]="isDragOver">
+            <img #plateImage [src]="platoImagen" alt="Plato" class="plate-image">
+            <div #plateArea
+                 class="plate-area"
+                 (drop)="handleDrop($event)"
+                 (dragover)="handleDragOver($event)"
+                 (dragenter)="handleDragEnter($event)"
+                 (dragleave)="handleDragLeave($event)">
+            </div>
 
-    <div class="ingredientes-en-plato">
-      <div *ngFor="let item of ingredientesEnPlato; let i = index" class="ingrediente-item">
-        <img [src]="getImagePath(item.ingrediente.imagen)"
-             [alt]="item.ingrediente.nombre"
-             class="ingrediente-mini">
+            <div class="food-on-plate"
+                 *ngFor="let item of ingredientesEnPlato; let i = index"
+                 [ngStyle]="{
+                   'left.%': item.x,
+                   'top.%': item.y,
+                   'width.px': item.size,
+                   'height.px': item.size,
+                   'transform': 'translate(-50%, -50%) rotate(' + item.rotation + 'deg)'
+                 }"
+                 (click)="eliminarIngrediente(i)"
+                 title="Eliminar {{ item.ingrediente.nombre }}">
+              <img [src]="getImagePath(item.ingrediente.imagen)" [alt]="item.ingrediente.nombre">
+            </div>
 
-        <div class="ingrediente-info">
-          <span class="nombre font-text">{{ item.ingrediente.nombre }}</span>
-          <div class="cantidad-control">
-            <input type="number"
-                   [(ngModel)]="item.cantidad"
-                   (ngModelChange)="actualizarCantidad(i, $event)"
-                   min="0"
-                   step="10"
-                   class="cantidad-input">
-            <span class="unidad">{{ item.unidad }}</span>
+          </div>
+
+          <div class="drag-hint font-text" *ngIf="ingredientesEnPlato.length === 0">
+            Arrastra la comida y suéltala sobre el plato
           </div>
         </div>
-
-        <button class="btn-eliminar" (click)="eliminarIngrediente(i)" title="Eliminar">
-          ✕
-        </button>
       </div>
-    </div>
-
-    <div class="mensaje-vacio" *ngIf="ingredientesEnPlato.length === 0">
-      <p class="font-text">Arrastra ingredientes aquí</p>
     </div>
   </div>
 
-  <div class="plato-info">
-    <div class="cantidad-total">
-      <span class="label font-text">Total:</span>
-      <span class="value font-text">{{ cantidadTotal }} gramos</span>
+  <div class="button-container">
+    <div class="cantidad-total font-text">
+      <span class="label">Total aproximado:</span>
+      <span class="value">{{ cantidadTotal | number:'1.0-0' }} g</span>
     </div>
-
-    <button class="btn-servir font-text"
-            (click)="servirPlato()"
-            [disabled]="ingredientesEnPlato.length === 0">
-      Servir Plato
-    </button>
+    <div class="actions">
+      <button class="btn clear-plate-btn font-text" type="button" (click)="onLimpiarPlato()">
+        Limpiar Plato
+      </button>
+      <button class="btn btn-primary font-text"
+              type="button"
+              (click)="servirPlato()"
+              [disabled]="ingredientesEnPlato.length === 0">
+        Finalizar Plato
+      </button>
+    </div>
   </div>
 </div>

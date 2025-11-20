@@ -24,7 +24,8 @@
       <h2 class="font-title">Ingredientes</h2>
       <app-ingredientes
         [ingredientes]="ingredientes"
-        [escenarioActual]="escenarioActual">
+        [escenarioActual]="escenarioActual"
+        (ingredienteSeleccionado)="onIngredienteSeleccionado($event)">
       </app-ingredientes>
     </aside>
 
@@ -39,8 +40,8 @@
         [ingredientesEnPlato]="ingredientesEnPlato"
         (ingredienteAgregado)="onIngredienteAgregado($event)"
         (ingredienteEliminado)="onIngredienteEliminado($event)"
-        (cantidadActualizada)="onCantidadActualizada($event)"
-        (platoServido)="onPlatoServido($event)">
+        (platoServido)="onPlatoServido($event)"
+        (limpiarSolicitado)="onLimpiarPlato()">
       </app-plato-drop-zone>
     </main>
 

@@ -276,7 +276,7 @@ server.listen(port, async () => {
   console.log(`🔗 URL: http://localhost:${port}`);
   console.log('='.repeat(50));
   
- // await initDatabase(); // TODO: Uncomment this when the database is ready
+  await initDatabase(); 
   
   console.log('\n📚 Endpoints disponibles:');
   console.log('  - GET  /api/health');

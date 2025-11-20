@@ -1,19 +1,15 @@
-<div class="ingrediente" 
-     cdkDrag 
-     [cdkDragData]="ingrediente"
-     (cdkDragStarted)="onDragStart()">
-  <div class="ingrediente-content">
-    <img [src]="getImagePath()" 
-         [alt]="ingrediente.nombre"
-         class="ingrediente-imagen">
-    <span class="ingrediente-nombre font-text">{{ ingrediente.nombre }}</span>
-    <span class="ingrediente-porcion">{{ ingrediente.porcionDefault }} {{ ingrediente.unidad }}</span>
-  </div>
-  <div class="drag-placeholder" *cdkDragPlaceholder></div>
-  <div class="drag-preview" *cdkDragPreview>
-    <div class="preview-content">
-      <img [src]="getImagePath()" [alt]="ingrediente.nombre">
-      <span>{{ ingrediente.nombre }}</span>
-    </div>
-  </div>
+<div class="food-item"
+     draggable="true"
+     (dragstart)="onDragStart($event)"
+     (dragend)="onDragEnd()"
+     (click)="onSeleccionar()"
+     (keydown.enter)="onSeleccionar()"
+     (keydown.space)="onSeleccionar(); $event.preventDefault()"
+     [attr.tabindex]="0"
+     role="button"
+     [attr.aria-label]="'Agregar ' + ingrediente.nombre"
+     [class.dragging]="isDragging">
+  <img [src]="getImagePath()"
+       [alt]="ingrediente.nombre"
+       draggable="false">
 </div>
