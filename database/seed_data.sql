@@ -2,6 +2,20 @@
 -- Menú del restaurante El Solar del Este, Las Mercedes
 
 -- ===================================
+-- PERSONAJES SINTÉTICOS
+-- ===================================
+INSERT INTO Personajes (tipo, edad_rango, sexo, imagen, nombre) VALUES
+    ('niño', '6-11', 'M', 'niño.png', 'Niño (6-11 años)'),
+    ('niña', '6-11', 'F', 'niño.png', 'Niña (6-11 años)'),
+    ('adolescente_hombre', '12-17', 'M', 'niño.png', 'Adolescente Hombre (12-17 años)'),
+    ('adolescente_mujer', '12-17', 'F', 'niño.png', 'Adolescente Mujer (12-17 años)'),
+    ('adulto_joven_hombre', '18-25', 'M', 'niño-comiendo.png', 'Adulto Joven Hombre (18-25 años)'),
+    ('adulto_joven_mujer', '18-25', 'F', 'niño-comiendo.png', 'Adulto Joven Mujer (18-25 años)'),
+    ('adulto_hombre', '30-50', 'M', 'niño-cubierto-plato.png', 'Adulto Hombre (30-50 años)'),
+    ('adulto_mujer', '30-50', 'F', 'niño-cubierto-plato.png', 'Adulto Mujer (30-50 años)')
+ON CONFLICT DO NOTHING;
+
+-- ===================================
 -- MENÚS PRINCIPALES
 -- ===================================
 INSERT INTO Menu (nombre) VALUES 
@@ -43,95 +57,126 @@ ON CONFLICT DO NOTHING;
 -- ===================================
 -- COMPONENTES (INGREDIENTES)
 -- ===================================
-INSERT INTO Componentes (nombre, descripcion) VALUES
-    -- Proteínas
-    ('Queso blanco', 'Queso blanco fresco'),
-    ('Queso amarillo', 'Queso amarillo tipo cheddar'),
-    ('Queso guayanés', 'Queso guayanés artesanal'),
-    ('Queso de mano', 'Queso de mano venezolano'),
-    ('Queso telita', 'Queso telita suave'),
-    ('Jamón', 'Jamón de pierna'),
-    ('Perico', 'Huevos revueltos con tomate y cebolla'),
-    ('Carne mechada', 'Carne de res desmechada'),
-    ('Pernil', 'Pernil de cerdo'),
-    ('Carne molida', 'Carne molida de res'),
-    ('Salchicha', 'Salchicha tipo viena'),
-    ('Pollo desmechado', 'Pollo desmenuzado'),
-    ('Chorizo', 'Chorizo español'),
-    ('Atún', 'Atún enlatado'),
-    ('Cazón', 'Pescado cazón'),
-    ('Pavo', 'Pavo en lonchas'),
-    ('Queso crema', 'Queso crema untable'),
+-- Ingredientes con imágenes del frontend y categorías
+INSERT INTO Componentes (nombre, descripcion, imagen, categoria, unidad, porcion_default) VALUES
+    -- Proteínas del frontend
+    ('Carne', 'Carne de res', 'carne.png', 'proteina', 'gramos', 100),
+    ('Pollo Frito', 'Pollo frito crujiente', 'pollo_frito.png', 'proteina', 'gramos', 150),
+    ('Muslo de Pollo', 'Muslo de pollo asado', 'muslo_de_pollo.png', 'proteina', 'gramos', 120),
+    ('Pescado', 'Filete de pescado', 'pescado.png', 'proteina', 'gramos', 150),
+    ('Tocineta', 'Tocino frito', 'tocineta.png', 'proteina', 'gramos', 30),
+    ('Salchicha', 'Salchicha tipo viena', 'salchicha.png', 'proteina', 'gramos', 50),
+    ('Huevo Frito', 'Huevo frito', 'huevo_frito.png', 'proteina', 'unidad', 1),
     
-    -- Carbohidratos
-    ('Arepa', 'Arepa de maíz'),
-    ('Empanada (masa)', 'Masa de empanada frita'),
-    ('Cachapa', 'Cachapa de maíz'),
-    ('Pan de sandwich', 'Pan de molde para sandwich'),
-    ('Pastelito (masa)', 'Masa de pastelito frita'),
-    ('Cachito (masa)', 'Croissant venezolano'),
-    ('Arroz blanco', 'Arroz blanco cocido'),
-    ('Pasta', 'Pasta cocida'),
-    ('Papa', 'Papa cocida o frita'),
-    ('Yuca', 'Yuca cocida'),
-    ('Plátano frito', 'Plátano maduro frito'),
-    ('Tostones', 'Plátano verde frito'),
-    ('Maíz', 'Maíz cocido'),
-    ('Pan', 'Pan tradicional'),
+    -- Carbohidratos del frontend
+    ('Papa', 'Papa cocida o frita', 'papa.png', 'carbohidrato', 'gramos', 150),
+    ('Pan Tostado', 'Pan tostado', 'pan tostado.png', 'carbohidrato', 'rebanadas', 2),
+    ('Bagel', 'Bagel', 'bagle.png', 'carbohidrato', 'unidad', 1),
+    ('Croissant', 'Croissant', 'croisant1.png', 'carbohidrato', 'unidad', 1),
+    ('Crackers', 'Galletas saladas', 'crackers.png', 'carbohidrato', 'gramos', 30),
+    ('Muffin', 'Muffin', 'muffin.png', 'carbohidrato', 'unidad', 1),
     
-    -- Legumbres y vegetales
-    ('Caraotas negras', 'Frijoles negros cocidos'),
-    ('Zanahoria', 'Zanahoria cocida'),
-    ('Auyama', 'Calabaza cocida'),
-    ('Lechuga', 'Lechuga fresca'),
-    ('Tomate', 'Tomate fresco'),
-    ('Cebolla', 'Cebolla'),
-    ('Aguacate', 'Aguacate fresco'),
-    ('Cilantro', 'Cilantro fresco'),
-    ('Perejil', 'Perejil fresco'),
-    ('Espinaca', 'Espinaca'),
-    ('Champiñones', 'Champiñones'),
+    -- Vegetales del frontend
+    ('Zanahoria', 'Zanahoria cocida', 'zanahoria.png', 'vegetal', 'gramos', 80),
+    ('Tomate', 'Tomate fresco', 'tomate.png', 'vegetal', 'gramos', 100),
+    ('Tomate Cherry', 'Tomate cherry', 'tomate_cherry.png', 'vegetal', 'unidades', 5),
+    ('Pepino', 'Pepino fresco', 'pepino.png', 'vegetal', 'gramos', 50),
+    ('Aguacate', 'Aguacate fresco', 'aguacate.png', 'vegetal', 'gramos', 100),
+    ('Espárragos', 'Espárragos', 'esparragos.png', 'vegetal', 'gramos', 80),
+    
+    -- Frutas del frontend
+    ('Manzana', 'Manzana fresca', 'manzana.png', 'fruta', 'unidad', 1),
+    ('Naranja', 'Naranja fresca', 'naranja.png', 'fruta', 'unidad', 1),
+    ('Cambur', 'Plátano/Banana', 'cambur.png', 'fruta', 'unidad', 1),
+    ('Fresa', 'Fresas frescas', 'fresa.png', 'fruta', 'gramos', 100),
+    ('Frambuesas', 'Frambuesas frescas', 'frambuesas.png', 'fruta', 'gramos', 50),
+    ('Durazno', 'Durazno fresco', 'durazno.png', 'fruta', 'unidad', 1),
+    ('Patilla', 'Sandía', 'patilla.png', 'fruta', 'gramos', 200),
+    ('Nueces', 'Nueces', 'nueces.png', 'fruta', 'gramos', 30),
+    
+    -- Ingredientes adicionales del menú venezolano (sin imagen del frontend)
+    ('Queso blanco', 'Queso blanco fresco', NULL, 'proteina', 'gramos', 50),
+    ('Queso amarillo', 'Queso amarillo tipo cheddar', NULL, 'proteina', 'gramos', 50),
+    ('Queso guayanés', 'Queso guayanés artesanal', NULL, 'proteina', 'gramos', 50),
+    ('Queso de mano', 'Queso de mano venezolano', NULL, 'proteina', 'gramos', 50),
+    ('Queso telita', 'Queso telita suave', NULL, 'proteina', 'gramos', 50),
+    ('Jamón', 'Jamón de pierna', NULL, 'proteina', 'gramos', 50),
+    ('Perico', 'Huevos revueltos con tomate y cebolla', NULL, 'proteina', 'gramos', 100),
+    ('Carne mechada', 'Carne de res desmechada', NULL, 'proteina', 'gramos', 80),
+    ('Pernil', 'Pernil de cerdo', NULL, 'proteina', 'gramos', 80),
+    ('Carne molida', 'Carne molida de res', NULL, 'proteina', 'gramos', 80),
+    ('Pollo desmechado', 'Pollo desmenuzado', NULL, 'proteina', 'gramos', 80),
+    ('Chorizo', 'Chorizo español', NULL, 'proteina', 'gramos', 50),
+    ('Atún', 'Atún enlatado', NULL, 'proteina', 'gramos', 60),
+    ('Cazón', 'Pescado cazón', NULL, 'proteina', 'gramos', 100),
+    ('Pavo', 'Pavo en lonchas', NULL, 'proteina', 'gramos', 50),
+    ('Queso crema', 'Queso crema untable', NULL, 'proteina', 'gramos', 30),
+    
+    -- Carbohidratos adicionales
+    ('Arepa', 'Arepa de maíz', NULL, 'carbohidrato', 'unidad', 1),
+    ('Empanada (masa)', 'Masa de empanada frita', NULL, 'carbohidrato', 'unidad', 1),
+    ('Cachapa', 'Cachapa de maíz', NULL, 'carbohidrato', 'unidad', 1),
+    ('Pan de sandwich', 'Pan de molde para sandwich', NULL, 'carbohidrato', 'rebanadas', 2),
+    ('Pastelito (masa)', 'Masa de pastelito frita', NULL, 'carbohidrato', 'unidad', 1),
+    ('Cachito (masa)', 'Croissant venezolano', NULL, 'carbohidrato', 'unidad', 1),
+    ('Arroz blanco', 'Arroz blanco cocido', NULL, 'carbohidrato', 'gramos', 150),
+    ('Pasta', 'Pasta cocida', NULL, 'carbohidrato', 'gramos', 200),
+    ('Yuca', 'Yuca cocida', NULL, 'carbohidrato', 'gramos', 100),
+    ('Plátano frito', 'Plátano maduro frito', NULL, 'carbohidrato', 'gramos', 50),
+    ('Tostones', 'Plátano verde frito', NULL, 'carbohidrato', 'gramos', 60),
+    ('Maíz', 'Maíz cocido', NULL, 'carbohidrato', 'gramos', 80),
+    ('Pan', 'Pan tradicional', NULL, 'carbohidrato', 'unidad', 1),
+    
+    -- Vegetales adicionales
+    ('Caraotas negras', 'Frijoles negros cocidos', NULL, 'vegetal', 'gramos', 100),
+    ('Auyama', 'Calabaza cocida', NULL, 'vegetal', 'gramos', 80),
+    ('Lechuga', 'Lechuga fresca', NULL, 'vegetal', 'gramos', 50),
+    ('Cebolla', 'Cebolla', NULL, 'vegetal', 'gramos', 30),
+    ('Cilantro', 'Cilantro fresco', NULL, 'vegetal', 'gramos', 10),
+    ('Perejil', 'Perejil fresco', NULL, 'vegetal', 'gramos', 10),
+    ('Espinaca', 'Espinaca', NULL, 'vegetal', 'gramos', 80),
+    ('Champiñones', 'Champiñones', NULL, 'vegetal', 'gramos', 80),
     
     -- Salsas y aderezos
-    ('Mayonesa', 'Mayonesa'),
-    ('Salsa de tomate', 'Salsa de tomate cocida'),
-    ('Salsa bechamel', 'Salsa bechamel'),
-    ('Salsa pesto', 'Salsa de albahaca'),
-    ('Salsa alfredo', 'Salsa cremosa alfredo'),
-    ('Salsa carbonara', 'Salsa carbonara con huevo'),
-    ('Salsa boloñesa', 'Salsa de carne molida'),
-    ('Salsa de champiñones', 'Salsa cremosa de champiñones'),
-    ('Salsa verde', 'Salsa verde de perejil'),
+    ('Mayonesa', 'Mayonesa', NULL, 'salsa', 'gramos', 20),
+    ('Salsa de tomate', 'Salsa de tomate cocida', NULL, 'salsa', 'gramos', 30),
+    ('Salsa bechamel', 'Salsa bechamel', NULL, 'salsa', 'gramos', 50),
+    ('Salsa pesto', 'Salsa de albahaca', NULL, 'salsa', 'gramos', 40),
+    ('Salsa alfredo', 'Salsa cremosa alfredo', NULL, 'salsa', 'gramos', 80),
+    ('Salsa carbonara', 'Salsa carbonara con huevo', NULL, 'salsa', 'gramos', 80),
+    ('Salsa boloñesa', 'Salsa de carne molida', NULL, 'salsa', 'gramos', 100),
+    ('Salsa de champiñones', 'Salsa cremosa de champiñones', NULL, 'salsa', 'gramos', 80),
+    ('Salsa verde', 'Salsa verde de perejil', NULL, 'salsa', 'gramos', 40),
     
     -- Carnes preparadas
-    ('Carne de res', 'Carne de res en trozos'),
-    ('Asado negro', 'Carne en salsa dulce oscura'),
-    ('Parrilla mixta', 'Carnes variadas a la parrilla'),
-    ('Morcilla', 'Morcilla'),
-    ('Pollo a la brasa', 'Pollo marinado y asado'),
-    ('Pollo al horno', 'Pollo horneado con especias'),
-    ('Cordon bleu', 'Pechuga rellena de jamón y queso'),
+    ('Carne de res', 'Carne de res en trozos', NULL, 'proteina', 'gramos', 150),
+    ('Asado negro', 'Carne en salsa dulce oscura', NULL, 'proteina', 'gramos', 150),
+    ('Parrilla mixta', 'Carnes variadas a la parrilla', NULL, 'proteina', 'gramos', 200),
+    ('Morcilla', 'Morcilla', NULL, 'proteina', 'gramos', 80),
+    ('Pollo a la brasa', 'Pollo marinado y asado', NULL, 'proteina', 'gramos', 200),
+    ('Pollo al horno', 'Pollo horneado con especias', NULL, 'proteina', 'gramos', 180),
+    ('Cordon bleu', 'Pechuga rellena de jamón y queso', NULL, 'proteina', 'gramos', 200),
     
     -- Pescados
-    ('Merluza', 'Filete de merluza'),
-    ('Trucha', 'Trucha entera o filete'),
-    ('Pargo', 'Pargo entero'),
-    ('Mero', 'Filete de mero'),
-    ('Camarones', 'Camarones'),
-    ('Mejillones', 'Mejillones'),
-    ('Calamares', 'Calamares'),
+    ('Merluza', 'Filete de merluza', NULL, 'proteina', 'gramos', 150),
+    ('Trucha', 'Trucha entera o filete', NULL, 'proteina', 'gramos', 180),
+    ('Pargo', 'Pargo entero', NULL, 'proteina', 'gramos', 200),
+    ('Mero', 'Filete de mero', NULL, 'proteina', 'gramos', 150),
+    ('Camarones', 'Camarones', NULL, 'proteina', 'gramos', 120),
+    ('Mejillones', 'Mejillones', NULL, 'proteina', 'gramos', 100),
+    ('Calamares', 'Calamares', NULL, 'proteina', 'gramos', 120),
     
     -- Otros
-    ('Ensalada mixta', 'Ensalada de vegetales'),
-    ('Crutones', 'Pan tostado en cubos'),
-    ('Queso parmesano', 'Queso parmesano rallado'),
-    ('Panceta', 'Tocino o panceta'),
-    ('Piñones', 'Piñones'),
-    ('Limón', 'Limón'),
-    ('Aceite de oliva', 'Aceite de oliva'),
-    ('Ajo', 'Ajo'),
-    ('Crema', 'Crema de leche'),
-    ('Mantequilla', 'Mantequilla')
+    ('Ensalada mixta', 'Ensalada de vegetales', NULL, 'vegetal', 'gramos', 100),
+    ('Crutones', 'Pan tostado en cubos', NULL, 'carbohidrato', 'gramos', 20),
+    ('Queso parmesano', 'Queso parmesano rallado', NULL, 'proteina', 'gramos', 20),
+    ('Panceta', 'Tocino o panceta', NULL, 'proteina', 'gramos', 30),
+    ('Piñones', 'Piñones', NULL, 'fruta', 'gramos', 20),
+    ('Limón', 'Limón', NULL, 'fruta', 'unidad', 1),
+    ('Aceite de oliva', 'Aceite de oliva', NULL, 'salsa', 'gramos', 10),
+    ('Ajo', 'Ajo', NULL, 'vegetal', 'gramos', 5),
+    ('Crema', 'Crema de leche', NULL, 'salsa', 'gramos', 30),
+    ('Mantequilla', 'Mantequilla', NULL, 'salsa', 'gramos', 20)
 ON CONFLICT DO NOTHING;
 
 -- ===================================

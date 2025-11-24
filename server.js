@@ -114,11 +114,15 @@ const participantesRoutes = require('./routes/participantes')(gameController);
 const sesionesRoutes = require('./routes/sesiones')(gameController);
 const menuRoutes = require('./routes/menu')(gameController);
 const decisionesRoutes = require('./routes/decisiones')(gameController);
+const personajesRoutes = require('./routes/personajes')(gameController);
+const ingredientesRoutes = require('./routes/ingredientes')(gameController);
 
 app.use('/api/participantes', participantesRoutes);
 app.use('/api/sesiones', sesionesRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/decisiones', decisionesRoutes);
+app.use('/api/personajes', personajesRoutes);
+app.use('/api/ingredientes', ingredientesRoutes);
 
 // ===================================
 // ENDPOINTS DE SISTEMA
@@ -284,6 +288,8 @@ server.listen(port, async () => {
   console.log('  - POST /api/participantes');
   console.log('  - POST /api/sesiones');
   console.log('  - GET  /api/menu');
+  console.log('  - GET  /api/personajes');
+  console.log('  - GET  /api/ingredientes');
   console.log('  - POST /api/decisiones');
   console.log('  - GET  /admin');
   console.log('  - GET  /juego');

@@ -93,6 +93,44 @@ class GameDataController {
   }
 
   // ===================================
+  // PERSONAJES
+  // ===================================
+
+  async obtenerPersonajes() {
+    const query = 'SELECT * FROM Personajes ORDER BY PK_personaje';
+    const result = await this.pool.query(query);
+    return result.rows;
+  }
+
+  async obtenerPersonaje(id) {
+    const query = 'SELECT * FROM Personajes WHERE PK_personaje = $1';
+    const result = await this.pool.query(query, [id]);
+    return result.rows[0];
+  }
+
+  // ===================================
+  // INGREDIENTES (COMPONENTES)
+  // ===================================
+
+  async obtenerIngredientes() {
+    const query = 'SELECT * FROM Componentes ORDER BY categoria, nombre';
+    const result = await this.pool.query(query);
+    return result.rows;
+  }
+
+  async obtenerIngredientesPorCategoria(categoria) {
+    const query = 'SELECT * FROM Componentes WHERE categoria = $1 ORDER BY nombre';
+    const result = await this.pool.query(query, [categoria]);
+    return result.rows;
+  }
+
+  async obtenerIngrediente(id) {
+    const query = 'SELECT * FROM Componentes WHERE PK_alimento = $1';
+    const result = await this.pool.query(query, [id]);
+    return result.rows[0];
+  }
+
+  // ===================================
   // MENÚ
   // ===================================
 

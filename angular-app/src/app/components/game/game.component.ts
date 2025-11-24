@@ -74,7 +74,7 @@ export class GameComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(ingredientes => this.ingredientes = ingredientes);
 
-    // Inicializar juego
+    // Inicializar juego (cargar datos desde API)
     this.inicializarJuego();
   }
 
@@ -84,14 +84,28 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   inicializarJuego(): void {
-    // Resetear juego
-    this.gameDataService.resetearJuego();
-
-    // Cargar primer personaje
-    const primerPersonaje = this.gameDataService.obtenerSiguientePersonaje();
-    if (primerPersonaje) {
-      this.seleccionarPersonaje(primerPersonaje);
-    }
+    this.loading = true;
+    
+    // Cargar datos desde la API
+    this.gameDataService.inicializarDatos().subscribe({
+      next: () => {
+        this.loading = false;
+        
+        // Resetear estados
+        this.gameDataService.resetearJuego();
+        
+        // Cargar primer personaje
+        const primerPersonaje = this.gameDataService.obtenerSiguientePersonaje();
+        if (primerPersonaje) {
+          this.seleccionarPersonaje(primerPersonaje);
+        }
+      },
+      error: (error) => {
+        console.error('Error al inicializar juego:', error);
+        this.loading = false;
+        this.mostrarError('Error al cargar los datos del juego. Por favor, recarga la página.');
+      }
+    });
   }
 
   seleccionarPersonaje(personaje: PersonajeSintetico): void {
@@ -141,73 +155,51 @@ export class GameComponent implements OnInit, OnDestroy {
       personaje_tipo: this.personajeActual.tipo,
       personaje_edad_rango: this.personajeActual.edad_rango,
       personaje_sexo: this.personajeActual.sexo,
+      personaje_id: this.personajeActual.id,
       componentes_servidos: componentesServidos,
       tiempo_decision_ms: tiempoDecision,
       orden_servicio: this.gameDataService.getOrdenServicioActual()
     };
 
-    // Guardar decisión temporalmente
-    this.gameDataService.agregarDecisionTemporal(decision);
+    // Guardar decisión inmediatamente en la base de datos
+    this.enviandoDecisiones = true;
+    this.gameDataService.guardarDecision(decision).subscribe({
+      next: (response) => {
+        this.enviandoDecisiones = false;
+        
+        // Marcar personaje como servido
+        this.gameDataService.marcarPersonajeServido(this.personajeActual!.id);
 
-    // Marcar personaje como servido
-    this.gameDataService.marcarPersonajeServido(this.personajeActual.id);
+        // Mostrar mensaje de éxito
+        this.mostrarExito(`¡Plato servido para ${this.personajeActual!.nombre}!`);
 
-    // Mostrar mensaje de éxito
-    this.mostrarExito(`¡Plato servido para ${this.personajeActual.nombre}!`);
+        // Limpiar plato
+        this.limpiarPlato();
 
-    // Pasar al siguiente personaje o escenario
-    setTimeout(() => {
-      this.siguienteAccion();
-    }, 1500);
+        // Pasar al siguiente personaje automáticamente
+        setTimeout(() => {
+          this.siguienteAccion();
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Error al guardar decisión:', error);
+        this.enviandoDecisiones = false;
+        this.mostrarError('Error al guardar el plato. Por favor, intenta nuevamente.');
+      }
+    });
   }
 
   private siguienteAccion(): void {
-    // Verificar si quedan personajes en el escenario actual
+    // Verificar si quedan personajes pendientes
     const siguientePersonaje = this.gameDataService.obtenerSiguientePersonaje();
 
     if (siguientePersonaje) {
-      // Seleccionar siguiente personaje
+      // Seleccionar siguiente personaje automáticamente
       this.seleccionarPersonaje(siguientePersonaje);
     } else {
-      // Todos los personajes servidos en este escenario
-      this.finalizarEscenario();
+      // Todos los personajes servidos - finalizar juego
+      this.finalizarJuego();
     }
-  }
-
-  private finalizarEscenario(): void {
-    this.mostrarExito(`¡${this.getNombreEscenario()} completado!`);
-
-    if (!this.gameDataService.esUltimoEscenario()) {
-      // Pasar al siguiente escenario después de una pausa
-      setTimeout(() => {
-        this.gameDataService.siguienteEscenario();
-        const primerPersonaje = this.gameDataService.obtenerSiguientePersonaje();
-        if (primerPersonaje) {
-          this.seleccionarPersonaje(primerPersonaje);
-        }
-      }, 2000);
-    } else {
-      // Juego completado - enviar todas las decisiones
-      this.enviarTodasLasDecisiones();
-    }
-  }
-
-  private enviarTodasLasDecisiones(): void {
-    this.enviandoDecisiones = true;
-    const decisiones = this.gameDataService.obtenerDecisionesTemporales();
-
-    this.apiService.registrarDecisionesBatch(decisiones).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.finalizarJuego();
-        }
-      },
-      error: (error) => {
-        console.error('Error al enviar decisiones:', error);
-        this.mostrarError('Error al guardar los datos. Por favor, intente nuevamente.');
-        this.enviandoDecisiones = false;
-      }
-    });
   }
 
   private finalizarJuego(): void {
@@ -263,5 +255,20 @@ export class GameComponent implements OnInit, OnDestroy {
   // Métodos para filtrar ingredientes por categoría
   getIngredientesPorCategoria(categoria: string): Ingrediente[] {
     return this.ingredientes.filter(i => i.categoria === categoria);
+  }
+
+  // Métodos para el progreso
+  getPersonajesServidos(): number {
+    return this.personajes.filter(p => p.estado === 'servido').length;
+  }
+
+  getTotalPersonajes(): number {
+    return this.personajes.length;
+  }
+
+  getProgresoPercentage(): number {
+    const total = this.getTotalPersonajes();
+    if (total === 0) return 0;
+    return (this.getPersonajesServidos() / total) * 100;
   }
 }
