@@ -53,6 +53,33 @@ export class ApiService {
   }
 
   // ===================================
+  // PERSONAJES
+  // ===================================
+
+  obtenerPersonajes(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/personajes`);
+  }
+
+  obtenerPersonaje(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/personajes/${id}`);
+  }
+
+  // ===================================
+  // INGREDIENTES
+  // ===================================
+
+  obtenerIngredientes(categoria?: string): Observable<any> {
+    const url = categoria 
+      ? `${this.apiUrl}/ingredientes?categoria=${categoria}`
+      : `${this.apiUrl}/ingredientes`;
+    return this.http.get(url);
+  }
+
+  obtenerIngrediente(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/ingredientes/${id}`);
+  }
+
+  // ===================================
   // MENÚ
   // ===================================
 

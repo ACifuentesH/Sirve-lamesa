@@ -1,7 +1,10 @@
 <div class="game-container">
   <!-- Header -->
   <header class="game-header">
-    <h1 class="font-title font-title-watermelon">{{ getNombreEscenario() }}</h1>
+    <h1 class="font-title font-title-watermelon">Sirve la Mesa</h1>
+    <div class="escenario-info">
+      <span class="font-text">Estás sirviendo: <strong>{{ getNombreEscenario() }}</strong></span>
+    </div>
     <div class="participante-info">
       <span class="font-text">{{ authService.getParticipante()?.nombres }}</span>
     </div>
@@ -66,4 +69,21 @@
     </div>
   </div>
 
+  <!-- Indicador de progreso -->
+  <div class="progreso-container" *ngIf="!juegoCompletado">
+    <div class="progreso-personajes">
+      <span class="font-text">
+        Progreso: {{ getPersonajesServidos() }} / {{ getTotalPersonajes() }} personajes servidos
+      </span>
+      <div class="barra-progreso">
+        <div class="barra-progreso-fill" [style.width.%]="getProgresoPercentage()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicador de carga -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p class="font-text">Cargando datos del juego...</p>
+  </div>
 </div>
