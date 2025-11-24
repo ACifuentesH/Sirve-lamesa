@@ -40,6 +40,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Eliminar el trigger si existe antes de crearlo
+DROP TRIGGER IF EXISTS trigger_calcular_duracion ON Sesiones_juego;
+
 CREATE TRIGGER trigger_calcular_duracion
 BEFORE UPDATE ON Sesiones_juego
 FOR EACH ROW

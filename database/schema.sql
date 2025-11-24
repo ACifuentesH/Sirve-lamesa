@@ -1,6 +1,19 @@
 -- Esquema de base de datos para "Sirve la Mesa"
 -- Tablas del sistema de menús según el diagrama
 
+-- Limpiar tablas existentes en el orden correcto (respetando dependencias)
+DROP TABLE IF EXISTS Decisiones_porcionamiento CASCADE;
+DROP TABLE IF EXISTS Sesiones_juego CASCADE;
+DROP TABLE IF EXISTS Participantes CASCADE;
+DROP TABLE IF EXISTS Porcion CASCADE;
+DROP TABLE IF EXISTS Menu_bebida CASCADE;
+DROP TABLE IF EXISTS Menu_plato CASCADE;
+DROP TABLE IF EXISTS Plato CASCADE;
+DROP TABLE IF EXISTS Componentes CASCADE;
+DROP TABLE IF EXISTS Bebida CASCADE;
+DROP TABLE IF EXISTS Menu CASCADE;
+DROP TABLE IF EXISTS Personajes CASCADE;
+
 -- Tabla Menu
 CREATE TABLE IF NOT EXISTS Menu (
     PK_menu SERIAL PRIMARY KEY,
