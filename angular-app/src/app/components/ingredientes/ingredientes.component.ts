@@ -16,12 +16,11 @@ export class IngredientesComponent implements OnInit {
   @Input() escenarioActual: 'desayuno' | 'almuerzo' | 'cena' = 'desayuno';
   @Output() ingredienteSeleccionado = new EventEmitter<Ingrediente>();
 
-  categoriaSeleccionada = 'todos';
+  categoriaSeleccionada = 'proteina';
   ingredientesFiltrados: Ingrediente[] = [];
 
-  // Categorías disponibles
+  // Categorías disponibles (sin "Todos")
   categorias = [
-    { id: 'todos', nombre: 'Todos', icono: '🍽️' },
     { id: 'proteina', nombre: 'Proteínas', icono: '🥩' },
     { id: 'carbohidrato', nombre: 'Carbohidratos', icono: '🍞' },
     { id: 'vegetal', nombre: 'Vegetales', icono: '🥕' },
@@ -29,17 +28,12 @@ export class IngredientesComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.filtrarPorCategoria('todos');
+    this.filtrarPorCategoria('proteina');
   }
 
   filtrarPorCategoria(categoria: string): void {
     this.categoriaSeleccionada = categoria;
-
-    if (categoria === 'todos') {
-      this.ingredientesFiltrados = this.ingredientes;
-    } else {
-      this.ingredientesFiltrados = this.ingredientes.filter(i => i.categoria === categoria);
-    }
+    this.ingredientesFiltrados = this.ingredientes.filter(i => i.categoria === categoria);
   }
 
   // Método para determinar qué ingredientes mostrar según el escenario

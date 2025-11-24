@@ -1,30 +1,36 @@
 .game-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #F8F8F8 0%, #FFFFFF 100%);
+  height: 100vh;
+  background: var(--color-azul-claro);
   display: flex;
   flex-direction: column;
+  overflow: hidden; // Sin scroll
 }
 
 // Header
 .game-header {
   background: var(--color-verde);
   color: white;
-  padding: 20px;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 
   h1 {
-    font-size: 2.5em;
+    font-size: 2em;
     margin: 0;
+    
+    &.font-title-watermelon {
+      font-family: 'Watermelon', sans-serif !important;
+      font-weight: normal !important;
+    }
   }
 
   .participante-info {
     background: rgba(255, 255, 255, 0.2);
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 20px;
-    font-size: 1.1em;
+    font-size: 1em;
   }
 }
 
@@ -73,29 +79,65 @@
 .game-content {
   flex: 1;
   display: grid;
-  grid-template-columns: 300px 1fr 300px;
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: 280px 1fr;
+  gap: 15px;
+  padding: 15px;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  overflow: hidden; // Sin scroll
+  min-height: 0; // Permite que el grid se ajuste
 }
 
-// Paneles laterales
-.ingredientes-panel,
-.personajes-panel {
-  background: white;
+// Panel de ingredientes debajo de la mesa
+.ingredientes-panel {
+  background: var(--color-azul-claro);
   border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  padding: 15px;
+  overflow: hidden; // Sin scroll
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // Permite que el flex se ajuste
+  width: 100%;
 
   h2 {
-    color: var(--color-verde);
-    margin-bottom: 20px;
+    color: var(--color-azul);
+    margin-bottom: 15px;
     text-align: center;
-    font-size: 1.8em;
+    font-size: 1.5em;
+    flex-shrink: 0;
+    font-weight: 700;
+    
+    &.font-title-watermelon {
+      font-family: 'Watermelon', sans-serif !important;
+      font-weight: normal !important;
+    }
+  }
+}
+
+// Panel de personajes
+.personajes-panel {
+  background: var(--color-azul-claro);
+  border-radius: 15px;
+  padding: 15px;
+  overflow-y: auto; // Scrollable
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // Permite que el flex se ajuste
+
+  h2 {
+    color: var(--color-azul);
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.5em;
+    flex-shrink: 0;
+    font-weight: 700;
+    
+    &.font-title-watermelon {
+      font-family: 'Watermelon', sans-serif !important;
+      font-weight: normal !important;
+    }
   }
 }
 
@@ -104,27 +146,37 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
+  justify-content: flex-start;
+  gap: 10px;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .personaje-actual-info {
   text-align: center;
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  flex-shrink: 0;
+  border: none;
 
   h3 {
     color: var(--color-azul);
-    margin-bottom: 10px;
-    font-size: 1.5em;
-  }
-
-  p {
-    color: var(--color-verde);
+    margin: 0;
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: 700;
+    display: inline;
+    
+    &.font-title-watermelon {
+      font-family: 'Watermelon', sans-serif !important;
+      font-weight: normal !important;
+    }
+    
+    span {
+      color: var(--color-azul);
+      font-size: 1em;
+      font-weight: 400;
+    }
   }
 }
 
@@ -139,11 +191,11 @@
 
 .completado-content {
   text-align: center;
-  background: white;
+  background: var(--color-azul-claro);
   padding: 60px;
   border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   max-width: 600px;
+  border: 2px solid var(--color-azul);
 
   h1 {
     color: var(--color-verde);
@@ -160,9 +212,9 @@
 
 // Indicador de progreso
 .progreso-container {
-  background: white;
-  padding: 15px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  background: var(--color-azul-claro);
+  padding: 10px 15px;
+  flex-shrink: 0;
 }
 
 .progreso-escenarios {
@@ -172,17 +224,18 @@
 }
 
 .escenario-item {
-  padding: 10px 30px;
+  padding: 8px 20px;
   border-radius: 20px;
   background: var(--color-azul-claro);
   color: var(--color-verde);
   font-weight: bold;
   transition: all 0.3s ease;
+  font-size: 0.9em;
 
   &.activo {
     background: var(--color-rosa);
     color: white;
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
 
   &.completado {

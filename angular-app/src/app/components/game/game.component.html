@@ -1,7 +1,7 @@
 <div class="game-container">
   <!-- Header -->
   <header class="game-header">
-    <h1 class="font-title">{{ getNombreEscenario() }}</h1>
+    <h1 class="font-title font-title-watermelon">{{ getNombreEscenario() }}</h1>
     <div class="participante-info">
       <span class="font-text">{{ authService.getParticipante()?.nombres }}</span>
     </div>
@@ -19,41 +19,41 @@
 
   <!-- Contenido principal -->
   <div class="game-content" *ngIf="!juegoCompletado">
-    <!-- Panel izquierdo: Ingredientes -->
-    <aside class="ingredientes-panel">
-      <h2 class="font-title">Ingredientes</h2>
-      <app-ingredientes
-        [ingredientes]="ingredientes"
-        [escenarioActual]="escenarioActual"
-        (ingredienteSeleccionado)="onIngredienteSeleccionado($event)">
-      </app-ingredientes>
-    </aside>
-
-    <!-- Centro: Plato -->
-    <main class="plato-section">
-      <div class="personaje-actual-info" *ngIf="personajeActual">
-        <h3 class="font-title">Sirviendo a:</h3>
-        <p class="font-text">{{ personajeActual.nombre }}</p>
-      </div>
-
-      <app-plato-drop-zone
-        [ingredientesEnPlato]="ingredientesEnPlato"
-        (ingredienteAgregado)="onIngredienteAgregado($event)"
-        (ingredienteEliminado)="onIngredienteEliminado($event)"
-        (platoServido)="onPlatoServido($event)"
-        (limpiarSolicitado)="onLimpiarPlato()">
-      </app-plato-drop-zone>
-    </main>
-
-    <!-- Panel derecho: Personajes -->
+    <!-- Panel izquierdo: Personajes -->
     <aside class="personajes-panel">
-      <h2 class="font-title">Personajes</h2>
+      <h2 class="font-title font-title-watermelon">Personajes</h2>
       <app-personajes
         [personajes]="personajes"
         [personajeActual]="personajeActual"
         (personajeSeleccionado)="onPersonajeSeleccionado($event)">
       </app-personajes>
     </aside>
+
+    <!-- Centro: Plato e Ingredientes -->
+    <main class="plato-section">
+      <div class="personaje-actual-info" *ngIf="personajeActual">
+        <h3 class="font-title font-title-watermelon">Sirviendo a: <span class="font-text">{{ personajeActual.nombre }}</span></h3>
+      </div>
+
+      <app-plato-drop-zone
+        [ingredientesEnPlato]="ingredientesEnPlato"
+        [personajeActual]="personajeActual"
+        (ingredienteAgregado)="onIngredienteAgregado($event)"
+        (ingredienteEliminado)="onIngredienteEliminado($event)"
+        (platoServido)="onPlatoServido($event)"
+        (limpiarSolicitado)="onLimpiarPlato()">
+      </app-plato-drop-zone>
+
+      <!-- Panel de ingredientes debajo de la mesa -->
+      <aside class="ingredientes-panel">
+        <h2 class="font-title font-title-watermelon">Ingredientes</h2>
+        <app-ingredientes
+          [ingredientes]="ingredientes"
+          [escenarioActual]="escenarioActual"
+          (ingredienteSeleccionado)="onIngredienteSeleccionado($event)">
+        </app-ingredientes>
+      </aside>
+    </main>
   </div>
 
   <!-- Pantalla de juego completado -->
@@ -66,23 +66,4 @@
     </div>
   </div>
 
-  <!-- Indicador de progreso -->
-  <div class="progreso-container">
-    <div class="progreso-escenarios">
-      <div class="escenario-item"
-           [class.activo]="escenarioActual === 'desayuno'"
-           [class.completado]="escenarioActual !== 'desayuno'">
-        <span class="font-text">Desayuno</span>
-      </div>
-      <div class="escenario-item"
-           [class.activo]="escenarioActual === 'almuerzo'"
-           [class.completado]="escenarioActual === 'cena'">
-        <span class="font-text">Almuerzo</span>
-      </div>
-      <div class="escenario-item"
-           [class.activo]="escenarioActual === 'cena'">
-        <span class="font-text">Cena</span>
-      </div>
-    </div>
-  </div>
 </div>

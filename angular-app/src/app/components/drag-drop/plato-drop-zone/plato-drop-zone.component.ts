@@ -28,6 +28,7 @@ interface DropPoint {
 })
 export class PlatoDropZoneComponent {
   @Input() ingredientesEnPlato: IngredienteEnPlato[] = [];
+  @Input() personajeActual: any = null; // Personaje actual para mostrar su imagen
   @Output() ingredienteAgregado = new EventEmitter<IngredienteEnPlato>();
   @Output() ingredienteEliminado = new EventEmitter<number>();
   @Output() platoServido = new EventEmitter<ComponenteServido[]>();
@@ -40,6 +41,14 @@ export class PlatoDropZoneComponent {
   mantelImagen = 'assets/images/ingredientes/mantel.png';
   platoImagen = 'assets/images/ingredientes/plato.png';
   isDragOver = false;
+
+  get personajeImagen(): string | null {
+    if (this.personajeActual?.imagen) {
+      return `assets/images/ingredientes/${this.personajeActual.imagen}`;
+    }
+    // Por ahora usar el niño por defecto
+    return 'assets/images/ingredientes/niño.png';
+  }
 
   private readonly tamanosVisuales: Record<number, number> = {
     1: 55, 2: 55, 3: 50, 4: 55, 5: 45, 6: 40, 7: 45,

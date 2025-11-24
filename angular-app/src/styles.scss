@@ -15,11 +15,19 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Watermelon';
+  src: url('./assets/fonts/Gildsley DEMO.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 // Variables de colores del proyecto
 :root {
-  --color-verde: #25533F;
+  --color-verde: #6B9B7A; // Verde más claro y sutil
+  --color-verde-oscuro: #4A7A5A; // Para contrastes cuando sea necesario
   --color-azul: #52A5CE;
-  --color-azul-claro: #B8CEE8;
+  --color-azul-claro: #f8ffc9; // Amarillo claro para fondos
   --color-rosa: #FF7BAC;
   --color-naranja: #EF6F3C;
   --color-blanco: #FFFFFF;
@@ -34,19 +42,34 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Montserrat', sans-serif;
   background: var(--color-blanco);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden; // Sin scroll en toda la página
 }
 
 // Clases utilitarias
 .font-title {
-  font-family: 'Rocket Raccoon', sans-serif;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.font-title-watermelon {
+  font-family: 'Watermelon', sans-serif !important;
+  font-weight: normal !important;
+}
+
+// Asegurar que Watermelon se aplique a los títulos específicos
+h1.font-title-watermelon,
+h2.font-title-watermelon,
+h3.font-title-watermelon {
+  font-family: 'Watermelon', sans-serif !important;
+  font-weight: normal !important;
 }
 
 .font-text {
-  font-family: 'Gildsley', sans-serif;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
 }
 
 // Scrollbar personalizada

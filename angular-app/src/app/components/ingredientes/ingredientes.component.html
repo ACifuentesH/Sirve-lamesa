@@ -1,4 +1,5 @@
 <div class="ingredientes-container">
+  <!-- Botones fuera de la nevera -->
   <div class="tabs-container">
     <div class="tabs">
       <button
@@ -13,8 +14,9 @@
     </div>
   </div>
 
-  <div class="menu-section" [class.empty]="getIngredientesParaEscenario().length === 0">
-    <div class="food-grid">
+  <!-- Panel de ingredientes -->
+  <div class="ingredientes-panel-content">
+    <div class="food-grid" *ngIf="getIngredientesParaEscenario().length > 0">
       <app-ingrediente
         *ngFor="let ingrediente of getIngredientesParaEscenario()"
         [ingrediente]="ingrediente"

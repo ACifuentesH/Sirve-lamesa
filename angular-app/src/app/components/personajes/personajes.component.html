@@ -1,7 +1,8 @@
 <div class="personajes-container">
   <div class="personaje-card" 
        *ngFor="let personaje of personajes"
-       [class]="getEstadoClass(personaje)"
+       [class.activo]="personajeActual?.id === personaje.id"
+       [class.servido]="personaje.estado === 'servido'"
        [class.clickable]="personaje.estado !== 'servido'"
        (click)="seleccionarPersonaje(personaje)">
     
@@ -14,11 +15,6 @@
       </div>
     </div>
     
-    <div class="personaje-info">
-      <h4 class="personaje-nombre font-text">{{ personaje.nombre }}</h4>
-      <p class="personaje-estado" [class.servido]="personaje.estado === 'servido'">
-        {{ getEstadoTexto(personaje.estado) }}
-      </p>
-    </div>
+    <h4 class="personaje-nombre font-text">{{ personaje.nombre }}</h4>
   </div>
 </div>

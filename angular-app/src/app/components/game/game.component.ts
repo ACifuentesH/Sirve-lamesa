@@ -264,4 +264,39 @@ export class GameComponent implements OnInit, OnDestroy {
   getIngredientesPorCategoria(categoria: string): Ingrediente[] {
     return this.ingredientes.filter(i => i.categoria === categoria);
   }
+
+  getCantidadTotal(): number {
+    return this.ingredientesEnPlato.reduce((total, item) => {
+      if (item.unidad === 'gramos') {
+        return total + item.cantidad;
+      }
+
+      if (item.unidad === 'unidad' || item.unidad === 'unidades') {
+        const pesosPorUnidad: { [key: string]: number } = {
+          'Huevo Frito': 50,
+          'Bagel': 100,
+          'Croissant': 60,
+          'Muffin': 80,
+          'Manzana': 180,
+          'Naranja': 150,
+          'Cambur': 120,
+          'Durazno': 150,
+          'Tomate Cherry': 20
+        };
+        const pesoPorUnidad = pesosPorUnidad[item.ingrediente.nombre] || 100;
+        return total + (item.cantidad * pesoPorUnidad);
+      }
+
+      if (item.unidad === 'rebanadas') {
+        return total + (item.cantidad * 30);
+      }
+
+      return total;
+    }, 0);
+  }
+
+  onServirPlato(): void {
+    if (!this.platoDropZoneComponent) return;
+    this.platoDropZoneComponent.servirPlato();
+  }
 }

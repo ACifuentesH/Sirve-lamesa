@@ -3,61 +3,65 @@
   flex-direction: column;
   gap: 12px;
   height: 100%;
+  overflow: hidden;
+  min-height: 0;
 }
 
+// Botones fuera de la nevera
 .tabs-container {
-  position: relative;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  flex-shrink: 0;
 }
 
 .tabs {
   display: flex;
   flex-direction: row;
-  gap: 10px;
-  padding: 0 20px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  gap: 6px;
+  padding: 0;
+  overflow: visible;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .tab-button {
-  padding: 10px 20px;
-  background: #FFFFFF;
-  border: 3px solid #25533F;
-  border-radius: 25px;
-  font-family: 'Gildsley', sans-serif;
-  font-size: 1em;
-  font-weight: bold;
-  color: #25533F;
+  padding: 5px 12px;
+  background: var(--color-azul-claro);
+  border: 2px solid var(--color-azul);
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75em;
+  font-weight: 600;
+  color: var(--color-azul);
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
   flex-shrink: 0;
 
   &.active {
-    background: #52A5CE;
+    background: var(--color-azul);
     color: #FFFFFF;
-    border-color: #52A5CE;
+    border-color: var(--color-azul);
   }
 
-  &:hover {
-    background: #F8F8F8;
-    border-color: #52A5CE;
+  &:hover:not(.active) {
+    background: var(--color-azul);
+    color: #FFFFFF;
+    border-color: var(--color-azul);
   }
 }
 
-.menu-section {
+// Panel de ingredientes
+.ingredientes-panel-content {
   flex: 1;
-  background: transparent;
-  padding: 10px 0;
+  padding: 15px 20px;
+  overflow-y: hidden;
+  overflow-x: auto;
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  flex-direction: row;
+  min-height: 0;
+  align-items: center;
+  justify-content: center; // Centrar los alimentos
 
   &.empty {
     align-items: center;
@@ -66,19 +70,20 @@
 }
 
 .food-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  display: flex;
+  flex-direction: row;
   gap: 15px;
   padding: 10px 0;
-  overflow: visible;
-  justify-items: center;
+  align-items: center;
+  min-width: min-content;
+  justify-content: center; // Centrar los alimentos
 }
 
 .no-ingredientes {
   text-align: center;
-  color: #25533F;
-  font-weight: bold;
-  padding: 20px;
+  color: var(--color-verde);
+  font-weight: 500;
+  padding: 40px 20px;
 }
 
 @media (max-width: 600px) {

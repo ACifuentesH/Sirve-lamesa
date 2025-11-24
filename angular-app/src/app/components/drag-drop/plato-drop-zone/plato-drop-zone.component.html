@@ -3,6 +3,7 @@
     <div class="table-scene">
       <div class="table-container">
         <div class="table-with-mantel">
+          <img [src]="personajeImagen" alt="Personaje" class="personaje-image" *ngIf="personajeImagen">
           <img [src]="mesaImagen" alt="Mesa" class="mesa-image">
           <img [src]="mantelImagen" alt="Mantel" class="mantel-image">
 
@@ -31,10 +32,6 @@
             </div>
 
           </div>
-
-          <div class="drag-hint font-text" *ngIf="ingredientesEnPlato.length === 0">
-            Arrastra la comida y suéltala sobre el plato
-          </div>
         </div>
       </div>
     </div>
@@ -45,16 +42,14 @@
       <span class="label">Total aproximado:</span>
       <span class="value">{{ cantidadTotal | number:'1.0-0' }} g</span>
     </div>
-    <div class="actions">
-      <button class="btn clear-plate-btn font-text" type="button" (click)="onLimpiarPlato()">
-        Limpiar Plato
-      </button>
-      <button class="btn btn-primary font-text"
-              type="button"
-              (click)="servirPlato()"
-              [disabled]="ingredientesEnPlato.length === 0">
-        Finalizar Plato
-      </button>
-    </div>
+    <button class="btn clear-plate-btn font-text" type="button" (click)="onLimpiarPlato()">
+      Limpiar Plato
+    </button>
+    <button class="btn btn-primary font-text"
+            type="button"
+            (click)="servirPlato()"
+            [disabled]="ingredientesEnPlato.length === 0">
+      Finalizar Plato
+    </button>
   </div>
 </div>
