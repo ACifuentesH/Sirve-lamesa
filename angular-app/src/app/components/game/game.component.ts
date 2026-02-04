@@ -225,7 +225,7 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
-  private limpiarPlato(): void {
+  limpiarPlato(): void {
     this.ingredientesEnPlato = [];
   }
 

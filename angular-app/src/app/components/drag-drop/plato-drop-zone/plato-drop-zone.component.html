@@ -18,7 +18,7 @@
             </div>
 
             <div class="food-on-plate"
-                 *ngFor="let item of ingredientesEnPlato; let i = index"
+                 *ngFor="let item of ingredientesEnPlato; let i = index; trackBy: trackByIndex"
                  [ngStyle]="{
                    'left.%': item.x,
                    'top.%': item.y,

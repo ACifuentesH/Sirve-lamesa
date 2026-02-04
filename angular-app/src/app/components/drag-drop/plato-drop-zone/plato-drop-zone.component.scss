@@ -161,7 +161,7 @@
 
 .button-container {
   position: relative;
-  z-index: 1;
+  z-index: 100; // Por encima de todos los elementos del plato
   margin-top: -130px;
   display: flex;
   flex-direction: row;
@@ -181,6 +181,8 @@
   padding: 6px 15px;
   border-radius: 25px;
   border: 2px solid var(--color-azul);
+  pointer-events: auto; // Asegurar que no interfiera con los clics
+  position: relative;
 
   .label {
     color: var(--color-azul);
@@ -214,6 +216,8 @@
   transition: all 0.3s ease;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  pointer-events: auto; // Asegurar que los botones capturen los clics
+  position: relative;
 }
 
 .btn-primary {

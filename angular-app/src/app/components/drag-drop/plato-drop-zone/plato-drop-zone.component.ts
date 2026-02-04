@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ComponenteServido } from '../../../models/decision.model';
 import { Ingrediente } from '../../../services/game-data.service';
@@ -26,7 +26,7 @@ interface DropPoint {
   templateUrl: './plato-drop-zone.component.html',
   styleUrls: ['./plato-drop-zone.component.scss']
 })
-export class PlatoDropZoneComponent {
+export class PlatoDropZoneComponent implements OnChanges {
   @Input() ingredientesEnPlato: IngredienteEnPlato[] = [];
   @Input() personajeActual: any = null; // Personaje actual para mostrar su imagen
   @Output() ingredienteAgregado = new EventEmitter<IngredienteEnPlato>();
@@ -59,6 +59,15 @@ export class PlatoDropZoneComponent {
   };
 
   constructor(private dragDropService: DragDropService) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Este método se llama cuando cambian los @Input()
+    // Angular detectará automáticamente los cambios en ingredientesEnPlato
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
 
   handleDragOver(event: DragEvent): void {
     event.preventDefault();
