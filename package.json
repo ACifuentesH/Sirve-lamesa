@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "dev:angular": "cd angular-app && npm start",
     "build:angular": "cd angular-app && npm run build:prod",
+    "init-db": "node init-database.js",
     "postinstall": "cd angular-app && npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

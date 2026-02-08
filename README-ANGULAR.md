@@ -10,6 +10,18 @@ npm install
 
 Esto instalará las dependencias del backend Y de Angular automáticamente.
 
+### 2. Inicializar la Base de Datos (SOLO LA PRIMERA VEZ)
+
+**⚠️ IMPORTANTE:** Este comando solo debe ejecutarse:
+- La primera vez que configuras el proyecto
+- Cuando necesites resetear completamente la base de datos
+
+```powershell
+# Esto creará las tablas y datos iniciales
+npm run init-db
+```
+
+**NOTA:** El servidor ya NO inicializa la base de datos automáticamente al arrancar. Esto permite que tus datos persistan entre reinicios del servidor.
 
 ### 3. Desarrollo
 
@@ -78,20 +90,27 @@ SirveLaMesa/
 
 ## 🛠️ Comandos Útiles
 
+### Inicialización (solo primera vez)
+```powershell
+# Crear/resetear base de datos con tablas y datos iniciales
+npm run init-db
+```
+
 ### Desarrollo
-```bash
+```powershell
 # Backend + Angular en paralelo (requiere 2 terminales)
 npm run dev          # Terminal 1
 npm run dev:angular  # Terminal 2
 ```
 
 ### Producción
-```bash
+```powershell
 # Build completo
 npm run build:angular
 
 # Servir en producción
-NODE_ENV=production npm start
+$env:NODE_ENV="production"  # PowerShell
+npm start
 ```
 
 ### Limpiar y reconstruir
@@ -107,13 +126,18 @@ cd angular-app && npm install && npm run build:prod
 
 ## 📝 Notas Importantes
 
-1. **CORS**: En desarrollo, Angular proxy maneja CORS. En producción, todo se sirve desde el mismo dominio.
+1. **Base de datos**: 
+   - La primera vez: ejecuta `npm run init-db` para crear las tablas
+   - El servidor ya NO resetea la base de datos al iniciar (los datos persisten)
+   - Solo ejecuta `npm run init-db` si necesitas resetear todo
 
-2. **Assets**: Las fuentes e imágenes DEBEN copiarse manualmente ya que son archivos binarios.
+2. **CORS**: En desarrollo, Angular proxy maneja CORS. En producción, todo se sirve desde el mismo dominio.
 
-3. **Base de datos**: Asegúrate de que PostgreSQL esté corriendo y las tablas estén creadas.
+3. **Assets**: Las fuentes e imágenes DEBEN copiarse manualmente ya que son archivos binarios.
 
-4. **Variables de entorno**: Usa `config.example.env` como plantilla para crear tu `.env`.
+4. **PostgreSQL**: Asegúrate de que PostgreSQL esté corriendo y accesible.
+
+5. **Variables de entorno**: Usa `config.example.env` como plantilla para crear tu `.env`.
 
 ## 🐛 Solución de Problemas
 

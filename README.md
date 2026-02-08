@@ -1,301 +1,504 @@
 # 🍽️ Sirve la Mesa
 
-Sistema de investigación psicológica sobre porcionamiento de alimentos con integración de juego Godot y backend Node.js + PostgreSQL.
+**Sistema de investigación psicológica sobre porcionamiento de alimentos**
+
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-blue.svg)](https://www.postgresql.org/)
+[![Angular](https://img.shields.io/badge/Angular-17+-red.svg)](https://angular.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+---
 
 ## 📋 Descripción
 
-"Sirve la Mesa" es una plataforma diseñada para simular situaciones de alimentación y estudiar patrones de porcionamiento según variables sociodemográficas. El sistema permite observar si existen diferencias en la cantidad y distribución de alimentos servidos según el género, edad y otras características de los comensales sintéticos.
+**Sirve la Mesa** es una plataforma de investigación que simula situaciones de alimentación para estudiar patrones de porcionamiento de alimentos según variables sociodemográficas. El sistema permite a los participantes servir comida a personajes sintéticos con diferentes características (edad, género), registrando todas sus decisiones para análisis posterior.
 
-## 🎯 Objetivo
+### 🎯 Objetivo
 
-Simular una situación en la que un usuario (participante) sirva comida a otras personas (sujetos sintéticos), observando si existen diferencias de porcionamiento según variables sociodemográficas.
+Observar si existen diferencias en el porcionamiento de alimentos según el género, edad y otras características de los comensales (personajes sintéticos).
 
-## 🏗️ Arquitectura del Sistema
+---
 
-```
-┌─────────────────────────────────────┐
-│   Juego Godot 4.4                   │
-│   (shity ass prueba/)               │
-│   - Interfaz de usuario             │
-│   - Mecánica drag & drop            │
-│   - Comunicación HTTP con backend   │
-└─────────────┬───────────────────────┘
-              │
-              │ HTTP/REST API
-              │
-┌─────────────▼───────────────────────┐
-│   Backend Express.js                │
-│   - API REST                        │
-│   - WebSocket (Socket.IO)           │
-│   - Controladores de lógica         │
-└─────────────┬───────────────────────┘
-              │
-              │ PostgreSQL
-              │
-┌─────────────▼───────────────────────┐
-│   Base de Datos PostgreSQL          │
-│   - Participantes                   │
-│   - Sesiones de juego               │
-│   - Decisiones de porcionamiento    │
-│   - Menús, Platos, Componentes      │
-└─────────────────────────────────────┘
-```
+## ✨ Características Principales
 
-## 🚀 Inicio Rápido
+### 🎮 Juego Interactivo (Angular)
+- Interfaz moderna y responsiva desarrollada en Angular
+- Sistema de drag & drop para servir alimentos
+- 3 escenarios: Desayuno, Almuerzo y Cena
+- 8 personajes sintéticos con diferentes perfiles
+- Registro automático de tiempos de decisión
 
-### Prerrequisitos
+### 🗄️ Backend Robusto (Node.js + Express)
+- API RESTful completa
+- Base de datos PostgreSQL con estructura optimizada
+- Sistema de sesiones y participantes
+- Registro detallado de decisiones de porcionamiento
+- WebSocket para comunicación en tiempo real
 
-- Node.js >= 18.x
-- PostgreSQL >= 12
-- Godot Engine 4.4 (para desarrollo del juego)
+### 📊 Panel Administrativo
+- Estadísticas en vivo de participantes y sesiones
+- Análisis por género y rango de edad
+- **Exportación de datos a CSV/Excel y JSON**
+- Visualización de métricas clave
+- Estado del sistema en tiempo real
 
-### Instalación
+### 📥 Exportación de Datos
+- **CSV compatible con Excel** (UTF-8 con BOM)
+- **JSON estructurado** para análisis programático
+- Datos organizados por categoría de alimento:
+  - Proteínas
+  - Carbohidratos
+  - Vegetales
+  - Frutas
+  - Salsas/Aderezos
+- Información completa de participantes y sesiones
 
-1. **Clonar el repositorio**
-```bash
-git clone https://github.com/tu-usuario/SirveLaMesa.git
-cd SirveLaMesa
-```
+### 🔬 Sistema de Investigación
+- Registro de datos sociodemográficos
+- Soporte para instrumento EAT-26
+- Datos antropométricos opcionales
+- Timestamps precisos de cada decisión
+- Orden de servicio y tiempos de decisión
 
-2. **Instalar dependencias**
+---
+
+## 🛠️ Tecnologías
+
+### Backend
+- **Node.js** (v18+) - Runtime de JavaScript
+- **Express** - Framework web
+- **PostgreSQL** - Base de datos relacional
+- **Socket.IO** - Comunicación en tiempo real
+- **dotenv** - Gestión de variables de entorno
+
+### Frontend
+- **Angular** (v17+) - Framework de aplicación web
+- **TypeScript** - Lenguaje tipado
+- **RxJS** - Programación reactiva
+- **Angular CDK** - Drag & Drop
+
+### Base de Datos
+- **PostgreSQL** (v12+)
+- Índices optimizados
+- Triggers automáticos
+- Soporte JSONB para datos flexibles
+
+---
+
+## 🚀 Instalación y Configuración
+
+### Requisitos Previos
+
+- **Node.js** v18 o superior
+- **PostgreSQL** v12 o superior
+- **npm** o **yarn**
+
+### 1. Clonar el Repositorio
+
 ```powershell
+git clone https://github.com/tu-usuario/Sirve-lamesa.git
+cd Sirve-lamesa
+```
+
+### 2. Instalar Dependencias
+
+```powershell
+# Instala dependencias del backend Y del frontend (Angular)
 npm install
 ```
 
-3. **Configurar variables de entorno**
+### 3. Configurar Variables de Entorno
 
-Copia el archivo de ejemplo y configura tus variables:
-```powershell
-Copy-Item config.example.env .env
-```
+Crea un archivo `.env` en la raíz del proyecto:
 
-Edita `.env` con tus configuraciones:
 ```env
-NODE_ENV=development
+# Base de datos
+DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/sirve_la_mesa
+
+# Servidor
 PORT=3000
-DATABASE_URL=postgresql://localhost:5432/sirve_la_mesa
-CLIENT_URL=http://localhost:3000
+NODE_ENV=development
+
+# Cliente (opcional)
+CLIENT_URL=http://localhost:4200
 ```
 
-4. **Crear base de datos PostgreSQL**
+### 4. Crear la Base de Datos
+
 ```powershell
-# Conectarse a PostgreSQL
+# Conectar a PostgreSQL y crear la base de datos
 psql -U postgres
-
-# Crear la base de datos
 CREATE DATABASE sirve_la_mesa;
-
-# Salir
 \q
 ```
 
-5. **Iniciar el servidor**
+### 5. Inicializar la Base de Datos
+
+**⚠️ IMPORTANTE:** Este comando solo se ejecuta UNA VEZ (la primera vez o cuando necesites resetear):
+
 ```powershell
+npm run init-db
+```
+
+Este comando:
+- Crea todas las tablas necesarias
+- Inserta datos iniciales (personajes, ingredientes, menús)
+- Configura relaciones e índices
+
+---
+
+## 🎮 Uso del Sistema
+
+### Modo Desarrollo
+
+Necesitas **dos terminales**:
+
+**Terminal 1 - Backend (Puerto 3000):**
+```powershell
+npm run dev
+```
+
+**Terminal 2 - Angular (Puerto 4200):**
+```powershell
+npm run dev:angular
+```
+
+Luego accede a:
+- **Juego:** http://localhost:4200
+- **Panel Admin:** http://localhost:3000/admin
+- **API:** http://localhost:3000/api
+
+### Modo Producción
+
+```powershell
+# 1. Construir Angular
+npm run build:angular
+
+# 2. Configurar entorno
+$env:NODE_ENV="production"
+
+# 3. Iniciar servidor
 npm start
 ```
 
-El servidor iniciará en `http://localhost:3000` y automáticamente:
-- Creará las tablas necesarias
-- Cargará los datos iniciales del menú
-- Estará listo para recibir peticiones
+Accede a: http://localhost:3000
 
-### Verificar la instalación
+---
 
-1. Abre tu navegador en `http://localhost:3000`
-2. Haz clic en "Test API" para verificar la conexión
-3. Accede al panel admin en `http://localhost:3000/admin`
+## 📚 Comandos Disponibles
 
-## 📁 Estructura del Proyecto
+| Comando | Descripción |
+|---------|-------------|
+| `npm start` | Inicia el servidor en modo producción |
+| `npm run dev` | Inicia el servidor en modo desarrollo (con nodemon) |
+| `npm run dev:angular` | Inicia Angular en modo desarrollo (puerto 4200) |
+| `npm run build:angular` | Construye Angular para producción |
+| `npm run init-db` | **Inicializa/resetea la base de datos** (⚠️ elimina datos) |
+
+---
+
+## 📊 Estructura del Proyecto
 
 ```
-SirveLaMesa/
-├── database/                    # Scripts SQL
-│   ├── schema.sql              # Tablas de menú
-│   ├── participantes.sql       # Tabla de participantes
-│   ├── sesiones_juego.sql      # Tabla de sesiones
-│   ├── decisiones_porcionamiento.sql
-│   └── seed_data.sql           # Datos iniciales del menú
+Sirve-lamesa/
+├── angular-app/              # Aplicación Angular (frontend)
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── components/   # Componentes del juego
+│   │   │   ├── services/     # Servicios de API
+│   │   │   ├── models/       # Modelos de datos
+│   │   │   └── guards/       # Guards de autenticación
+│   │   └── assets/           # Imágenes de ingredientes
+│   └── dist/                 # Build de producción
 │
-├── controllers/                 # Lógica de negocio
-│   └── gameDataController.js
+├── controllers/              # Lógica de negocio
+│   └── gameDataController.js # Controlador principal
 │
-├── routes/                      # Endpoints de la API
+├── routes/                   # Rutas de la API
 │   ├── participantes.js
 │   ├── sesiones.js
-│   ├── menu.js
-│   └── decisiones.js
+│   ├── decisiones.js
+│   ├── personajes.js
+│   ├── ingredientes.js
+│   └── menu.js
 │
-├── public/                      # Archivos públicos
-│   ├── index.html              # Página principal
-│   ├── admin.html              # Panel administrativo
-│   └── game/                   # Juego exportado de Godot
-│       └── index.html
+├── database/                 # Scripts SQL
+│   ├── schema.sql           # Estructura de tablas
+│   ├── participantes.sql
+│   ├── sesiones_juego.sql
+│   ├── decisiones_porcionamiento.sql
+│   └── seed_data.sql        # Datos iniciales
 │
-├── docs/                        # Documentación
-│   └── INTEGRACION_GODOT.md    # Guía de integración
+├── public/                   # Archivos estáticos
+│   ├── admin.html           # Panel administrativo
+│   └── index.html           # Página de inicio
 │
-├── shity ass prueba/            # Proyecto Godot
-│   └── [archivos de Godot]
-│
-├── server.js                    # Servidor principal
+├── server.js                 # Servidor principal
+├── init-database.js          # Script de inicialización de BD
 ├── package.json
-└── README.md
+└── .env                      # Variables de entorno (no versionado)
 ```
 
-## 🎮 Integración con Godot
-
-### Exportar el juego
-
-1. Abre el proyecto de Godot en `shity ass prueba/`
-2. Ve a **Project → Export**
-3. Selecciona **Web** o **Desktop**
-4. Exporta a `public/game/`
-
-### Usar las APIs desde Godot
-
-Consulta la guía completa en [`docs/INTEGRACION_GODOT.md`](docs/INTEGRACION_GODOT.md)
-
-Ejemplo básico:
-```gdscript
-# Crear un participante
-var datos = {
-    "edad": 25,
-    "sexo": "F",
-    "peso_kg": 65,
-    "altura_cm": 165,
-    "consentimiento_informado": true
-}
-
-api_client.post_request("/participantes", datos, callback)
-```
+---
 
 ## 🔌 API Endpoints
 
 ### Participantes
-- `POST /api/participantes` - Crear nuevo participante
+- `POST /api/participantes` - Crear participante
 - `GET /api/participantes/:id` - Obtener participante
 
 ### Sesiones
 - `POST /api/sesiones` - Iniciar sesión de juego
 - `PUT /api/sesiones/:id` - Finalizar sesión
-- `GET /api/sesiones/:id` - Obtener datos de sesión
-- `GET /api/sesiones/:id/decisiones` - Obtener decisiones de una sesión
-
-### Menú
-- `GET /api/menu` - Obtener todos los menús
-- `GET /api/menu/platos/:menu_id` - Obtener platos de un menú
-- `GET /api/menu/componentes/:plato_id` - Obtener componentes de un plato
-- `GET /api/menu/bebidas` - Obtener todas las bebidas
+- `GET /api/sesiones/:id` - Obtener sesión
+- `GET /api/sesiones/:id/decisiones` - Obtener decisiones de sesión
 
 ### Decisiones
-- `POST /api/decisiones` - Registrar decisión de porcionamiento
+- `POST /api/decisiones` - Registrar decisión
 - `POST /api/decisiones/batch` - Registrar múltiples decisiones
 
-### Sistema
-- `GET /api/health` - Estado del servidor
-- `GET /api/test-connection` - Verificar conexión a BD
+### Datos del Juego
+- `GET /api/personajes` - Obtener personajes sintéticos
+- `GET /api/ingredientes` - Obtener ingredientes
+- `GET /api/menu` - Obtener menús
 
 ### Estadísticas
 - `GET /api/estadisticas/generales` - Estadísticas generales
 - `GET /api/estadisticas/por-genero` - Análisis por género
 - `GET /api/estadisticas/por-edad` - Análisis por edad
 
-## 📊 Base de Datos
+### Exportación
+- `GET /api/exportar/csv` - **Descargar datos en CSV**
+- `GET /api/exportar/json` - **Descargar datos en JSON**
 
-### Tablas Principales
-
-1. **Participantes**: Datos sociodemográficos
-2. **Sesiones_juego**: Registro de cada sesión
-3. **Decisiones_porcionamiento**: Cada decisión de servir comida
-4. **Menu**: Menús disponibles (Desayuno, Almuerzo, Cena)
-5. **Plato**: Platos del restaurante
-6. **Componentes**: Ingredientes/alimentos
-7. **Bebida**: Bebidas disponibles
-8. **Porcion**: Relación Plato-Componentes
-
-### Diagrama de Relaciones
-
-Ver imagen del diagrama en la raíz del proyecto.
-
-## 🛠️ Desarrollo
-
-### Modo desarrollo
-```powershell
-npm run dev
-```
-
-### Variables de entorno
-
-- `NODE_ENV`: development | production
-- `PORT`: Puerto del servidor (default: 3000)
-- `DATABASE_URL`: URL de conexión PostgreSQL
-- `CLIENT_URL`: URL del cliente para CORS
-
-## 📦 Deploy
-
-### Render.com (Recomendado)
-
-1. Conecta tu repositorio en Render
-2. Configura las variables de entorno
-3. Añade servicio PostgreSQL
-4. Deploy automático desde Git
-
-### Otras plataformas
-
-El sistema es compatible con Heroku, Railway, DigitalOcean, etc.
-
-## 🧪 Testing
-
-Para probar los endpoints:
-
-```powershell
-# Test de salud
-curl http://localhost:3000/api/health
-
-# Test de conexión BD
-curl http://localhost:3000/api/test-connection
-
-# Crear participante
-curl -X POST http://localhost:3000/api/participantes `
-  -H "Content-Type: application/json" `
-  -d '{"edad":25,"sexo":"F","consentimiento_informado":true}'
-```
-
-## 📝 Datos de Investigación
-
-Los datos registrados incluyen:
-
-- **Participante**: Edad, sexo, IMC, nivel socioeconómico, EAT-26
-- **Sesión**: Tiempo de inicio/fin, duración total, dispositivo
-- **Decisión**: Personaje servido, plato elegido, componentes con cantidades en gramos, tiempo de decisión, orden de servicio
-
-## 🤝 Contribución
-
-Este es un proyecto de investigación. Para contribuir:
-
-1. Fork del repositorio
-2. Crea tu rama (`git checkout -b feature/NuevaCaracteristica`)
-3. Commit de cambios (`git commit -m 'Agregar característica'`)
-4. Push a la rama (`git push origin feature/NuevaCaracteristica`)
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-MIT License - Ver archivo LICENSE para más detalles
-
-## 👥 Equipo
-
-- Desarrollo Backend: [Tu nombre]
-- Desarrollo Godot: [Compañero]
-- Investigación: [Equipo de investigación]
-
-## 📞 Contacto
-
-Para preguntas sobre el proyecto:
-- Email: [tu-email]
-- Issues: GitHub Issues
+### Sistema
+- `GET /api/health` - Estado del servidor
+- `GET /api/test-connection` - Probar conexión a BD
 
 ---
 
-**Versión:** 1.0.0  
-**Última actualización:** Octubre 2025
+## 📥 Exportación de Datos
+
+### Acceso al Panel de Exportación
+
+1. Inicia el servidor: `npm run dev`
+2. Ve a: http://localhost:3000/admin
+3. Busca la sección **"📥 Exportar Datos de Sesiones"**
+4. Haz clic en **"📥 Descargar CSV (Excel)"** o **"📋 Descargar JSON"**
+
+### Formato de Datos Exportados
+
+El archivo CSV/JSON incluye:
+
+#### Información del Participante
+- ID, Nombre, Edad, Sexo
+- Datos antropométricos (peso, altura, IMC)
+- Datos geográficos y socioeconómicos
+- Puntuación EAT-26 (si aplica)
+
+#### Información de la Sesión
+- ID de sesión, fechas de inicio/fin
+- Duración total en segundos
+- Estado de la sesión
+
+#### Información de Decisiones
+- Escenario (desayuno/almuerzo/cena)
+- Tipo de personaje servido (sujeto)
+- Edad y sexo del personaje
+- Orden de servicio
+- Tiempo de decisión en milisegundos
+- Cantidad total servida en gramos
+
+#### **Porciones Organizadas por Categoría**
+- **Proteínas:** Ej. "Pollo Frito (150g), Tocineta (30g)"
+- **Carbohidratos:** Ej. "Papa (100g), Pan Tostado (2rebanadas)"
+- **Vegetales:** Ej. "Tomate (100g), Zanahoria (80g)"
+- **Frutas:** Ej. "Manzana (1unidad), Fresa (100g)"
+- **Salsas/Aderezos:** Ej. "Mayonesa (20g)"
+
+---
+
+## 🗄️ Base de Datos
+
+### Esquema Principal
+
+```
+Participantes
+├── Sesiones_juego
+│   └── Decisiones_porcionamiento
+│
+Menu
+├── Menu_plato → Plato
+│   └── Porcion → Componentes
+└── Menu_bebida → Bebida
+
+Personajes (personajes sintéticos)
+Componentes (ingredientes)
+```
+
+### Características de la BD
+
+- **Relaciones bien definidas** con claves foráneas
+- **Índices optimizados** para consultas rápidas
+- **Triggers automáticos** para calcular duraciones
+- **JSONB** para almacenar componentes servidos
+- **Índices GIN** para búsquedas en JSONB
+
+### Persistencia de Datos
+
+⚠️ **IMPORTANTE:** El servidor ya NO resetea la base de datos al iniciar.
+
+- ✅ Los datos persisten entre reinicios del servidor
+- ✅ Solo se resetean con `npm run init-db`
+- ✅ Exporta tus datos antes de ejecutar `npm run init-db`
+
+---
+
+## 🎯 Flujo del Juego
+
+1. **Login del Participante**
+   - Captura: nombres, edad, sexo
+   - Datos opcionales: antropométricos, EAT-26
+
+2. **Inicio de Sesión**
+   - Se crea una sesión en la BD
+   - Se registran metadatos del dispositivo
+
+3. **Juego - 3 Escenarios**
+   - Se asigna un escenario aleatorio (desayuno/almuerzo/cena)
+   - Se presentan 8 personajes sintéticos
+   - El participante sirve comida mediante drag & drop
+
+4. **Registro de Decisiones**
+   - Cada plato servido se guarda con:
+     - Componentes y cantidades
+     - Tiempo de decisión
+     - Orden de servicio
+     - Características del personaje servido
+
+5. **Finalización**
+   - Se marca la sesión como completada
+   - Se calcula la duración total
+
+6. **Análisis**
+   - Los investigadores acceden al panel admin
+   - Exportan datos para análisis estadístico
+
+---
+
+## 🔧 Solución de Problemas
+
+### Error: "Cannot connect to database"
+
+```powershell
+# Verificar que PostgreSQL esté corriendo
+pg_isready
+
+# Verificar credenciales en .env
+DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/sirve_la_mesa
+```
+
+### Error: "Port 3000 already in use"
+
+```powershell
+# Cambiar el puerto en .env
+PORT=3001
+```
+
+### Error: "Angular not found"
+
+```powershell
+# Reinstalar dependencias de Angular
+cd angular-app
+npm install
+cd ..
+```
+
+### Los datos se borran al reiniciar
+
+✅ **Solución:** Esto ya NO debería pasar. El servidor ya no ejecuta `init-db` automáticamente.
+
+Si aún se borran, verifica que no tengas `await initDatabase()` sin comentar en `server.js`.
+
+---
+
+## 📖 Documentación Adicional
+
+- **[README-ANGULAR.md](README-ANGULAR.md)** - Guía detallada de Angular
+- **[INICIALIZACION-BD.md](INICIALIZACION-BD.md)** - Guía de base de datos
+- **[CONFIGURACION.md](CONFIGURACION.md)** - Configuración avanzada
+
+---
+
+## 🤝 Contribuir
+
+Este es un proyecto de investigación académica. Si deseas contribuir:
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+---
+
+## 👥 Equipo
+
+**Equipo Sirve la Mesa**  
+Proyecto de investigación en psicología de la alimentación
+
+---
+
+## 📞 Soporte
+
+Si tienes problemas o preguntas:
+
+1. Revisa la documentación en `/docs`
+2. Verifica los issues existentes en GitHub
+3. Crea un nuevo issue con detalles del problema
+
+---
+
+## 🎓 Citas y Referencias
+
+Si utilizas este sistema en tu investigación, por favor cita:
+
+```
+Sirve la Mesa - Sistema de investigación sobre porcionamiento de alimentos
+Equipo Sirve la Mesa (2025)
+https://github.com/tu-usuario/Sirve-lamesa
+```
+
+---
+
+## 🔄 Changelog
+
+### v1.0.0 (2025-02-08)
+- ✅ Sistema completo de juego en Angular
+- ✅ Backend con API RESTful
+- ✅ Panel administrativo con estadísticas
+- ✅ **Exportación de datos a CSV/JSON**
+- ✅ Base de datos PostgreSQL optimizada
+- ✅ Sistema de persistencia de datos
+- ✅ Documentación completa
+
+---
+
+## 🌟 Características Futuras
+
+- [ ] Autenticación de administradores
+- [ ] Dashboard con gráficos interactivos
+- [ ] Soporte para múltiples idiomas
+- [ ] Modo offline con sincronización
+- [ ] Análisis estadístico integrado
+- [ ] Exportación a SPSS/R
+
+---
+
+**¡Gracias por usar Sirve la Mesa!** 🍽️✨

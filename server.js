@@ -74,36 +74,16 @@ const gameController = new GameDataController(pool);
 // ===================================
 // INICIALIZACIÓN DE BASE DE DATOS
 // ===================================
-
-async function initDatabase() {
-  try {
-    console.log('Inicializando base de datos...');
-    
-    const sqlFiles = [
-      'database/schema.sql',
-      'database/participantes.sql',
-      'database/sesiones_juego.sql',
-      'database/decisiones_porcionamiento.sql',
-      'database/seed_data.sql'
-    ];
-
-    for (const file of sqlFiles) {
-      try {
-        const filePath = path.join(__dirname, file);
-        const sql = await fs.readFile(filePath, 'utf8');
-        await pool.query(sql);
-        console.log(`✓ Ejecutado: ${file}`);
-      } catch (err) {
-        console.error(`✗ Error en ${file}:`, err.message);
-        // Continuar con los demás archivos incluso si uno falla
-      }
-    }
-    
-    console.log('Base de datos inicializada correctamente');
-  } catch (err) {
-    console.error('Error general al inicializar la base de datos:', err);
-  }
-}
+// NOTA: La inicialización de la base de datos ya NO se ejecuta automáticamente
+// al iniciar el servidor para preservar los datos existentes.
+// 
+// Para inicializar la base de datos (crear tablas y seed data), ejecutar:
+//   npm run init-db
+//
+// Este comando solo debe ejecutarse:
+// - La primera vez que se configura el proyecto
+// - Cuando se necesite resetear completamente la base de datos
+// ===================================
 
 // ===================================
 // RUTAS DE LA API
@@ -340,7 +320,9 @@ server.listen(port, async () => {
   console.log(`🔗 URL: http://localhost:${port}`);
   console.log('='.repeat(50));
   
-  await initDatabase(); 
+  // NOTA: La inicialización de la BD ya NO se ejecuta automáticamente
+  // Para crear/resetear la base de datos, ejecutar: npm run init-db
+  // await initDatabase(); // ← Ya no se ejecuta automáticamente
   
   console.log('\n📚 Endpoints disponibles:');
   console.log('  - GET  /api/health');
