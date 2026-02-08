@@ -4,7 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sirve la Mesa - Sistema de Investigación</title>
+    <link rel="icon" type="image/png" href="/icons/plato.png">
     <style>
+        :root {
+            /* Tema Claro */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --bg-tertiary: #e8ecef;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --text-tertiary: #6e7781;
+            --border-color: #d0d7de;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-hover: rgba(0, 0, 0, 0.12);
+            --accent: #ff5722;
+            --accent-hover: #e64a19;
+            --accent-light: rgba(255, 87, 34, 0.1);
+        }
+
+        [data-theme="dark"] {
+            /* Tema Oscuro */
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #b1bac4;
+            --text-tertiary: #8b949e;
+            --border-color: #30363d;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.5);
+            --accent: #ff6b47;
+            --accent-hover: #ff8866;
+            --accent-light: rgba(255, 107, 71, 0.15);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,38 +45,63 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-secondary);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px var(--shadow-hover);
         }
 
         .container {
-            max-width: 800px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px var(--shadow);
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
             padding: 40px;
             text-align: center;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .header h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
+            font-size: 1.1em;
+            color: var(--text-secondary);
         }
 
         .content {
@@ -51,20 +109,21 @@
         }
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .section h2 {
-            color: #667eea;
-            font-size: 1.8em;
+            color: var(--text-primary);
+            font-size: 1.6em;
             margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid var(--accent);
             padding-bottom: 10px;
+            font-weight: 600;
         }
 
         .section p {
-            line-height: 1.6;
-            color: #555;
+            line-height: 1.7;
+            color: var(--text-secondary);
             margin-bottom: 15px;
         }
 
@@ -76,77 +135,131 @@
         }
 
         .card {
-            background: #f8f9fa;
+            background: var(--bg-secondary);
             padding: 25px;
             border-radius: 10px;
             text-align: center;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 1px solid var(--border-color);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-color: #667eea;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px var(--shadow-hover);
+            border-color: var(--accent);
+            background: var(--bg-tertiary);
         }
 
         .card-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 15px;
+            display: block;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        /* Iconos para tema claro */
+        .icon-light {
+            display: block;
+        }
+
+        .icon-dark {
+            display: none;
+        }
+
+        /* Iconos para tema oscuro */
+        [data-theme="dark"] .icon-light {
+            display: none;
+        }
+
+        [data-theme="dark"] .icon-dark {
+            display: block;
         }
 
         .card-title {
-            font-size: 1.2em;
-            color: #333;
-            font-weight: bold;
+            font-size: 1.15em;
+            color: var(--text-primary);
+            font-weight: 600;
             margin-bottom: 10px;
         }
 
         .card-description {
             font-size: 0.9em;
-            color: #666;
+            color: var(--text-tertiary);
         }
 
         .btn {
-            display: inline-block;
-            background: #667eea;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--accent);
             color: white;
-            padding: 15px 40px;
-            border-radius: 50px;
+            padding: 14px 32px;
+            border-radius: 8px;
             text-decoration: none;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: all 0.3s;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             margin: 10px;
         }
 
         .btn:hover {
-            background: #5568d3;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-light);
         }
 
         .btn-secondary {
-            background: #48c774;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background: #3ead63;
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Asegurar que los iconos en botones también sigan las reglas de tema */
+        .btn-icon.icon-light {
+            display: inline-block;
+        }
+
+        .btn-icon.icon-dark {
+            display: none;
+        }
+
+        [data-theme="dark"] .btn-icon.icon-light {
+            display: none;
+        }
+
+        [data-theme="dark"] .btn-icon.icon-dark {
+            display: inline-block;
         }
 
         .info-box {
-            background: #e8f4f8;
-            border-left: 4px solid #3498db;
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 6px;
             margin: 20px 0;
         }
 
         .info-box strong {
-            color: #2980b9;
+            color: var(--accent);
         }
 
         .features {
@@ -155,26 +268,28 @@
         }
 
         .features li {
-            padding: 10px 0;
+            padding: 12px 0;
             padding-left: 30px;
             position: relative;
+            color: var(--text-secondary);
         }
 
         .features li:before {
             content: "✓";
             position: absolute;
             left: 0;
-            color: #48c774;
+            color: var(--accent);
             font-weight: bold;
             font-size: 1.2em;
         }
 
         .footer {
-            background: #f8f9fa;
-            padding: 20px;
+            background: var(--bg-secondary);
+            padding: 25px;
             text-align: center;
-            color: #666;
+            color: var(--text-tertiary);
             font-size: 0.9em;
+            border-top: 1px solid var(--border-color);
         }
 
         .status-indicator {
@@ -186,8 +301,14 @@
         }
 
         .status-online {
-            background: #48c774;
-            box-shadow: 0 0 5px #48c774;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         @media (max-width: 768px) {
@@ -198,13 +319,27 @@
             .card-grid {
                 grid-template-columns: 1fr;
             }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+            }
         }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle" title="Cambiar tema">
+        🌙
+    </button>
+    
     <div class="container">
         <div class="header">
-            <h1>🍽️ Sirve la Mesa</h1>
+            <h1>
+                <img src="/icons/plato.png" alt="Sirve la Mesa" class="header-icon icon-light" style="width: 64px; height: 64px; vertical-align: middle; margin-right: 10px;">
+                <img src="/icons/plato (1).png" alt="Sirve la Mesa" class="header-icon icon-dark" style="width: 64px; height: 64px; vertical-align: middle; margin-right: 10px;">
+                Sirve la Mesa
+            </h1>
             <p>Sistema de Investigación sobre Porcionamiento de Alimentos</p>
         </div>
 
@@ -226,19 +361,22 @@
                 <h2>Accesos Rápidos</h2>
                 <div class="card-grid">
                     <div class="card" onclick="irAlJuego()">
-                        <div class="card-icon">🎮</div>
+                        <img src="/icons/juegos.png" alt="Jugar" class="card-icon icon-light">
+                        <img src="/icons/juegos(1).png" alt="Jugar" class="card-icon icon-dark">
                         <div class="card-title">Jugar</div>
                         <div class="card-description">Iniciar el juego de investigación</div>
                     </div>
 
                     <div class="card" onclick="window.location.href='/admin'">
-                        <div class="card-icon">📊</div>
+                        <img src="/icons/analitica.png" alt="Panel Admin" class="card-icon icon-light">
+                        <img src="/icons/analitica (1).png" alt="Panel Admin" class="card-icon icon-dark">
                         <div class="card-title">Panel Admin</div>
                         <div class="card-description">Ver estadísticas y datos</div>
                     </div>
 
                     <div class="card" onclick="testAPI()">
-                        <div class="card-icon">🔧</div>
+                        <img src="/icons/api.png" alt="Test API" class="card-icon icon-light">
+                        <img src="/icons/api (1).png" alt="Test API" class="card-icon icon-dark">
                         <div class="card-title">Test API</div>
                         <div class="card-description">Verificar conexión</div>
                     </div>
@@ -262,8 +400,16 @@
 
             <div class="section" style="text-align: center;">
                 <h2>Comenzar</h2>
-                <button onclick="irAlJuego()" class="btn">🎮 Iniciar Juego</button>
-                <a href="/admin" class="btn btn-secondary">📊 Panel Admin</a>
+                <button onclick="irAlJuego()" class="btn">
+                    <img src="/icons/juegos.png" alt="" class="btn-icon icon-light">
+                    <img src="/icons/juegos(1).png" alt="" class="btn-icon icon-dark">
+                    Iniciar Juego
+                </button>
+                <a href="/admin" class="btn btn-secondary">
+                    <img src="/icons/analitica.png" alt="" class="btn-icon icon-light">
+                    <img src="/icons/analitica (1).png" alt="" class="btn-icon icon-dark">
+                    Panel Admin
+                </a>
             </div>
 
             <div class="section">
@@ -282,6 +428,29 @@
     </div>
 
     <script>
+        // Sistema de tema oscuro/claro
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Cambiar icono
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
         // Redirigir al juego Angular (desarrollo o producción)
         function irAlJuego() {
             // En desarrollo, Angular corre en puerto 4200
@@ -344,7 +513,10 @@
         }
 
         // Verificar estado al cargar la página
-        window.addEventListener('DOMContentLoaded', checkAPIStatus);
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            checkAPIStatus();
+        });
     </script>
 </body>
 </html>

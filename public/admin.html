@@ -4,7 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo - Sirve la Mesa</title>
+    <link rel="icon" type="image/png" href="/icons/plato.png">
     <style>
+        :root {
+            /* Tema Claro */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --bg-tertiary: #e8ecef;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --text-tertiary: #6e7781;
+            --border-color: #d0d7de;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-hover: rgba(0, 0, 0, 0.12);
+            --accent: #ff5722;
+            --accent-hover: #e64a19;
+            --accent-light: rgba(255, 87, 34, 0.1);
+            --success: #28a745;
+            --success-hover: #218838;
+            --warning: #ffa726;
+            --error: #dc3545;
+        }
+
+        [data-theme="dark"] {
+            /* Tema Oscuro */
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #b1bac4;
+            --text-tertiary: #8b949e;
+            --border-color: #30363d;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.5);
+            --accent: #ff6b47;
+            --accent-hover: #ff8866;
+            --accent-light: rgba(255, 107, 71, 0.15);
+            --success: #3fb950;
+            --success-hover: #56d364;
+            --warning: #ffb86c;
+            --error: #ff6b6b;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,10 +53,32 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-secondary);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px var(--shadow-hover);
         }
 
         .container {
@@ -24,21 +87,23 @@
         }
 
         header {
-            background: white;
+            background: var(--bg-primary);
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px var(--shadow);
             margin-bottom: 30px;
+            border: 1px solid var(--border-color);
         }
 
         h1 {
-            color: #667eea;
+            color: var(--text-primary);
             font-size: 2.5em;
             margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .subtitle {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 1.1em;
         }
 
@@ -50,45 +115,59 @@
         }
 
         .stat-card {
-            background: white;
+            background: var(--bg-primary);
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px var(--shadow-hover);
+            border-color: var(--accent);
         }
 
         .stat-label {
-            color: #666;
-            font-size: 0.9em;
+            color: var(--text-tertiary);
+            font-size: 0.85em;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 10px;
+            font-weight: 500;
         }
 
         .stat-value {
-            color: #667eea;
+            color: var(--accent);
             font-size: 2.5em;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .section {
-            background: white;
+            background: var(--bg-primary);
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow);
             margin-bottom: 20px;
+            border: 1px solid var(--border-color);
         }
 
         h2 {
-            color: #667eea;
+            color: var(--text-primary);
             margin-bottom: 20px;
-            border-bottom: 2px solid #667eea;
+            border-bottom: 2px solid var(--accent);
             padding-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 28px;
+            height: 28px;
+            display: inline-block;
         }
 
         table {
@@ -99,75 +178,124 @@
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            background-color: #667eea;
-            color: white;
-            font-weight: bold;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         tr:hover {
-            background-color: #f5f5f5;
+            background-color: var(--bg-secondary);
         }
 
         .btn {
-            background: #667eea;
+            background: var(--accent);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
             margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn:hover {
-            background: #5568d3;
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-light);
         }
 
         .btn-success {
-            background: #48c774;
+            background: var(--success);
         }
 
         .btn-success:hover {
-            background: #3ead63;
+            background: var(--success-hover);
+        }
+
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Iconos para tema claro */
+        .icon-light {
+            display: inline-block;
+        }
+
+        .icon-dark {
+            display: none;
+        }
+
+        /* Iconos para tema oscuro */
+        [data-theme="dark"] .icon-light {
+            display: none;
+        }
+
+        [data-theme="dark"] .icon-dark {
+            display: inline-block;
+        }
+
+        /* Asegurar que los iconos en botones también sigan las reglas de tema */
+        .btn-icon.icon-light {
+            display: inline-block;
+        }
+
+        .btn-icon.icon-dark {
+            display: none;
+        }
+
+        [data-theme="dark"] .btn-icon.icon-light {
+            display: none;
+        }
+
+        [data-theme="dark"] .btn-icon.icon-dark {
+            display: inline-block;
         }
 
         .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 0.85em;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .status-completada {
-            background: #48c774;
+            background: var(--success);
             color: white;
         }
 
         .status-en_curso {
-            background: #ffdd57;
-            color: #333;
+            background: var(--warning);
+            color: var(--bg-primary);
         }
 
         .status-abandonada {
-            background: #f14668;
+            background: var(--error);
             color: white;
         }
 
         #loading {
             text-align: center;
             padding: 40px;
-            color: #667eea;
+            color: var(--text-primary);
             font-size: 1.2em;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow);
         }
 
         .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border: 4px solid var(--bg-tertiary);
+            border-top: 4px solid var(--accent);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -183,38 +311,63 @@
         .chart-container {
             margin: 20px 0;
             padding: 20px;
-            background: #f9f9f9;
+            background: var(--bg-secondary);
             border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
         .no-data {
             text-align: center;
             padding: 40px;
-            color: #999;
+            color: var(--text-tertiary);
             font-style: italic;
         }
 
         .error-message {
-            background: #f14668;
+            background: var(--error);
             color: white;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin: 10px 0;
         }
 
         .success-message {
-            background: #48c774;
+            background: var(--success);
             color: white;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
         }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle" title="Cambiar tema">
+        🌙
+    </button>
+    
     <div class="container">
         <header>
-            <h1>🎮 Panel Administrativo - Sirve la Mesa</h1>
+            <h1>
+                <img src="/icons/plato.png" alt="Sirve la Mesa" class="header-icon icon-light" style="width: 48px; height: 48px; vertical-align: middle; margin-right: 12px;">
+                <img src="/icons/plato (1).png" alt="Sirve la Mesa" class="header-icon icon-dark" style="width: 48px; height: 48px; vertical-align: middle; margin-right: 12px;">
+                Panel Administrativo - Sirve la Mesa
+            </h1>
             <p class="subtitle">Sistema de investigación sobre porcionamiento de alimentos</p>
         </header>
 
@@ -246,33 +399,51 @@
 
             <!-- Análisis por Género -->
             <div class="section">
-                <h2>📊 Análisis por Género del Personaje</h2>
+                <h2>
+                    <img src="/icons/analitica.png" alt="" class="section-icon icon-light">
+                    <img src="/icons/analitica (1).png" alt="" class="section-icon icon-dark">
+                    Análisis por Género del Personaje
+                </h2>
                 <div id="analisis-genero" class="chart-container"></div>
             </div>
 
             <!-- Análisis por Edad -->
             <div class="section">
-                <h2>📈 Análisis por Rango de Edad</h2>
+                <h2>
+                    <img src="/icons/analisis.png" alt="" class="section-icon icon-light">
+                    <img src="/icons/analisis (1).png" alt="" class="section-icon icon-dark">
+                    Análisis por Rango de Edad
+                </h2>
                 <div id="analisis-edad" class="chart-container"></div>
             </div>
 
             <!-- Acciones de Exportación -->
             <div class="section">
-                <h2>📥 Exportar Datos de Sesiones</h2>
-                <p style="color: #666; margin-bottom: 15px;">
+                <h2>
+                    <img src="/icons/descarga-de-archivos.png" alt="" class="section-icon icon-light">
+                    <img src="/icons/descarga-de-archivos (1).png" alt="" class="section-icon icon-dark">
+                    Exportar Datos de Sesiones
+                </h2>
+                <p style="color: var(--text-secondary); margin-bottom: 15px;">
                     Descarga los datos completos de todas las sesiones incluyendo información de participantes, 
                     decisiones de porcionamiento y porciones organizadas por categoría de alimento 
                     (proteínas, carbohidratos, vegetales, frutas, salsas).
                 </p>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                     <button class="btn btn-success" onclick="exportarCSV()" id="btn-export-csv">
-                        📥 Descargar CSV (Excel)
+                        <img src="/icons/archivo-excel.png" alt="" class="btn-icon icon-light">
+                        <img src="/icons/archivo-excel (1).png" alt="" class="btn-icon icon-dark">
+                        Descargar CSV (Excel)
                     </button>
                     <button class="btn" onclick="exportarJSON()" id="btn-export-json">
-                        📋 Descargar JSON
+                        <img src="/icons/archivo-json.png" alt="" class="btn-icon icon-light">
+                        <img src="/icons/archivo-json (1).png" alt="" class="btn-icon icon-dark">
+                        Descargar JSON
                     </button>
                     <button class="btn" onclick="actualizarDatos()" style="background: #8e44ad;">
-                        🔄 Actualizar Datos
+                        <img src="/icons/respaldo.png" alt="" class="btn-icon icon-light">
+                        <img src="/icons/respaldo (1).png" alt="" class="btn-icon icon-dark">
+                        Actualizar Datos
                     </button>
                 </div>
                 <div id="export-status" style="margin-top: 10px; display: none;"></div>
@@ -280,7 +451,11 @@
 
             <!-- Estado de la conexión -->
             <div class="section">
-                <h2>🔗 Estado del Sistema</h2>
+                <h2>
+                    <img src="/icons/api.png" alt="" class="section-icon icon-light">
+                    <img src="/icons/api (1).png" alt="" class="section-icon icon-dark">
+                    Estado del Sistema
+                </h2>
                 <p><strong>Estado de la BD:</strong> <span id="db-status">Verificando...</span></p>
                 <p><strong>Última actualización:</strong> <span id="last-update">-</span></p>
             </div>
@@ -289,6 +464,29 @@
 
     <script>
         const API_URL = window.location.origin;
+
+        // Sistema de tema oscuro/claro
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Cambiar icono
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Cargar tema guardado
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
 
         async function cargarEstadisticas() {
             try {
@@ -497,6 +695,7 @@
 
         // Cargar datos al iniciar
         window.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
             cargarTodosDatos();
             
             // Actualizar cada 30 segundos

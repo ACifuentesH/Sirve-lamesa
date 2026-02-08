@@ -488,17 +488,6 @@ https://github.com/tu-usuario/Sirve-lamesa
 - ✅ Sistema de persistencia de datos
 - ✅ Documentación completa
 
----
 
-## 🌟 Características Futuras
-
-- [ ] Autenticación de administradores
-- [ ] Dashboard con gráficos interactivos
-- [ ] Soporte para múltiples idiomas
-- [ ] Modo offline con sincronización
-- [ ] Análisis estadístico integrado
-- [ ] Exportación a SPSS/R
-
----
 
 **¡Gracias por usar Sirve la Mesa!** 🍽️✨
