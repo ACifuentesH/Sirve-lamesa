@@ -225,7 +225,7 @@
             <div class="section">
                 <h2>Accesos Rápidos</h2>
                 <div class="card-grid">
-                    <div class="card" onclick="window.location.href='/juego'">
+                    <div class="card" onclick="irAlJuego()">
                         <div class="card-icon">🎮</div>
                         <div class="card-title">Jugar</div>
                         <div class="card-description">Iniciar el juego de investigación</div>
@@ -250,18 +250,19 @@
                 <ul class="features">
                     <li>Backend robusto con Node.js y Express</li>
                     <li>Base de datos PostgreSQL con estructura optimizada</li>
-                    <li>API RESTful completa para integración con Godot</li>
+                    <li>Interfaz de juego moderna desarrollada con Angular</li>
+                    <li>API RESTful completa para gestión de datos</li>
                     <li>Soporte para WebSocket (tiempo real)</li>
                     <li>Sistema de registro de participantes y sesiones</li>
                     <li>Registro detallado de decisiones de porcionamiento</li>
                     <li>Panel administrativo con estadísticas en vivo</li>
-                    <li>Compatible con juego Godot (web y desktop)</li>
+                    <li>Exportación de datos a CSV/JSON para análisis</li>
                 </ul>
             </div>
 
             <div class="section" style="text-align: center;">
                 <h2>Comenzar</h2>
-                <a href="/juego" class="btn">🎮 Iniciar Juego</a>
+                <button onclick="irAlJuego()" class="btn">🎮 Iniciar Juego</button>
                 <a href="/admin" class="btn btn-secondary">📊 Panel Admin</a>
             </div>
 
@@ -281,6 +282,27 @@
     </div>
 
     <script>
+        // Redirigir al juego Angular (desarrollo o producción)
+        function irAlJuego() {
+            // En desarrollo, Angular corre en puerto 4200
+            // En producción, Angular se sirve desde la raíz
+            fetch('/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.environment === 'development') {
+                        // En desarrollo, abrir Angular en puerto 4200
+                        window.location.href = 'http://localhost:4200';
+                    } else {
+                        // En producción, Angular está servido en la raíz
+                        window.location.href = '/';
+                    }
+                })
+                .catch(() => {
+                    // Si falla, intentar ir a la raíz (producción)
+                    window.location.href = '/';
+                });
+        }
+
         // Verificar estado de la API al cargar
         async function checkAPIStatus() {
             try {

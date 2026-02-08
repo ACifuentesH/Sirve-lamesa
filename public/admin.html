@@ -256,11 +256,26 @@
                 <div id="analisis-edad" class="chart-container"></div>
             </div>
 
-            <!-- Acciones -->
+            <!-- Acciones de Exportación -->
             <div class="section">
-                <h2>⚙️ Acciones</h2>
-                <button class="btn btn-success" onclick="exportarDatos()">📥 Exportar Datos a CSV</button>
-                <button class="btn" onclick="actualizarDatos()">🔄 Actualizar Datos</button>
+                <h2>📥 Exportar Datos de Sesiones</h2>
+                <p style="color: #666; margin-bottom: 15px;">
+                    Descarga los datos completos de todas las sesiones incluyendo información de participantes, 
+                    decisiones de porcionamiento y porciones organizadas por categoría de alimento 
+                    (proteínas, carbohidratos, vegetales, frutas, salsas).
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <button class="btn btn-success" onclick="exportarCSV()" id="btn-export-csv">
+                        📥 Descargar CSV (Excel)
+                    </button>
+                    <button class="btn" onclick="exportarJSON()" id="btn-export-json">
+                        📋 Descargar JSON
+                    </button>
+                    <button class="btn" onclick="actualizarDatos()" style="background: #8e44ad;">
+                        🔄 Actualizar Datos
+                    </button>
+                </div>
+                <div id="export-status" style="margin-top: 10px; display: none;"></div>
             </div>
 
             <!-- Estado de la conexión -->
@@ -390,9 +405,94 @@
             document.getElementById('content').style.display = 'block';
         }
 
-        function exportarDatos() {
-            alert('Funcionalidad de exportación a CSV en desarrollo.\nPuedes acceder a los datos directamente desde la base de datos PostgreSQL.');
-            // TODO: Implementar exportación real a CSV
+        function mostrarEstadoExport(mensaje, tipo) {
+            const statusEl = document.getElementById('export-status');
+            statusEl.style.display = 'block';
+            statusEl.className = tipo === 'error' ? 'error-message' : 'success-message';
+            statusEl.textContent = mensaje;
+            // Ocultar después de 5 segundos
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        async function exportarCSV() {
+            const btn = document.getElementById('btn-export-csv');
+            const textoOriginal = btn.textContent;
+            btn.textContent = '⏳ Descargando...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/exportar/csv`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al exportar');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Obtener nombre del archivo del header o usar uno por defecto
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let nombreArchivo = `sirve-la-mesa_datos_${new Date().toISOString().split('T')[0]}.csv`;
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename="(.+)"/);
+                    if (match) nombreArchivo = match[1];
+                }
+                
+                a.download = nombreArchivo;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                mostrarEstadoExport(`✓ Archivo CSV descargado exitosamente: ${nombreArchivo}`, 'success');
+            } catch (error) {
+                console.error('Error al exportar CSV:', error);
+                mostrarEstadoExport(`✗ Error al exportar: ${error.message}`, 'error');
+            } finally {
+                btn.textContent = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        async function exportarJSON() {
+            const btn = document.getElementById('btn-export-json');
+            const textoOriginal = btn.textContent;
+            btn.textContent = '⏳ Descargando...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/exportar/json`);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al exportar');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                const nombreArchivo = `sirve-la-mesa_datos_${new Date().toISOString().split('T')[0]}.json`;
+                a.download = nombreArchivo;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                mostrarEstadoExport(`✓ Archivo JSON descargado exitosamente: ${nombreArchivo}`, 'success');
+            } catch (error) {
+                console.error('Error al exportar JSON:', error);
+                mostrarEstadoExport(`✗ Error al exportar: ${error.message}`, 'error');
+            } finally {
+                btn.textContent = textoOriginal;
+                btn.disabled = false;
+            }
         }
 
         // Cargar datos al iniciar

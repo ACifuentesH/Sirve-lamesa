@@ -210,6 +210,66 @@ app.get('/api/estadisticas/por-edad', async (req, res) => {
 });
 
 // ===================================
+// EXPORTACIÓN DE DATOS
+// ===================================
+
+app.get('/api/exportar/csv', async (req, res) => {
+  try {
+    const datos = await gameController.exportarDatosCompletos();
+    const csv = gameController.generarCSV(datos);
+
+    if (!csv) {
+      return res.status(404).json({
+        error: 'No hay datos para exportar'
+      });
+    }
+
+    const fecha = new Date().toISOString().split('T')[0];
+    const nombreArchivo = `sirve-la-mesa_datos_${fecha}.csv`;
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
+    res.send(csv);
+  } catch (err) {
+    console.error('Error al exportar datos CSV:', err);
+    res.status(500).json({
+      error: 'Error al exportar datos',
+      details: err.message
+    });
+  }
+});
+
+app.get('/api/exportar/json', async (req, res) => {
+  try {
+    const datos = await gameController.exportarDatosCompletos();
+
+    if (!datos || datos.length === 0) {
+      return res.status(404).json({
+        error: 'No hay datos para exportar'
+      });
+    }
+
+    const fecha = new Date().toISOString().split('T')[0];
+    const nombreArchivo = `sirve-la-mesa_datos_${fecha}.json`;
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
+    res.json({
+      success: true,
+      exportado_en: new Date().toISOString(),
+      total_registros: datos.length,
+      data: datos
+    });
+  } catch (err) {
+    console.error('Error al exportar datos JSON:', err);
+    res.status(500).json({
+      error: 'Error al exportar datos',
+      details: err.message
+    });
+  }
+});
+
+// ===================================
 // RUTAS DE PÁGINAS WEB
 // ===================================
 
@@ -291,6 +351,8 @@ server.listen(port, async () => {
   console.log('  - GET  /api/personajes');
   console.log('  - GET  /api/ingredientes');
   console.log('  - POST /api/decisiones');
+  console.log('  - GET  /api/exportar/csv');
+  console.log('  - GET  /api/exportar/json');
   console.log('  - GET  /admin');
   console.log('  - GET  /juego');
   console.log('');
