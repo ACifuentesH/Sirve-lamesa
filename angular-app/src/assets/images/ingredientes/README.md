@@ -3,40 +3,32 @@
 Copiar todas las imágenes desde `Sirve-lamesa/assets/` a esta carpeta:
 
 ## Proteínas
-- carne.png
-- pollo_frito.png
 - muslo_de_pollo.png
-- pescado.png
+- bistecs.png
 - tocineta.png
-- salchicha.png
 - huevo_frito.png
 
 ## Carbohidratos
+- arroz.png
+- platano.png
 - papa.png
+- pasta.png
+- granos.png
 - pan tostado.png
-- bagle.png
-- croisant1.png
-- croisant2.png
-- crackers.png
-- muffin.png
 
 ## Vegetales
+- lechuga.png
+- brocoli.png
 - zanahoria.png
 - tomate.png
-- tomate_cherry.png
 - pepino.png
-- aguacate.png
-- esparragos.png
 
 ## Frutas
-- manzana.png
 - naranja.png
+- lechosa.png
 - cambur.png
 - fresa.png
-- frambuesas.png
-- durazno.png
-- patilla.png
-- nueces.png
+- pina.png
 
 ## Elementos de UI/Escena
 - mesa.png

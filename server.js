@@ -18,7 +18,7 @@ const io = socketIO(server, {
   }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // ===================================
 // CONFIGURACIÓN DE MIDDLEWARES
@@ -32,9 +32,9 @@ app.use(cors({
     
     const allowedOrigins = [
       process.env.CLIENT_URL,
-      'http://localhost:3000',
+      'http://localhost:3001',
       'http://localhost:8080',
-      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001',
       'http://127.0.0.1:8080',
       '*' // En desarrollo, permitir todos
     ].filter(Boolean);
@@ -65,7 +65,9 @@ if (process.env.NODE_ENV === 'production') {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/sirve_la_mesa',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: process.env.DATABASE_URL?.includes('supabase') 
+    ? { rejectUnauthorized: false } 
+    : (process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false),
 });
 
 // Instancia del controlador

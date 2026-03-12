@@ -1,0 +1,9 @@
+bistecs.png
+arroz.png
+platano.png
+pasta.png
+granos.png
+lechuga.png
+brocoli.png
+lechosa.png
+pina.png

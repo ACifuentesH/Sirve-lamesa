@@ -50,12 +50,27 @@ export class PlatoDropZoneComponent implements OnChanges {
     return 'assets/images/ingredientes/niño.png';
   }
 
-  private readonly tamanosVisuales: Record<number, number> = {
-    1: 55, 2: 55, 3: 50, 4: 55, 5: 45, 6: 40, 7: 45,
-    8: 45, 9: 50, 10: 50, 11: 45, 12: 40, 13: 45,
-    14: 48, 15: 38, 16: 42, 17: 40, 18: 50, 19: 45,
-    20: 45, 21: 45, 22: 45, 23: 40, 24: 40, 25: 45,
-    26: 55, 27: 35
+  private readonly tamanosVisuales: Record<string, number> = {
+    'Pollo': 50,
+    'Bistecs': 55,
+    'Huevo': 45,
+    'Tocineta': 45,
+    'Arroz': 45,
+    'Plátano': 48,
+    'Papa': 45,
+    'Pasta': 48,
+    'Granos': 45,
+    'Pan': 50,
+    'Tomate': 38,
+    'Lechuga': 42,
+    'Brócoli': 45,
+    'Zanahoria': 48,
+    'Pepino': 40,
+    'Naranja': 45,
+    'Lechosa': 50,
+    'Cambur': 45,
+    'Fresa': 40,
+    'Piña': 55
   };
 
   constructor(private dragDropService: DragDropService) {}
@@ -197,22 +212,23 @@ export class PlatoDropZoneComponent implements OnChanges {
 
       if (item.unidad === 'unidad' || item.unidad === 'unidades') {
         const pesosPorUnidad: { [key: string]: number } = {
-          'Huevo Frito': 50,
-          'Bagel': 100,
-          'Croissant': 60,
-          'Muffin': 80,
-          'Manzana': 180,
+          'Huevo': 50,
           'Naranja': 150,
-          'Cambur': 120,
-          'Durazno': 150,
-          'Tomate Cherry': 20
+          'Cambur': 120
         };
         const pesoPorUnidad = pesosPorUnidad[item.ingrediente.nombre] || 100;
         return total + (item.cantidad * pesoPorUnidad);
       }
 
       if (item.unidad === 'rebanadas') {
-        return total + (item.cantidad * 30);
+        const pesosPorRebanada: { [key: string]: number } = {
+          'Pan': 30,
+          'Tomate': 25,
+          'Lechosa': 80,
+          'Piña': 60
+        };
+        const pesoPorRebanada = pesosPorRebanada[item.ingrediente.nombre] || 30;
+        return total + (item.cantidad * pesoPorRebanada);
       }
 
       return total;
@@ -230,19 +246,19 @@ export class PlatoDropZoneComponent implements OnChanges {
       if (item.unidad !== 'gramos') {
         if (item.unidad === 'unidad' || item.unidad === 'unidades') {
           const pesosPorUnidad: { [key: string]: number } = {
-            'Huevo Frito': 50,
-            'Bagel': 100,
-            'Croissant': 60,
-            'Muffin': 80,
-            'Manzana': 180,
+            'Huevo': 50,
             'Naranja': 150,
-            'Cambur': 120,
-            'Durazno': 150,
-            'Tomate Cherry': 20
+            'Cambur': 120
           };
           cantidadEnGramos = item.cantidad * (pesosPorUnidad[item.ingrediente.nombre] || 100);
         } else if (item.unidad === 'rebanadas') {
-          cantidadEnGramos = item.cantidad * 30;
+          const pesosPorRebanada: { [key: string]: number } = {
+            'Pan': 30,
+            'Tomate': 25,
+            'Lechosa': 80,
+            'Piña': 60
+          };
+          cantidadEnGramos = item.cantidad * (pesosPorRebanada[item.ingrediente.nombre] || 30);
         }
       }
 
@@ -396,7 +412,7 @@ export class PlatoDropZoneComponent implements OnChanges {
   }
 
   private getVisualSize(ingrediente: Ingrediente): number {
-    const base = this.tamanosVisuales[ingrediente.id] ?? 45;
+    const base = this.tamanosVisuales[ingrediente.nombre] ?? 45;
     return Math.round(base * 2.5);
   }
 }

@@ -265,22 +265,23 @@ export class GameComponent implements OnInit, OnDestroy {
 
       if (item.unidad === 'unidad' || item.unidad === 'unidades') {
         const pesosPorUnidad: { [key: string]: number } = {
-          'Huevo Frito': 50,
-          'Bagel': 100,
-          'Croissant': 60,
-          'Muffin': 80,
-          'Manzana': 180,
+          'Huevo': 50,
           'Naranja': 150,
-          'Cambur': 120,
-          'Durazno': 150,
-          'Tomate Cherry': 20
+          'Cambur': 120
         };
         const pesoPorUnidad = pesosPorUnidad[item.ingrediente.nombre] || 100;
         return total + (item.cantidad * pesoPorUnidad);
       }
 
       if (item.unidad === 'rebanadas') {
-        return total + (item.cantidad * 30);
+        const pesosPorRebanada: { [key: string]: number } = {
+          'Pan': 30,
+          'Tomate': 25,
+          'Lechosa': 80,
+          'Piña': 60
+        };
+        const pesoPorRebanada = pesosPorRebanada[item.ingrediente.nombre] || 30;
+        return total + (item.cantidad * pesoPorRebanada);
       }
 
       return total;

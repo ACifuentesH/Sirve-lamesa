@@ -60,39 +60,31 @@ ON CONFLICT DO NOTHING;
 -- Ingredientes con imágenes del frontend y categorías
 INSERT INTO Componentes (nombre, descripcion, imagen, categoria, unidad, porcion_default) VALUES
     -- Proteínas del frontend
-    ('Carne', 'Carne de res', 'carne.png', 'proteina', 'gramos', 100),
-    ('Pollo Frito', 'Pollo frito crujiente', 'pollo_frito.png', 'proteina', 'gramos', 150),
-    ('Muslo de Pollo', 'Muslo de pollo asado', 'muslo_de_pollo.png', 'proteina', 'gramos', 120),
-    ('Pescado', 'Filete de pescado', 'pescado.png', 'proteina', 'gramos', 150),
-    ('Tocineta', 'Tocino frito', 'tocineta.png', 'proteina', 'gramos', 30),
-    ('Salchicha', 'Salchicha tipo viena', 'salchicha.png', 'proteina', 'gramos', 50),
-    ('Huevo Frito', 'Huevo frito', 'huevo_frito.png', 'proteina', 'unidad', 1),
+    ('Pollo', 'Pollo', 'muslo_de_pollo.png', 'proteina', 'gramos', 120),
+    ('Bistecs', 'Bistecs de res', 'bistecs.png', 'proteina', 'gramos', 150),
+    ('Huevo', 'Huevo', 'huevo_frito.png', 'proteina', 'unidad', 1),
+    ('Tocineta', 'Tocineta frita', 'tocineta.png', 'proteina', 'gramos', 30),
     
     -- Carbohidratos del frontend
+    ('Arroz', 'Arroz cocido', 'arroz.png', 'carbohidrato', 'gramos', 150),
+    ('Plátano', 'Plátano', 'platano.png', 'carbohidrato', 'gramos', 100),
     ('Papa', 'Papa cocida o frita', 'papa.png', 'carbohidrato', 'gramos', 150),
-    ('Pan Tostado', 'Pan tostado', 'pan tostado.png', 'carbohidrato', 'rebanadas', 2),
-    ('Bagel', 'Bagel', 'bagle.png', 'carbohidrato', 'unidad', 1),
-    ('Croissant', 'Croissant', 'croisant1.png', 'carbohidrato', 'unidad', 1),
-    ('Crackers', 'Galletas saladas', 'crackers.png', 'carbohidrato', 'gramos', 30),
-    ('Muffin', 'Muffin', 'muffin.png', 'carbohidrato', 'unidad', 1),
+    ('Granos', 'Granos cocidos', 'granos.png', 'carbohidrato', 'gramos', 120),
+    ('Pan', 'Pan', 'pan tostado.png', 'carbohidrato', 'rebanadas', 1),
     
     -- Vegetales del frontend
+    ('Tomate', 'Tomate fresco en rodaja', 'tomate.png', 'vegetal', 'rebanadas', 1),
+    ('Lechuga', 'Lechuga fresca', 'lechuga.png', 'vegetal', 'gramos', 50),
+    ('Brócoli', 'Brócoli', 'brocoli.png', 'vegetal', 'gramos', 80),
     ('Zanahoria', 'Zanahoria cocida', 'zanahoria.png', 'vegetal', 'gramos', 80),
-    ('Tomate', 'Tomate fresco', 'tomate.png', 'vegetal', 'gramos', 100),
-    ('Tomate Cherry', 'Tomate cherry', 'tomate_cherry.png', 'vegetal', 'unidades', 5),
     ('Pepino', 'Pepino fresco', 'pepino.png', 'vegetal', 'gramos', 50),
-    ('Aguacate', 'Aguacate fresco', 'aguacate.png', 'vegetal', 'gramos', 100),
-    ('Espárragos', 'Espárragos', 'esparragos.png', 'vegetal', 'gramos', 80),
     
     -- Frutas del frontend
-    ('Manzana', 'Manzana fresca', 'manzana.png', 'fruta', 'unidad', 1),
     ('Naranja', 'Naranja fresca', 'naranja.png', 'fruta', 'unidad', 1),
-    ('Cambur', 'Plátano/Banana', 'cambur.png', 'fruta', 'unidad', 1),
+    ('Lechosa', 'Lechosa/Papaya en rebanadas', 'lechosa.png', 'fruta', 'rebanadas', 1),
+    ('Cambur', 'Cambur', 'cambur.png', 'fruta', 'unidad', 1),
     ('Fresa', 'Fresas frescas', 'fresa.png', 'fruta', 'gramos', 100),
-    ('Frambuesas', 'Frambuesas frescas', 'frambuesas.png', 'fruta', 'gramos', 50),
-    ('Durazno', 'Durazno fresco', 'durazno.png', 'fruta', 'unidad', 1),
-    ('Patilla', 'Sandía', 'patilla.png', 'fruta', 'gramos', 200),
-    ('Nueces', 'Nueces', 'nueces.png', 'fruta', 'gramos', 30),
+    ('Piña', 'Piña fresca en rebanadas', 'pina.png', 'fruta', 'rebanadas', 1),
     
     -- Ingredientes adicionales del menú venezolano (sin imagen del frontend)
     ('Queso blanco', 'Queso blanco fresco', NULL, 'proteina', 'gramos', 50),
@@ -120,17 +112,17 @@ INSERT INTO Componentes (nombre, descripcion, imagen, categoria, unidad, porcion
     ('Pastelito (masa)', 'Masa de pastelito frita', NULL, 'carbohidrato', 'unidad', 1),
     ('Cachito (masa)', 'Croissant venezolano', NULL, 'carbohidrato', 'unidad', 1),
     ('Arroz blanco', 'Arroz blanco cocido', NULL, 'carbohidrato', 'gramos', 150),
-    ('Pasta', 'Pasta cocida', NULL, 'carbohidrato', 'gramos', 200),
+    ('Pasta', 'Pasta cocida', 'pasta.png', 'carbohidrato', 'gramos', 200),
     ('Yuca', 'Yuca cocida', NULL, 'carbohidrato', 'gramos', 100),
     ('Plátano frito', 'Plátano maduro frito', NULL, 'carbohidrato', 'gramos', 50),
     ('Tostones', 'Plátano verde frito', NULL, 'carbohidrato', 'gramos', 60),
     ('Maíz', 'Maíz cocido', NULL, 'carbohidrato', 'gramos', 80),
-    ('Pan', 'Pan tradicional', NULL, 'carbohidrato', 'unidad', 1),
+    ('Pan tradicional', 'Pan tradicional', NULL, 'carbohidrato', 'unidad', 1),
     
     -- Vegetales adicionales
     ('Caraotas negras', 'Frijoles negros cocidos', NULL, 'vegetal', 'gramos', 100),
     ('Auyama', 'Calabaza cocida', NULL, 'vegetal', 'gramos', 80),
-    ('Lechuga', 'Lechuga fresca', NULL, 'vegetal', 'gramos', 50),
+    ('Lechuga extra', 'Lechuga fresca', NULL, 'vegetal', 'gramos', 50),
     ('Cebolla', 'Cebolla', NULL, 'vegetal', 'gramos', 30),
     ('Cilantro', 'Cilantro fresco', NULL, 'vegetal', 'gramos', 10),
     ('Perejil', 'Perejil fresco', NULL, 'vegetal', 'gramos', 10),

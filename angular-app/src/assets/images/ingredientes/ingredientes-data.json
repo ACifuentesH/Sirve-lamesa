@@ -2,38 +2,30 @@
   "ingredientes": [
     {
       "id": 1,
-      "nombre": "Carne",
-      "imagen": "carne.png",
-      "categoria": "proteina",
-      "unidad": "gramos",
-      "porcionDefault": 100
-    },
-    {
-      "id": 2,
-      "nombre": "Pollo Frito",
-      "imagen": "pollo_frito.png",
-      "categoria": "proteina",
-      "unidad": "gramos",
-      "porcionDefault": 150
-    },
-    {
-      "id": 3,
-      "nombre": "Muslo de Pollo",
+      "nombre": "Pollo",
       "imagen": "muslo_de_pollo.png",
       "categoria": "proteina",
       "unidad": "gramos",
       "porcionDefault": 120
     },
     {
-      "id": 4,
-      "nombre": "Pescado",
-      "imagen": "pescado.png",
+      "id": 2,
+      "nombre": "Bistecs",
+      "imagen": "bistecs.png",
       "categoria": "proteina",
       "unidad": "gramos",
       "porcionDefault": 150
     },
     {
-      "id": 5,
+      "id": 3,
+      "nombre": "Huevo",
+      "imagen": "huevo_frito.png",
+      "categoria": "proteina",
+      "unidad": "unidad",
+      "porcionDefault": 1
+    },
+    {
+      "id": 4,
       "nombre": "Tocineta",
       "imagen": "tocineta.png",
       "categoria": "proteina",
@@ -41,23 +33,23 @@
       "porcionDefault": 30
     },
     {
-      "id": 6,
-      "nombre": "Salchicha",
-      "imagen": "salchicha.png",
-      "categoria": "proteina",
+      "id": 5,
+      "nombre": "Arroz",
+      "imagen": "arroz.png",
+      "categoria": "carbohidrato",
       "unidad": "gramos",
-      "porcionDefault": 50
+      "porcionDefault": 150
+    },
+    {
+      "id": 6,
+      "nombre": "Plátano",
+      "imagen": "platano.png",
+      "categoria": "carbohidrato",
+      "unidad": "gramos",
+      "porcionDefault": 100
     },
     {
       "id": 7,
-      "nombre": "Huevo Frito",
-      "imagen": "huevo_frito.png",
-      "categoria": "proteina",
-      "unidad": "unidad",
-      "porcionDefault": 1
-    },
-    {
-      "id": 8,
       "nombre": "Papa",
       "imagen": "papa.png",
       "categoria": "carbohidrato",
@@ -65,44 +57,52 @@
       "porcionDefault": 150
     },
     {
-      "id": 9,
-      "nombre": "Pan Tostado",
-      "imagen": "pan tostado.png",
+      "id": 8,
+      "nombre": "Pasta",
+      "imagen": "pasta.png",
       "categoria": "carbohidrato",
-      "unidad": "rebanadas",
-      "porcionDefault": 2
+      "unidad": "gramos",
+      "porcionDefault": 200
+    },
+    {
+      "id": 9,
+      "nombre": "Granos",
+      "imagen": "granos.png",
+      "categoria": "carbohidrato",
+      "unidad": "gramos",
+      "porcionDefault": 120
     },
     {
       "id": 10,
-      "nombre": "Bagel",
-      "imagen": "bagle.png",
+      "nombre": "Pan",
+      "imagen": "pan tostado.png",
       "categoria": "carbohidrato",
-      "unidad": "unidad",
+      "unidad": "rebanadas",
       "porcionDefault": 1
     },
     {
       "id": 11,
-      "nombre": "Croissant",
-      "imagen": "croisant1.png",
-      "categoria": "carbohidrato",
-      "unidad": "unidad",
+      "nombre": "Tomate",
+      "imagen": "tomate.png",
+      "categoria": "vegetal",
+      "unidad": "rebanadas",
       "porcionDefault": 1
     },
     {
       "id": 12,
-      "nombre": "Crackers",
-      "imagen": "crackers.png",
-      "categoria": "carbohidrato",
+      "nombre": "Lechuga",
+      "imagen": "lechuga.png",
+      "categoria": "vegetal",
       "unidad": "gramos",
-      "porcionDefault": 30
+      "porcionDefault": 50
     },
     {
       "id": 13,
-      "nombre": "Muffin",
-      "imagen": "muffin.png",
-      "categoria": "carbohidrato",
-      "unidad": "unidad",
-      "porcionDefault": 1
+      "nombre": "Brócoli",
+      "imagen": "brocoli.png",
+      "categoria": "vegetal",
+      "unidad": "gramos",
+      "porcionDefault": 80
     },
     {
       "id": 14,
@@ -114,22 +114,6 @@
     },
     {
       "id": 15,
-      "nombre": "Tomate",
-      "imagen": "tomate.png",
-      "categoria": "vegetal",
-      "unidad": "gramos",
-      "porcionDefault": 100
-    },
-    {
-      "id": 16,
-      "nombre": "Tomate Cherry",
-      "imagen": "tomate_cherry.png",
-      "categoria": "vegetal",
-      "unidad": "unidades",
-      "porcionDefault": 5
-    },
-    {
-      "id": 17,
       "nombre": "Pepino",
       "imagen": "pepino.png",
       "categoria": "vegetal",
@@ -137,31 +121,7 @@
       "porcionDefault": 50
     },
     {
-      "id": 18,
-      "nombre": "Aguacate",
-      "imagen": "aguacate.png",
-      "categoria": "vegetal",
-      "unidad": "gramos",
-      "porcionDefault": 100
-    },
-    {
-      "id": 19,
-      "nombre": "Espárragos",
-      "imagen": "esparragos.png",
-      "categoria": "vegetal",
-      "unidad": "gramos",
-      "porcionDefault": 80
-    },
-    {
-      "id": 20,
-      "nombre": "Manzana",
-      "imagen": "manzana.png",
-      "categoria": "fruta",
-      "unidad": "unidad",
-      "porcionDefault": 1
-    },
-    {
-      "id": 21,
+      "id": 16,
       "nombre": "Naranja",
       "imagen": "naranja.png",
       "categoria": "fruta",
@@ -169,7 +129,15 @@
       "porcionDefault": 1
     },
     {
-      "id": 22,
+      "id": 17,
+      "nombre": "Lechosa",
+      "imagen": "lechosa.png",
+      "categoria": "fruta",
+      "unidad": "rebanadas",
+      "porcionDefault": 1
+    },
+    {
+      "id": 18,
       "nombre": "Cambur",
       "imagen": "cambur.png",
       "categoria": "fruta",
@@ -177,7 +145,7 @@
       "porcionDefault": 1
     },
     {
-      "id": 23,
+      "id": 19,
       "nombre": "Fresa",
       "imagen": "fresa.png",
       "categoria": "fruta",
@@ -185,36 +153,12 @@
       "porcionDefault": 100
     },
     {
-      "id": 24,
-      "nombre": "Frambuesas",
-      "imagen": "frambuesas.png",
+      "id": 20,
+      "nombre": "Piña",
+      "imagen": "pina.png",
       "categoria": "fruta",
-      "unidad": "gramos",
-      "porcionDefault": 50
-    },
-    {
-      "id": 25,
-      "nombre": "Durazno",
-      "imagen": "durazno.png",
-      "categoria": "fruta",
-      "unidad": "unidad",
+      "unidad": "rebanadas",
       "porcionDefault": 1
-    },
-    {
-      "id": 26,
-      "nombre": "Patilla",
-      "imagen": "patilla.png",
-      "categoria": "fruta",
-      "unidad": "gramos",
-      "porcionDefault": 200
-    },
-    {
-      "id": 27,
-      "nombre": "Nueces",
-      "imagen": "nueces.png",
-      "categoria": "fruta",
-      "unidad": "gramos",
-      "porcionDefault": 30
     }
   ]
 }
