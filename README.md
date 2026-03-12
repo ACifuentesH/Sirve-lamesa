@@ -56,7 +56,7 @@ Observar si existen diferencias en el porcionamiento de alimentos según el gén
 ### 🔬 Sistema de Investigación
 - Registro de datos sociodemográficos
 - Soporte para instrumento EAT-26
-- Datos antropométricos opcionales
+- Datos antropométricos obligatorios (peso y estatura)
 - Timestamps precisos de cada decisión
 - Orden de servicio y tiempos de decisión
 
@@ -291,7 +291,7 @@ Sirve-lamesa/
 El archivo CSV/JSON incluye:
 
 #### Información del Participante
-- ID, Nombre, Edad, Sexo
+- ID anónimo, Edad, Sexo
 - Datos antropométricos (peso, altura, IMC)
 - Datos geográficos y socioeconómicos
 - Puntuación EAT-26 (si aplica)
@@ -357,8 +357,8 @@ Componentes (ingredientes)
 ## 🎯 Flujo del Juego
 
 1. **Login del Participante**
-   - Captura: nombres, edad, sexo
-   - Datos opcionales: antropométricos, EAT-26
+   - Captura: edad, sexo, peso y estatura
+   - Datos opcionales: EAT-26 y datos complementarios
 
 2. **Inicio de Sesión**
    - Se crea una sesión en la BD

@@ -89,7 +89,7 @@ La aplicación estará en: http://localhost:3000
 
 ### Componente Login
 - **Ubicación**: `angular-app/src/app/components/login/`
-- **Función**: Captura nombres, edad y sexo del participante
+- **Función**: Captura edad, sexo, peso y estatura del participante (anónimo)
 - **Diseño**: Mantiene el diseño circular con patrón de picnic
 - **Validaciones**: Formularios reactivos con validación en tiempo real
 
@@ -172,7 +172,7 @@ npm install
 ```
 Usuario → Login Component
     ↓
-POST /api/participantes (nombres, edad, sexo)
+POST /api/participantes (edad, sexo, peso_kg, altura_cm)
     ↓
 Recibe: { pk_participante: 1, ... }
     ↓

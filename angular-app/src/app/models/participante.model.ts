@@ -1,10 +1,9 @@
 export interface Participante {
   pk_participante?: number;
-  nombres: string;
   edad: number;
   sexo: string;
-  peso_kg?: number;
-  altura_cm?: number;
+  peso_kg: number;
+  altura_cm: number;
   imc?: number;
   lugar_nacimiento?: string;
   lugar_residencia?: string;
@@ -18,12 +17,11 @@ export interface Participante {
 }
 
 export interface CreateParticipanteDto {
-  nombres: string;
   edad: number;
   sexo: string;
   consentimiento_informado: boolean;
-  peso_kg?: number;
-  altura_cm?: number;
+  peso_kg: number;
+  altura_cm: number;
   lugar_nacimiento?: string;
   lugar_residencia?: string;
   ocupacion?: string;

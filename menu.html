@@ -418,8 +418,8 @@
     </div>
 
     <div ng-controller="MenuController" class="content-wrapper">
-        <div class="welcome-message" ng-if="usuario.nombres">
-            ¡Hola, {{usuario.nombres}}! Arrastra la comida al plato
+        <div class="welcome-message" ng-if="usuario">
+            Participante anónimo: Arrastra la comida al plato
         </div>
 
         <div class="scene-container">
@@ -493,7 +493,7 @@
             $scope.usuario = datosUsuario;
 
             // Si no hay datos, redirigir al inicio
-            if (!datosUsuario.nombres) {
+            if (!datosUsuario.edad || !datosUsuario.sexo) {
                 window.location.href = 'index.html';
             }
 

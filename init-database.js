@@ -32,7 +32,9 @@ async function initDatabase() {
       'database/participantes.sql',
       'database/sesiones_juego.sql',
       'database/decisiones_porcionamiento.sql',
-      'database/seed_data.sql'
+      'database/seed_data.sql',
+      'database/migrations/001_ampliar_campo_navegador.sql',
+      'database/migrations/002_anonimizar_participantes.sql'
     ];
 
     console.log('📂 Archivos SQL a ejecutar:');

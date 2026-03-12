@@ -30,9 +30,10 @@ export class LoginComponent implements OnInit {
 
   createForm(): void {
     this.loginForm = this.fb.group({
-      nombres: ['', [Validators.required, Validators.minLength(2)]],
       sexo: ['', Validators.required],
-      edad: ['', [Validators.required, Validators.min(1), Validators.max(120)]]
+      edad: ['', [Validators.required, Validators.min(1), Validators.max(120)]],
+      peso_kg: ['', [Validators.required, Validators.min(1), Validators.max(500)]],
+      altura_cm: ['', [Validators.required, Validators.min(30), Validators.max(250)]]
     });
   }
 
@@ -49,8 +50,9 @@ export class LoginComponent implements OnInit {
     this.error = '';
 
     const formData = {
-      nombres: this.loginForm.value.nombres,
       edad: parseInt(this.loginForm.value.edad),
+      peso_kg: parseFloat(this.loginForm.value.peso_kg),
+      altura_cm: parseFloat(this.loginForm.value.altura_cm),
       sexo: this.mapSexo(this.loginForm.value.sexo),
       consentimiento_informado: true
     };
@@ -110,7 +112,8 @@ export class LoginComponent implements OnInit {
   }
 
   // Getters para validación en template
-  get nombres() { return this.loginForm.get('nombres'); }
   get sexo() { return this.loginForm.get('sexo'); }
   get edad() { return this.loginForm.get('edad'); }
+  get pesoKg() { return this.loginForm.get('peso_kg'); }
+  get alturaCm() { return this.loginForm.get('altura_cm'); }
 }

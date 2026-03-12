@@ -78,7 +78,7 @@ SirveLaMesa/
 
 ## 🔄 Flujo de la Aplicación
 
-1. **Login** → Captura nombres, edad, sexo
+1. **Login** → Captura edad, sexo, peso y estatura (sin nombre)
 2. **Crear Participante** → POST `/api/participantes`
 3. **Iniciar Sesión** → POST `/api/sesiones`
 4. **Juego** → 3 escenarios (desayuno, almuerzo, cena)

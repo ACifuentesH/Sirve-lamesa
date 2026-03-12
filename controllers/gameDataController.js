@@ -12,7 +12,7 @@ class GameDataController {
   
   async crearParticipante(datos) {
     const {
-      nombres, edad, sexo,
+      edad, sexo,
       peso_kg, altura_cm,
       lugar_nacimiento, lugar_residencia,
       ocupacion, nivel_socioeconomico,
@@ -26,17 +26,17 @@ class GameDataController {
 
     const query = `
       INSERT INTO Participantes (
-        nombres, edad, sexo, peso_kg, altura_cm, imc,
+        edad, sexo, peso_kg, altura_cm, imc,
         lugar_nacimiento, lugar_residencia,
         ocupacion, nivel_socioeconomico,
         eat26_score, eat26_data,
         consentimiento_informado, notas
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
     `;
 
     const values = [
-      nombres, edad, sexo, peso_kg, altura_cm, imc,
+      edad, sexo, peso_kg, altura_cm, imc,
       lugar_nacimiento, lugar_residencia,
       ocupacion, nivel_socioeconomico,
       eat26_score, eat26_data ? JSON.stringify(eat26_data) : null,
@@ -319,7 +319,6 @@ class GameDataController {
     const query = `
       SELECT 
         p.pk_participante,
-        p.nombres AS participante_nombre,
         p.edad AS participante_edad,
         p.sexo AS participante_sexo,
         p.peso_kg AS participante_peso_kg,
@@ -402,7 +401,6 @@ class GameDataController {
       return {
         // Participante
         participante_id: row.pk_participante,
-        participante_nombre: row.participante_nombre,
         participante_edad: row.participante_edad,
         participante_sexo: row.participante_sexo,
         participante_peso_kg: row.participante_peso_kg || '',
@@ -451,7 +449,6 @@ class GameDataController {
     // Encabezados legibles
     const encabezados = {
       participante_id: 'ID Participante',
-      participante_nombre: 'Nombre Participante',
       participante_edad: 'Edad Participante',
       participante_sexo: 'Sexo Participante',
       participante_peso_kg: 'Peso (kg)',

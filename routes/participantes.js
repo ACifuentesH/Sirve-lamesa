@@ -6,7 +6,7 @@ module.exports = (gameController) => {
   router.post('/', async (req, res) => {
     try {
       const {
-        nombres, edad, sexo,
+        edad, sexo,
         peso_kg, altura_cm,
         lugar_nacimiento, lugar_residencia,
         ocupacion, nivel_socioeconomico,
@@ -15,9 +15,9 @@ module.exports = (gameController) => {
       } = req.body;
 
       // Validaciones básicas
-      if (!nombres || !edad || !sexo) {
+      if (!edad || !sexo || peso_kg === undefined || altura_cm === undefined) {
         return res.status(400).json({ 
-          error: 'Nombres, edad y sexo son campos obligatorios' 
+          error: 'Edad, sexo, peso_kg y altura_cm son campos obligatorios'
         });
       }
 
@@ -30,6 +30,12 @@ module.exports = (gameController) => {
       if (edad < 1 || edad > 120) {
         return res.status(400).json({ 
           error: 'La edad debe estar entre 1 y 120 años' 
+        });
+      }
+
+      if (peso_kg <= 0 || altura_cm <= 0) {
+        return res.status(400).json({
+          error: 'El peso y la altura deben ser mayores a 0'
         });
       }
 
