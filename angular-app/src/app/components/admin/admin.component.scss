@@ -319,7 +319,18 @@
   position: relative;
 
   canvas { max-width: 100%; }
+
+  &--xl { height: 380px; }
 }
+
+.chart-card--principal {
+  border: 2px solid rgba(107, 155, 122, 0.25);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.chart-card--span2 { grid-column: span 2; }
+
+.chart-box--tall { height: 360px; }
 
 .empty-hint {
   text-align: center;
@@ -471,63 +482,32 @@
   flex-wrap: wrap;
 }
 
-// ─── Export panel ─────────────────────────────────────────────────────
+// ─── Export row ───────────────────────────────────────────────────────
 
-.export-panel { gap: 20px; }
-
-.export-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.export-card {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(196, 98, 45, 0.12);
-  border-radius: 16px;
-  padding: 28px 24px;
-  text-align: center;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+.export-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 4px 2px;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  &__label {
+    font-size: 0.88em;
+    font-weight: 700;
+    color: var(--color-verde-oscuro);
+    white-space: nowrap;
   }
-
-  h3 {
-    font-size: 1.15em;
-    color: var(--color-verde);
-    margin: 0;
-  }
-
-  p {
-    font-size: 0.85em;
-    color: #666;
-    line-height: 1.55;
-    margin: 0;
-  }
-}
-
-.export-icon {
-  font-size: 2.6em;
-  line-height: 1;
 }
 
 .btn-dl {
-  padding: 10px 28px;
+  padding: 8px 20px;
   border: none;
   border-radius: 50px;
-  font-size: 0.9em;
+  font-size: 0.88em;
   font-weight: 700;
   font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   transition: all 0.22s ease;
-  margin-top: 4px;
   letter-spacing: 0.03em;
 
   &:hover {
@@ -590,7 +570,7 @@
   .admin-header { flex-direction: column; text-align: center; }
   .charts-grid.cols-2,
   .charts-grid.cols-3 { grid-template-columns: 1fr; }
-  .export-cards { grid-template-columns: 1fr; }
+  .chart-card--span2 { grid-column: span 1; }
 }
 
 @keyframes spin {

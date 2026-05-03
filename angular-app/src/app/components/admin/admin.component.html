@@ -101,8 +101,16 @@
         </div>
       </div>
 
-      <!-- 6 charts — 2 columns -->
-      <div class="charts-grid cols-2">
+      <!-- Gráfico principal — ancho completo -->
+      <div class="charts-grid cols-1">
+        <div class="chart-card chart-card--principal">
+          <h3 class="chart-title font-title">Promedio de Comida Servida por Personaje — Género · Edad · IMC × Categoría (g/decisión)</h3>
+          <div class="chart-box chart-box--xl"><canvas #resumenPersonajeChart></canvas></div>
+        </div>
+      </div>
+
+      <!-- Fila A: 3 columnas — Edad | M/F por Edad | Sexo Participante -->
+      <div class="charts-grid cols-3">
 
         <div class="chart-card">
           <h3 class="chart-title font-title">Promedio (g) por Edad del Personaje</h3>
@@ -110,11 +118,21 @@
         </div>
 
         <div class="chart-card">
-          <h3 class="chart-title font-title">Promedio (g) por Edad — Masculino vs Femenino</h3>
+          <h3 class="chart-title font-title">Promedio (g) por Edad — Masc. vs Fem.</h3>
           <div class="chart-box"><canvas #mfEdadChart></canvas></div>
         </div>
 
         <div class="chart-card">
+          <h3 class="chart-title font-title">Sexo del Participante</h3>
+          <div class="chart-box"><canvas #partSexoChart></canvas></div>
+        </div>
+
+      </div>
+
+      <!-- Fila B: Cat por Sexo (ancho) + Pie categorías -->
+      <div class="charts-grid cols-3">
+
+        <div class="chart-card chart-card--span2">
           <h3 class="chart-title font-title">Promedio (g) por Categoría — según Sexo del Personaje</h3>
           <div class="chart-box"><canvas #catSexoPerChart></canvas></div>
         </div>
@@ -124,14 +142,34 @@
           <div class="chart-box"><canvas #catChart></canvas></div>
         </div>
 
-        <div class="chart-card tall">
+      </div>
+
+      <!-- Fila C: Top 10 (tall, ancho) + IMC participante -->
+      <div class="charts-grid cols-3">
+
+        <div class="chart-card tall chart-card--span2">
           <h3 class="chart-title font-title">Top 10 Alimentos — Frecuencia</h3>
-          <div class="chart-box"><canvas #topCountChart></canvas></div>
+          <div class="chart-box chart-box--tall"><canvas #topCountChart></canvas></div>
         </div>
 
         <div class="chart-card">
-          <h3 class="chart-title font-title">Sexo del Participante</h3>
-          <div class="chart-box"><canvas #partSexoChart></canvas></div>
+          <h3 class="chart-title font-title">Promedio (g) por IMC del Participante</h3>
+          <div class="chart-box"><canvas #imcPartChart></canvas></div>
+        </div>
+
+      </div>
+
+      <!-- Fila D: Ranking (tall) + Stacked % -->
+      <div class="charts-grid cols-2">
+
+        <div class="chart-card tall">
+          <h3 class="chart-title font-title">Ranking de Personajes — Promedio (g) Servidos</h3>
+          <div class="chart-box chart-box--tall"><canvas #rankingChart></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title font-title">Distribución de Categorías por Sexo del Personaje (%)</h3>
+          <div class="chart-box"><canvas #catSexoStackChart></canvas></div>
         </div>
 
       </div>
@@ -146,26 +184,12 @@
     ════════════════════════════════════════════ -->
     <div class="tab-panel" [hidden]="activeTab !== 'datos'">
 
-      <!-- Export cards -->
-      <div class="export-cards">
-        <div class="export-card">
-          <div class="export-icon">🟢</div>
-          <h3 class="font-title">Exportar Excel</h3>
-          <p class="font-text">Descarga todos los datos en formato .xlsx, compatible con Microsoft Excel y Google Sheets.</p>
-          <button class="btn-dl btn-dl--excel font-text" (click)="downloadExcel()">↓ Descargar Excel</button>
-        </div>
-        <div class="export-card">
-          <div class="export-icon">📊</div>
-          <h3 class="font-title">Exportar CSV</h3>
-          <p class="font-text">Descarga todos los datos en formato CSV. Incluye información de participantes, sesiones, personajes y alimentos servidos.</p>
-          <button class="btn-dl btn-dl--csv font-text" (click)="downloadCSV()">↓ Descargar CSV</button>
-        </div>
-        <div class="export-card">
-          <div class="export-icon">&#123; &#125;</div>
-          <h3 class="font-title">Exportar JSON</h3>
-          <p class="font-text">Descarga todos los datos en formato JSON estructurado, ideal para análisis con Python, R u otras herramientas.</p>
-          <button class="btn-dl btn-dl--json font-text" (click)="downloadJSON()">↓ Descargar JSON</button>
-        </div>
+      <!-- Export row -->
+      <div class="export-row font-text">
+        <span class="export-row__label">Exportar:</span>
+        <button class="btn-dl btn-dl--excel font-text" (click)="downloadExcel()">↓ Excel</button>
+        <button class="btn-dl btn-dl--csv font-text" (click)="downloadCSV()">↓ CSV</button>
+        <button class="btn-dl btn-dl--json font-text" (click)="downloadJSON()">↓ JSON</button>
       </div>
 
       <!-- Table toolbar: count + pagination -->

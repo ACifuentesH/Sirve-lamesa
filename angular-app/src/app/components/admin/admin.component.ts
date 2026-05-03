@@ -73,12 +73,16 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   // ── canvas refs ────────────────────────────────────────────────
+  @ViewChild('resumenPersonajeChart') resumenPersonajeRef!: ElementRef<HTMLCanvasElement>; // chart 0 — principal
   @ViewChild('edadChart')       edadRef!:       ElementRef<HTMLCanvasElement>; // chart 1
   @ViewChild('mfEdadChart')     mfEdadRef!:     ElementRef<HTMLCanvasElement>; // chart 2
   @ViewChild('catSexoPerChart') catSexoPerRef!: ElementRef<HTMLCanvasElement>; // chart 3
   @ViewChild('catChart')        catRef!:        ElementRef<HTMLCanvasElement>; // chart 4
   @ViewChild('topCountChart')   topCountRef!:   ElementRef<HTMLCanvasElement>; // chart 5
   @ViewChild('partSexoChart')   partSexoRef!:   ElementRef<HTMLCanvasElement>; // chart 6
+  @ViewChild('rankingChart')    rankingRef!:    ElementRef<HTMLCanvasElement>; // chart 7
+  @ViewChild('catSexoStackChart') catSexoStackRef!: ElementRef<HTMLCanvasElement>; // chart 8
+  @ViewChild('imcPartChart')    imcPartRef!:    ElementRef<HTMLCanvasElement>; // chart 9
 
   private charts: Record<string, Chart> = {};
 
@@ -175,6 +179,12 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
   }
 
+  private personajeLabel(tipo: string, edad: string, imc: string): string {
+    const t = tipo === 'adulto_hombre' ? 'H' : tipo === 'adulto_mujer' ? 'M' : tipo === 'niño' ? 'N' : tipo;
+    const i = imc === 'normopeso' ? 'Normo' : imc === 'sobrepeso' ? 'Sobre' : '';
+    return i ? `${t} · ${edad} · ${i}` : `${t} · ${edad}`;
+  }
+
   private partEdadRange(edad: number): string {
     if (edad < 18)  return '<18';
     if (edad <= 25) return '18-25';
@@ -221,6 +231,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   renderCharts(): void {
+    this.chartResumenPersonaje();
     this.chartEdad();
     this.chartMFporEdad();
     this.chartCatPorSexoPersonaje();
@@ -228,6 +239,69 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chartCategorias(categorias);
     this.chartTopCount(topCount);
     this.chartPartSexo();
+    this.chartRankingPersonajes();
+    this.chartCatSexoStacked();
+    this.chartImcParticipante();
+  }
+
+  // ── CHART 0 — Resumen principal: personaje × categoría ───────────
+  // Cada barra = un personaje único. Label = tipo | edad | sexo | IMC.
+  // Stack = categorías de alimento. Y = promedio de gramos de esa categoría por decisión.
+  private chartResumenPersonaje(): void {
+    const cats = ['proteina', 'carbohidrato', 'vegetal', 'fruta'];
+
+    // Composite key so each of the 7 characters gets its own bar
+    const charMap = new Map<string, { label: string; items: any[] }>();
+    this.filteredData.forEach(d => {
+      const key = `${d.personaje_tipo}|${d.personaje_edad_rango}|${d.personaje_imc_representado || ''}`;
+      if (!charMap.has(key)) {
+        charMap.set(key, {
+          label: this.personajeLabel(d.personaje_tipo, d.personaje_edad_rango, d.personaje_imc_representado || ''),
+          items: []
+        });
+      }
+      charMap.get(key)!.items.push(d);
+    });
+
+    const chars = [...charMap.values()];
+    const labels = chars.map(c => c.label);
+
+    const datasets = cats.map(cat => ({
+      label: CAT_LABEL[cat],
+      data: chars.map(c => {
+        const n = c.items.length || 1;
+        let total = 0;
+        c.items.forEach(d => {
+          (d.componentes_servidos || []).forEach((comp: any) => {
+            if (this.componentesMap.get(comp.componente_id)?.categoria === cat)
+              total += +comp.cantidad_gramos || 0;
+          });
+        });
+        return Math.round(total / n);
+      }),
+      backgroundColor: CAT_COLOR[cat],
+      stack: 'main'
+    }));
+
+    this.upsert('resumenPersonaje', this.resumenPersonajeRef, {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              title: (items: any[]) => items[0]?.label?.replace(/\s\s+/g, ' ') ?? ''
+            }
+          }
+        },
+        scales: {
+          x: { stacked: true },
+          y: { stacked: true, beginAtZero: true, title: { display: true, text: 'g promedio / decisión' } }
+        }
+      }
+    } as ChartConfiguration);
   }
 
   // ── CHART 1 — Promedio (g) por edad del personaje ──────────────
@@ -352,6 +426,101 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
       type: 'doughnut',
       data: { labels, datasets: [{ data: [...g.values()].map(v => v.length), backgroundColor: [PALETTE[0], PALETTE[2], PALETTE[4]] }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+
+  // ── CHART 7 — Ranking de personajes por gramos servidos ──────────
+  private chartRankingPersonajes(): void {
+    const g = new Map<string, { label: string; items: any[] }>();
+    this.filteredData.forEach(d => {
+      const key = `${d.personaje_tipo}|${d.personaje_edad_rango}|${d.personaje_imc_representado || ''}`;
+      if (!g.has(key)) g.set(key, { label: this.personajeLabel(d.personaje_tipo, d.personaje_edad_rango, d.personaje_imc_representado || ''), items: [] });
+      g.get(key)!.items.push(d);
+    });
+    const sorted = [...g.values()]
+      .map(({ label, items }) => ({ label, avg: Math.round(this.avgGramos(items)) }))
+      .sort((a, b) => b.avg - a.avg);
+    this.upsert('ranking', this.rankingRef, {
+      type: 'bar',
+      data: {
+        labels: sorted.map(s => s.label),
+        datasets: [{ label: 'Promedio (g)', data: sorted.map(s => s.avg), backgroundColor: sorted.map((_, i) => PALETTE[i % PALETTE.length]) }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true } }
+      }
+    } as ChartConfiguration);
+  }
+
+  // ── CHART 8 — Categorías por sexo personaje (stacked 100%) ───────
+  private chartCatSexoStacked(): void {
+    const cats  = ['proteina', 'carbohidrato', 'vegetal', 'fruta'];
+    const sexos = ['M', 'F'];
+    const totals: Record<string, Record<string, number>> = {};
+    sexos.forEach(s => { totals[s] = Object.fromEntries(cats.map(c => [c, 0])); });
+
+    this.filteredData.forEach(d => {
+      const sexo = d.personaje_sexo;
+      if (!totals[sexo]) return;
+      (d.componentes_servidos || []).forEach((c: any) => {
+        const cat = this.componentesMap.get(c.componente_id)?.categoria;
+        if (cats.includes(cat)) totals[sexo][cat] += +c.cantidad_gramos || 0;
+      });
+    });
+
+    const pct: Record<string, Record<string, number>> = {};
+    sexos.forEach(s => {
+      const sum = cats.reduce((a, c) => a + totals[s][c], 0) || 1;
+      pct[s] = Object.fromEntries(cats.map(c => [c, Math.round((totals[s][c] / sum) * 100)]));
+    });
+
+    this.upsert('catSexoStack', this.catSexoStackRef, {
+      type: 'bar',
+      data: {
+        labels: ['Masculino', 'Femenino'],
+        datasets: cats.map(cat => ({
+          label: CAT_LABEL[cat],
+          data: sexos.map(s => pct[s][cat]),
+          backgroundColor: CAT_COLOR[cat],
+          stack: 'main'
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { stacked: true },
+          y: { stacked: true, max: 100, ticks: { callback: (v: any) => v + '%' } }
+        }
+      }
+    } as ChartConfiguration);
+  }
+
+  // ── CHART 9 — Promedio (g) por IMC del participante ───────────────
+  private chartImcParticipante(): void {
+    const groups = [
+      { label: 'Bajo peso',  fn: (imc: number) => imc > 0 && imc < 18.5 },
+      { label: 'Normal',     fn: (imc: number) => imc >= 18.5 && imc < 25 },
+      { label: 'Sobrepeso',  fn: (imc: number) => imc >= 25 && imc < 30 },
+      { label: 'Obesidad',   fn: (imc: number) => imc >= 30 }
+    ];
+    const data = groups.map(gr =>
+      Math.round(this.avgGramos(this.filteredData.filter(d => gr.fn(parseFloat(d.participante_imc) || 0))))
+    );
+    this.upsert('imcPart', this.imcPartRef, {
+      type: 'bar',
+      data: {
+        labels: groups.map(g => g.label),
+        datasets: [{ label: 'Promedio (g)', data, backgroundColor: PALETTE[0] }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
     });
   }
 
