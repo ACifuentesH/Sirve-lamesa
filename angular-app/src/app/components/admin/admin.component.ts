@@ -1,6 +1,6 @@
 import {
   Component, OnInit, AfterViewInit, OnDestroy,
-  ViewChild, ElementRef
+  ViewChild, ElementRef, ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -86,7 +86,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private charts: Record<string, Chart> = {};
 
-  constructor(private api: ApiService, private router: Router) {}
+  constructor(private api: ApiService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void { this.loadData(); }
 
@@ -110,10 +110,12 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
         this.applyFilters();
         this.loading = false;
         if (this.chartsReady) this.renderCharts();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'No se pudieron cargar los datos. Verifique la conexión al servidor.';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

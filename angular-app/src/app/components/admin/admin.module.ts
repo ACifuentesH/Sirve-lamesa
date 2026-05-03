@@ -13,7 +13,8 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
+    AdminComponent
   ]
 })
 export class AdminModule { }
