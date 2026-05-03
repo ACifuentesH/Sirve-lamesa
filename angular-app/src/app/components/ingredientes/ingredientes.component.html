@@ -1,31 +1,24 @@
-<div class="ingredientes-container">
-  <!-- Botones fuera de la nevera -->
-  <div class="tabs-container">
-    <div class="tabs">
-      <button
-        *ngFor="let categoria of categorias"
-        type="button"
-        class="tab-button font-text"
-        [class.active]="categoriaSeleccionada === categoria.id"
-        (click)="filtrarPorCategoria(categoria.id)">
-        <span class="icono">{{ categoria.icono }}</span>
-        {{ categoria.nombre }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Panel de ingredientes -->
-  <div class="ingredientes-panel-content">
-    <div class="food-grid" *ngIf="getIngredientesParaEscenario().length > 0">
+<div class="ingredientes-alacena">
+  <section
+    class="categoria-seccion"
+    [ngClass]="'categoria-seccion--' + cat.id"
+    *ngFor="let cat of categorias"
+    [attr.aria-labelledby]="'cat-' + cat.id">
+    <header class="categoria-seccion__header" [id]="'cat-' + cat.id">
+      <span class="categoria-seccion__icon" aria-hidden="true">{{ cat.icono }}</span>
+      <span class="categoria-seccion__titulo font-text">{{ cat.nombre }}</span>
+    </header>
+    <div class="categoria-seccion__items">
       <app-ingrediente
-        *ngFor="let ingrediente of getIngredientesParaEscenario()"
+        *ngFor="let ingrediente of getIngredientesPorCategoria(cat.id)"
         [ingrediente]="ingrediente"
         (ingredienteArrastrado)="onIngredienteArrastrado($event)"
         (ingredienteSeleccionado)="onIngredienteSeleccionado($event)">
       </app-ingrediente>
     </div>
-    <div class="no-ingredientes" *ngIf="getIngredientesParaEscenario().length === 0">
-      <p class="font-text">No hay ingredientes en esta categoría</p>
-    </div>
-  </div>
+  </section>
+
+  <p class="ingredientes-alacena__vacio font-text" *ngIf="ingredientes.length === 0">
+    No hay alimentos disponibles
+  </p>
 </div>

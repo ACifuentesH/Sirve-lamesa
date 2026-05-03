@@ -1,4 +1,9 @@
 require('dotenv').config();
+try {
+  require('dns').setDefaultResultOrder('ipv4first');
+} catch (_) {
+  /* Node < 17 */
+}
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
@@ -8,6 +13,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 
 const GameDataController = require('./controllers/gameDataController');
+const { getPgPoolConfig } = require('./database-pool-config');
 
 const app = express();
 const server = http.createServer(app);
@@ -18,7 +24,7 @@ const io = socketIO(server, {
   }
 });
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 // ===================================
 // CONFIGURACIÓN DE MIDDLEWARES
@@ -32,9 +38,11 @@ app.use(cors({
     
     const allowedOrigins = [
       process.env.CLIENT_URL,
-      'http://localhost:3001',
+      'http://localhost:3000',
+      'http://localhost:4200',
       'http://localhost:8080',
-      'http://127.0.0.1:3001',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:4200',
       'http://127.0.0.1:8080',
       '*' // En desarrollo, permitir todos
     ].filter(Boolean);
@@ -63,12 +71,21 @@ if (process.env.NODE_ENV === 'production') {
 // CONFIGURACIÓN DE BASE DE DATOS
 // ===================================
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/sirve_la_mesa',
-  ssl: process.env.DATABASE_URL?.includes('supabase') 
-    ? { rejectUnauthorized: false } 
-    : (process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false),
-});
+const pool = new Pool(getPgPoolConfig());
+
+/** Resumen del host de BD para logs (sin contraseña). */
+function describeDatabaseTarget() {
+  const raw =
+    process.env.DATABASE_URL ||
+    'postgresql://localhost:5432/sirve_la_mesa';
+  try {
+    const u = new URL(raw);
+    const db = (u.pathname || '').replace(/^\//, '') || 'postgres';
+    return `${u.hostname}:${u.port || 5432} → ${db}`;
+  } catch (_) {
+    return '(DATABASE_URL no es una URL válida)';
+  }
+}
 
 // Instancia del controlador
 const gameController = new GameDataController(pool);
@@ -252,6 +269,20 @@ app.get('/api/exportar/json', async (req, res) => {
 });
 
 // ===================================
+// DATOS ADMIN PANEL
+// ===================================
+
+app.get('/api/admin/datos', async (req, res) => {
+  try {
+    const datos = await gameController.obtenerDatosAdmin();
+    res.json({ success: true, data: datos });
+  } catch (err) {
+    console.error('Error al obtener datos admin:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===================================
 // RUTAS DE PÁGINAS WEB
 // ===================================
 
@@ -321,6 +352,17 @@ server.listen(port, async () => {
   console.log(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 URL: http://localhost:${port}`);
   console.log('='.repeat(50));
+
+  try {
+    await pool.query('SELECT 1');
+    console.log(`✅ PostgreSQL: conexión OK — ${describeDatabaseTarget()}`);
+  } catch (err) {
+    console.error('❌ PostgreSQL: no hay conexión.');
+    console.error(`   Destino: ${describeDatabaseTarget()}`);
+    console.error(`   Error: ${err.message}`);
+    console.error('   Revisa DATABASE_URL en .env (Supabase: URI puerto 5432).');
+    console.error('   Tablas y datos: npm run init-db');
+  }
   
   // NOTA: La inicialización de la BD ya NO se ejecuta automáticamente
   // Para crear/resetear la base de datos, ejecutar: npm run init-db

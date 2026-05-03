@@ -43,10 +43,11 @@ CREATE TABLE IF NOT EXISTS Componentes (
 CREATE TABLE IF NOT EXISTS Personajes (
     PK_personaje SERIAL PRIMARY KEY,
     tipo VARCHAR(50) NOT NULL, -- 'niño', 'niña', 'adolescente_hombre', etc.
-    edad_rango VARCHAR(20) NOT NULL, -- '6-11', '12-17', '18-25', '30-50'
+    edad_rango VARCHAR(20) NOT NULL, -- '6-11', '12-17', '18-25', '30-50', '65+', ...
     sexo VARCHAR(1) NOT NULL CHECK (sexo IN ('M', 'F')),
-    imagen VARCHAR(255), -- Nombre del archivo de imagen
-    nombre VARCHAR(150) NOT NULL -- Nombre descriptivo del personaje
+    imagen VARCHAR(255), -- Archivo bajo assets/images/ o subruta, ej. ingredientes/niño.png
+    nombre VARCHAR(150) NOT NULL,
+    imc_representado VARCHAR(20) DEFAULT 'no_aplica' -- normopeso | sobrepeso | no_aplica (figura del personaje)
 );
 
 -- Tabla Bebida

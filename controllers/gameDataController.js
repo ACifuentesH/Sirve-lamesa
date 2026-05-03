@@ -190,6 +190,7 @@ class GameDataController {
     const {
       sesion_id, escenario,
       personaje_tipo, personaje_edad_rango, personaje_sexo,
+      personaje_imc_representado,
       plato_id, bebida_id,
       componentes_servidos,
       tiempo_decision_ms, orden_servicio,
@@ -207,17 +208,18 @@ class GameDataController {
     const query = `
       INSERT INTO Decisiones_porcionamiento (
         FK_sesion, escenario,
-        personaje_tipo, personaje_edad_rango, personaje_sexo,
+        personaje_tipo, personaje_edad_rango, personaje_sexo, personaje_imc_representado,
         FK_plato, FK_bebida,
         componentes_servidos, cantidad_total_gramos,
         tiempo_decision_ms, orden_servicio, notas
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       RETURNING *
     `;
 
     const values = [
       sesion_id, escenario,
       personaje_tipo, personaje_edad_rango, personaje_sexo,
+      personaje_imc_representado || null,
       plato_id, bebida_id,
       JSON.stringify(componentes_servidos), cantidad_total,
       tiempo_decision_ms, orden_servicio, notas
@@ -340,6 +342,7 @@ class GameDataController {
         d.personaje_tipo,
         d.personaje_edad_rango,
         d.personaje_sexo,
+        d.personaje_imc_representado,
         d.componentes_servidos,
         d.cantidad_total_gramos,
         d.tiempo_decision_ms,
@@ -424,6 +427,7 @@ class GameDataController {
         personaje_tipo: row.personaje_tipo,
         personaje_edad_rango: row.personaje_edad_rango || '',
         personaje_sexo: row.personaje_sexo || '',
+        personaje_imc_representado: row.personaje_imc_representado || '',
         orden_servicio: row.orden_servicio || '',
         tiempo_decision_ms: row.tiempo_decision_ms || '',
         cantidad_total_gramos: row.cantidad_total_gramos || '',
@@ -470,6 +474,7 @@ class GameDataController {
       personaje_tipo: 'Tipo Personaje (Sujeto Servido)',
       personaje_edad_rango: 'Rango Edad Personaje',
       personaje_sexo: 'Sexo Personaje',
+      personaje_imc_representado: 'Figura IMC personaje (normopeso/sobrepeso/no_aplica)',
       orden_servicio: 'Orden de Servicio',
       tiempo_decision_ms: 'Tiempo Decisión (ms)',
       cantidad_total_gramos: 'Cantidad Total (g)',
@@ -502,6 +507,49 @@ class GameDataController {
     }
 
     return csv;
+  }
+
+  // ===================================
+  // DATOS ADMIN (panel Angular)
+  // ===================================
+
+  async obtenerDatosAdmin() {
+    const decisionesResult = await this.pool.query(`
+      SELECT
+        d.pk_decision,
+        d.escenario,
+        d.personaje_tipo,
+        d.personaje_edad_rango,
+        d.personaje_sexo,
+        d.personaje_imc_representado,
+        d.componentes_servidos,
+        d.cantidad_total_gramos,
+        d.tiempo_decision_ms,
+        d.orden_servicio,
+        d.timestamp_decision,
+        p.pk_participante  AS participante_id,
+        p.sexo             AS participante_sexo,
+        p.edad             AS participante_edad,
+        p.peso_kg          AS participante_peso_kg,
+        p.altura_cm        AS participante_altura_cm,
+        p.imc              AS participante_imc,
+        s.pk_sesion        AS sesion_id,
+        s.estado           AS sesion_estado,
+        s.fecha_inicio     AS sesion_fecha_inicio
+      FROM Decisiones_porcionamiento d
+      INNER JOIN Sesiones_juego      s ON d.fk_sesion        = s.pk_sesion
+      INNER JOIN Participantes       p ON s.fk_participante  = p.pk_participante
+      ORDER BY d.timestamp_decision DESC
+    `);
+
+    const componentesResult = await this.pool.query(
+      'SELECT pk_alimento, nombre, categoria, unidad FROM Componentes ORDER BY categoria, nombre'
+    );
+
+    return {
+      decisiones: decisionesResult.rows,
+      componentes_catalogo: componentesResult.rows
+    };
   }
 }
 

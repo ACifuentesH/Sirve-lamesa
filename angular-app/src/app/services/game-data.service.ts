@@ -18,6 +18,8 @@ export interface PersonajeSintetico {
   sexo: string;
   imagen: string;
   nombre: string;
+  /** normopeso | sobrepeso | no_aplica — figura del personaje sintético */
+  imc_representado?: string;
   estado?: 'pendiente' | 'en_curso' | 'servido';
 }
 
@@ -35,6 +37,7 @@ export interface Decision {
   personaje_tipo: string;
   personaje_edad_rango: string;
   personaje_sexo: string;
+  personaje_imc_representado?: string | null;
   personaje_id?: number;
   plato_id?: number;
   bebida_id?: number;
@@ -83,6 +86,7 @@ export class GameDataService {
               sexo: p.sexo,
               imagen: p.imagen,
               nombre: p.nombre,
+              imc_representado: p.imc_representado || 'no_aplica',
               estado: 'pendiente' as const
             }));
             this.personajesSubject.next(personajes);

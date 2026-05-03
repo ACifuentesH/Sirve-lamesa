@@ -132,6 +132,14 @@ export class ApiService {
   }
 
   // ===================================
+  // ADMIN
+  // ===================================
+
+  obtenerDatosAdmin(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admin/datos`);
+  }
+
+  // ===================================
   // SISTEMA
   // ===================================
 

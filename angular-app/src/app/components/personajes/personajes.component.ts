@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PersonajeSintetico } from '../../services/game-data.service';
+import { personajeImagenSrc } from '../../utils/personaje-assets';
 
 @Component({
   selector: 'app-personajes',
@@ -21,7 +22,14 @@ export class PersonajesComponent {
   }
 
   getImagePath(imagen: string): string {
-    return `assets/images/ingredientes/${imagen}`;
+    return personajeImagenSrc(imagen) ?? '';
+  }
+
+  /** Retrato de Pedro: encuadre más pequeño dentro del círculo. */
+  esPedro(personaje: PersonajeSintetico): boolean {
+    const n = (personaje.nombre || '').toLowerCase().trim();
+    const img = (personaje.imagen || '').toLowerCase();
+    return n === 'pedro' || img.includes('pedro');
   }
 
   getEstadoClass(personaje: PersonajeSintetico): string {

@@ -1,6 +1,6 @@
 .login-container {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #FFFFFF;
+  background: #FFF8F0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
   position: relative;
   overflow-x: hidden;
 
-  // Patrón de mantel a cuadros de picnic
+  // Patrón de mantel a cuadros de picnic — colores cálidos
   &::before {
     content: '';
     position: fixed;
@@ -18,17 +18,17 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-      linear-gradient(0deg, rgba(82, 165, 206, 0.25) 50%, transparent 50%),
-      linear-gradient(90deg, rgba(82, 165, 206, 0.25) 50%, transparent 50%),
-      linear-gradient(0deg, rgba(184, 206, 232, 0.15) 50%, transparent 50%),
-      linear-gradient(90deg, rgba(184, 206, 232, 0.15) 50%, transparent 50%);
-    background-size: 
+    background-image:
+      linear-gradient(0deg, rgba(196, 98, 45, 0.18) 50%, transparent 50%),
+      linear-gradient(90deg, rgba(196, 98, 45, 0.18) 50%, transparent 50%),
+      linear-gradient(0deg, rgba(244, 147, 106, 0.11) 50%, transparent 50%),
+      linear-gradient(90deg, rgba(244, 147, 106, 0.11) 50%, transparent 50%);
+    background-size:
       80px 80px,
       80px 80px,
       160px 160px,
       160px 160px;
-    background-position: 
+    background-position:
       0 0,
       0 0,
       80px 80px,
@@ -38,7 +38,7 @@
     animation: picnicPattern 30s linear infinite;
   }
 
-  // Elementos decorativos de picnic
+  // Destellos cálidos de fondo
   &::after {
     content: '';
     position: fixed;
@@ -46,12 +46,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-      radial-gradient(circle at 10% 20%, rgba(82, 165, 206, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(184, 206, 232, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 40% 60%, rgba(82, 165, 206, 0.06) 0%, transparent 50%),
-      radial-gradient(circle at 90% 10%, rgba(184, 206, 232, 0.06) 0%, transparent 50%),
-      radial-gradient(circle at 20% 90%, rgba(82, 165, 206, 0.08) 0%, transparent 50%);
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(244, 184, 96, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(244, 147, 106, 0.10) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(255, 123, 172, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 90% 10%, rgba(196, 98, 45, 0.07) 0%, transparent 50%),
+      radial-gradient(circle at 20% 90%, rgba(244, 184, 96, 0.10) 0%, transparent 50%);
     z-index: 0;
     pointer-events: none;
   }
@@ -59,54 +59,45 @@
 
 @keyframes picnicPattern {
   0% {
-    background-position: 
-      0 0,
-      0 0,
-      80px 80px,
-      80px 80px;
+    background-position:
+      0 0, 0 0, 80px 80px, 80px 80px;
   }
   50% {
-    background-position: 
-      40px 40px,
-      40px 40px,
-      120px 120px,
-      120px 120px;
+    background-position:
+      40px 40px, 40px 40px, 120px 120px, 120px 120px;
   }
   100% {
-    background-position: 
-      0 0,
-      0 0,
-      80px 80px,
-      80px 80px;
+    background-position:
+      0 0, 0 0, 80px 80px, 80px 80px;
   }
 }
 
-// Patrón de líneas sutiles adicionales
+// Líneas cálidas sutiles de overlay
 .picnic-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 2px,
-      rgba(82, 165, 206, 0.08) 2px,
-      rgba(82, 165, 206, 0.08) 4px
+      rgba(196, 98, 45, 0.06) 2px,
+      rgba(196, 98, 45, 0.06) 4px
     ),
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 2px,
-      rgba(184, 206, 232, 0.08) 2px,
-      rgba(184, 206, 232, 0.08) 4px
+      rgba(244, 147, 106, 0.06) 2px,
+      rgba(244, 147, 106, 0.06) 4px
     );
   background-size: 100% 40px, 40px 100%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .title-container {
@@ -238,6 +229,9 @@ select {
   margin-top: 40px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .btn-continue {
@@ -270,6 +264,27 @@ select {
   }
 }
 
+.btn-admin {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  color: rgba(0, 0, 0, 0.18);
+  font-size: 1.1em;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
+
 .error-message {
   color: #EF6F3C;
   font-size: 0.85em;
@@ -295,6 +310,7 @@ select {
       background-size: 60px 60px, 60px 60px, 120px 120px, 120px 120px;
       background-position: 0 0, 0 0, 60px 60px, 60px 60px;
     }
+    background: #FFF8F0;
   }
 
   .picnic-overlay {

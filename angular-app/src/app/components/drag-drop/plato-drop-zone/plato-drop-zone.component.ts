@@ -1,8 +1,21 @@
-import { Component, Input, Output, EventEmitter, ElementRef, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ElementRef,
+  ViewChild,
+  OnChanges,
+  SimpleChanges,
+  OnInit,
+  OnDestroy
+} from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ComponenteServido } from '../../../models/decision.model';
 import { Ingrediente } from '../../../services/game-data.service';
 import { DragDropService } from '../../../services/drag-drop.service';
+import { personajeImagenSrc } from '../../../utils/personaje-assets';
 
 export interface IngredienteEnPlato {
   ingrediente: Ingrediente;
@@ -26,7 +39,7 @@ interface DropPoint {
   templateUrl: './plato-drop-zone.component.html',
   styleUrls: ['./plato-drop-zone.component.scss']
 })
-export class PlatoDropZoneComponent implements OnChanges {
+export class PlatoDropZoneComponent implements OnChanges, OnInit, OnDestroy {
   @Input() ingredientesEnPlato: IngredienteEnPlato[] = [];
   @Input() personajeActual: any = null; // Personaje actual para mostrar su imagen
   @Output() ingredienteAgregado = new EventEmitter<IngredienteEnPlato>();
@@ -42,12 +55,11 @@ export class PlatoDropZoneComponent implements OnChanges {
   platoImagen = 'assets/images/ingredientes/plato.png';
   isDragOver = false;
 
+  private dragEndSub?: Subscription;
+  private dragHoverSub?: Subscription;
+
   get personajeImagen(): string | null {
-    if (this.personajeActual?.imagen) {
-      return `assets/images/ingredientes/${this.personajeActual.imagen}`;
-    }
-    // Por ahora usar el niño por defecto
-    return 'assets/images/ingredientes/niño.png';
+    return personajeImagenSrc(this.personajeActual?.imagen);
   }
 
   private readonly tamanosVisuales: Record<string, number> = {
@@ -75,6 +87,30 @@ export class PlatoDropZoneComponent implements OnChanges {
 
   constructor(private dragDropService: DragDropService) {}
 
+  ngOnInit(): void {
+    this.dragEndSub = this.dragDropService.pointerDragEnd$.subscribe(({ clientX, clientY }) => {
+      const ingrediente = this.dragDropService.getDraggedIngredient();
+      if (!ingrediente) return;
+      if (!this.isPointInsidePlate(clientX, clientY)) return;
+
+      this.clearDragOverVisual();
+      const posicionManual = this.calcularPosicionManual({ x: clientX, y: clientY }, ingrediente);
+      if (posicionManual) {
+        this.tryAgregarIngrediente(ingrediente, null, true, posicionManual);
+      }
+    });
+
+    this.dragHoverSub = this.dragDropService.pointerOverPlate$.subscribe((over) => {
+      this.isDragOver = over;
+      this.syncDragOverClass(over);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.dragEndSub?.unsubscribe();
+    this.dragHoverSub?.unsubscribe();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     // Este método se llama cuando cambian los @Input()
     // Angular detectará automáticamente los cambios en ingredientesEnPlato
@@ -84,68 +120,31 @@ export class PlatoDropZoneComponent implements OnChanges {
     return index;
   }
 
-  handleDragOver(event: DragEvent): void {
-    event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'copy';
-    }
+  private isPointInsidePlate(clientX: number, clientY: number): boolean {
+    const plateRect = this.getPlateRect();
+    if (!plateRect) return false;
+    return (
+      clientX >= plateRect.left &&
+      clientX <= plateRect.right &&
+      clientY >= plateRect.top &&
+      clientY <= plateRect.bottom
+    );
   }
 
-  handleDragEnter(event: DragEvent): void {
-    event.preventDefault();
-    this.isDragOver = true;
+  private syncDragOverClass(over: boolean): void {
     const plateArea = this.plateAreaRef?.nativeElement;
     const plateContainer = plateArea?.closest('.plate-container') as HTMLElement;
     if (plateArea) {
-      plateArea.classList.add('dragging-active');
+      plateArea.classList.toggle('dragging-active', over);
     }
     if (plateContainer) {
-      plateContainer.classList.add('dragging-active');
+      plateContainer.classList.toggle('dragging-active', over);
     }
   }
 
-  handleDragLeave(event: DragEvent): void {
-    event.preventDefault();
+  private clearDragOverVisual(): void {
     this.isDragOver = false;
-    const plateArea = this.plateAreaRef?.nativeElement;
-    const plateContainer = plateArea?.closest('.plate-container') as HTMLElement;
-    if (plateArea) {
-      plateArea.classList.remove('dragging-active');
-    }
-    if (plateContainer) {
-      plateContainer.classList.remove('dragging-active');
-    }
-  }
-
-  handleDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver = false;
-    const plateArea = this.plateAreaRef?.nativeElement;
-    const plateContainer = plateArea?.closest('.plate-container') as HTMLElement;
-    if (plateArea) {
-      plateArea.classList.remove('dragging-active');
-    }
-    if (plateContainer) {
-      plateContainer.classList.remove('dragging-active');
-    }
-
-    const ingrediente = this.dragDropService.getDraggedIngredient();
-    if (!ingrediente) {
-      console.warn('No hay ingrediente en el servicio de drag-drop');
-      return;
-    }
-
-    const pointer = { x: event.clientX, y: event.clientY };
-    const posicionManual = this.calcularPosicionManual(pointer, ingrediente);
-
-    if (posicionManual) {
-      this.tryAgregarIngrediente(ingrediente, null, true, posicionManual);
-    } else {
-      console.warn('No se pudo calcular la posición manual');
-    }
-
-    this.dragDropService.clear();
+    this.syncDragOverClass(false);
   }
 
   tryAgregarIngrediente(

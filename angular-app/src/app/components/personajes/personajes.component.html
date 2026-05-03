@@ -7,9 +7,11 @@
        (click)="seleccionarPersonaje(personaje)">
     
     <div class="personaje-imagen-container">
-      <img [src]="getImagePath(personaje.imagen)" 
+      <img *ngIf="personaje.imagen"
+           [src]="getImagePath(personaje.imagen)"
            [alt]="personaje.nombre"
-           class="personaje-imagen">
+           class="personaje-imagen"
+           [class.personaje-imagen--pedro]="esPedro(personaje)">
       <div class="estado-overlay" *ngIf="personaje.estado === 'servido'">
         <span class="check-icon">✓</span>
       </div>

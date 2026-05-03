@@ -1,25 +1,21 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { Ingrediente } from '../../services/game-data.service';
 import { IngredienteComponent } from '../drag-drop/ingrediente/ingrediente.component';
 
 @Component({
   selector: 'app-ingredientes',
   standalone: true,
-  imports: [CommonModule, DragDropModule, IngredienteComponent],
+  imports: [CommonModule, IngredienteComponent],
   templateUrl: './ingredientes.component.html',
   styleUrls: ['./ingredientes.component.scss']
 })
-export class IngredientesComponent implements OnInit {
+export class IngredientesComponent {
   @Input() ingredientes: Ingrediente[] = [];
   @Input() escenarioActual: 'desayuno' | 'almuerzo' | 'cena' = 'desayuno';
   @Output() ingredienteSeleccionado = new EventEmitter<Ingrediente>();
 
-  categoriaSeleccionada = 'proteina';
-  ingredientesFiltrados: Ingrediente[] = [];
-
-  // Categorías disponibles (sin "Todos")
+  /** Orden fijo de bloques en el panel (todas visibles a la vez). */
   categorias = [
     { id: 'proteina', nombre: 'Proteínas', icono: '🥩' },
     { id: 'carbohidrato', nombre: 'Carbohidratos', icono: '🍞' },
@@ -27,24 +23,12 @@ export class IngredientesComponent implements OnInit {
     { id: 'fruta', nombre: 'Frutas', icono: '🍎' }
   ];
 
-  ngOnInit(): void {
-    this.filtrarPorCategoria('proteina');
-  }
-
-  filtrarPorCategoria(categoria: string): void {
-    this.categoriaSeleccionada = categoria;
-    this.ingredientesFiltrados = this.ingredientes.filter(i => i.categoria === categoria);
-  }
-
-  // Método para determinar qué ingredientes mostrar según el escenario
-  getIngredientesParaEscenario(): Ingrediente[] {
-    // Por ahora mostramos todos los ingredientes filtrados
-    // En el futuro se podría filtrar por escenario específico
-    return this.ingredientesFiltrados;
+  getIngredientesPorCategoria(categoriaId: string): Ingrediente[] {
+    const id = categoriaId.trim().toLowerCase();
+    return this.ingredientes.filter(i => (i.categoria || '').trim().toLowerCase() === id);
   }
 
   onIngredienteArrastrado(ingrediente: Ingrediente): void {
-    // Este evento se puede usar para analytics o feedback visual
     console.log('Ingrediente arrastrado:', ingrediente.nombre);
   }
 

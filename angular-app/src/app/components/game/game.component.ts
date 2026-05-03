@@ -155,6 +155,7 @@ export class GameComponent implements OnInit, OnDestroy {
       personaje_tipo: this.personajeActual.tipo,
       personaje_edad_rango: this.personajeActual.edad_rango,
       personaje_sexo: this.personajeActual.sexo,
+      personaje_imc_representado: this.personajeActual.imc_representado ?? null,
       personaje_id: this.personajeActual.id,
       componentes_servidos: componentesServidos,
       tiempo_decision_ms: tiempoDecision,
@@ -176,9 +177,11 @@ export class GameComponent implements OnInit, OnDestroy {
         // Limpiar plato
         this.limpiarPlato();
 
-        // Pasar al siguiente personaje automáticamente
+        // Verificar si el juego terminó; si no, esperar selección manual
         setTimeout(() => {
-          this.siguienteAccion();
+          if (!this.gameDataService.obtenerSiguientePersonaje()) {
+            this.finalizarJuego();
+          }
         }, 1500);
       },
       error: (error) => {

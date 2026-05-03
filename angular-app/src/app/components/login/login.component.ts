@@ -116,4 +116,14 @@ export class LoginComponent implements OnInit {
   get edad() { return this.loginForm.get('edad'); }
   get pesoKg() { return this.loginForm.get('peso_kg'); }
   get alturaCm() { return this.loginForm.get('altura_cm'); }
+
+  goToAdmin(): void {
+    const clave = prompt('Clave de acceso:');
+    if (clave === null) return;
+    if (clave === 'admin') {
+      this.router.navigate(['/admin']);
+    } else {
+      alert('Clave incorrecta.');
+    }
+  }
 }

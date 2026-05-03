@@ -1,8 +1,7 @@
-<div class="food-item"
-     draggable="true"
-     (dragstart)="onDragStart($event)"
-     (dragend)="onDragEnd()"
-     (click)="onSeleccionar()"
+<div #foodRoot
+     class="food-item"
+     (pointerdown)="onPointerDown($event)"
+     (click)="onRootClick($event)"
      (keydown.enter)="onSeleccionar()"
      (keydown.space)="onSeleccionar(); $event.preventDefault()"
      [attr.tabindex]="0"
@@ -11,5 +10,7 @@
      [class.dragging]="isDragging">
   <img [src]="getImagePath()"
        [alt]="ingrediente.nombre"
+       [attr.data-imagen]="ingrediente.imagen"
        draggable="false">
+  <span class="food-label">{{ ingrediente.nombre }}</span>
 </div>

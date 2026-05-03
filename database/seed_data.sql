@@ -4,16 +4,15 @@
 -- ===================================
 -- PERSONAJES SINTÉTICOS
 -- ===================================
-INSERT INTO Personajes (tipo, edad_rango, sexo, imagen, nombre) VALUES
-    ('niño', '6-11', 'M', 'niño.png', 'Niño (6-11 años)'),
-    ('niña', '6-11', 'F', 'niño.png', 'Niña (6-11 años)'),
-    ('adolescente_hombre', '12-17', 'M', 'niño.png', 'Adolescente Hombre (12-17 años)'),
-    ('adolescente_mujer', '12-17', 'F', 'niño.png', 'Adolescente Mujer (12-17 años)'),
-    ('adulto_joven_hombre', '18-25', 'M', 'niño-comiendo.png', 'Adulto Joven Hombre (18-25 años)'),
-    ('adulto_joven_mujer', '18-25', 'F', 'niño-comiendo.png', 'Adulto Joven Mujer (18-25 años)'),
-    ('adulto_hombre', '30-50', 'M', 'niño-cubierto-plato.png', 'Adulto Hombre (30-50 años)'),
-    ('adulto_mujer', '30-50', 'F', 'niño-cubierto-plato.png', 'Adulto Mujer (30-50 años)')
-ON CONFLICT DO NOTHING;
+-- Retratos en assets/images/ (columna imagen = nombre de archivo). imc_representado: normopeso | sobrepeso | no_aplica
+INSERT INTO Personajes (tipo, edad_rango, sexo, imagen, nombre, imc_representado) VALUES
+    ('adulto_hombre', '65+', 'M', 'Juan.png', 'Juan', 'no_aplica'),
+    ('adulto_mujer', '65+', 'F', 'Rosa.png', 'Rosa', 'no_aplica'),
+    ('adulto_mujer', '40-55', 'F', 'Claudia.png', 'Claudia', 'no_aplica'),
+    ('adulto_hombre', '40-55', 'M', 'Luis.png', 'Luis', 'no_aplica'),
+    ('niña', '8-12', 'F', 'Sofia.png', 'Sofia', 'normopeso'),
+    ('niño', '8-12', 'M', 'matias.png', 'Matias', 'sobrepeso'),
+    ('niño', '8-12', 'M', 'pedro.png', 'Pedro', 'normopeso');
 
 -- ===================================
 -- MENÚS PRINCIPALES

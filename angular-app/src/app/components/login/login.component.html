@@ -100,13 +100,15 @@
   </div>
   
   <div class="button-container">
-    <button 
-      type="submit" 
-      (click)="onSubmit()" 
+    <button
+      type="submit"
+      (click)="onSubmit()"
       class="btn-continue font-text"
       [disabled]="loading || loginForm.invalid">
       <span *ngIf="!loading">Continuar</span>
       <span *ngIf="loading">Cargando...</span>
     </button>
   </div>
+
+  <button type="button" class="btn-admin font-text" (click)="goToAdmin()">⚙</button>
 </div>

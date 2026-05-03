@@ -3,7 +3,11 @@
     <div class="table-scene">
       <div class="table-container">
         <div class="table-with-mantel">
-          <img [src]="personajeImagen" alt="Personaje" class="personaje-image" *ngIf="personajeImagen">
+          <img [src]="personajeImagen" alt="Personaje"
+               class="personaje-image"
+               [class.personaje-image--matias]="personajeActual?.nombre === 'Matias'"
+               [class.personaje-image--pedro]="personajeActual?.nombre === 'Pedro'"
+               *ngIf="personajeImagen">
           <img [src]="mesaImagen" alt="Mesa" class="mesa-image">
           <img [src]="mantelImagen" alt="Mantel" class="mantel-image">
 
@@ -11,10 +15,8 @@
             <img #plateImage [src]="platoImagen" alt="Plato" class="plate-image">
             <div #plateArea
                  class="plate-area"
-                 (drop)="handleDrop($event)"
-                 (dragover)="handleDragOver($event)"
-                 (dragenter)="handleDragEnter($event)"
-                 (dragleave)="handleDragLeave($event)">
+                 data-plato-drop-area
+                 role="presentation">
             </div>
 
             <div class="food-on-plate"
@@ -28,7 +30,9 @@
                  }"
                  (click)="eliminarIngrediente(i)"
                  title="Eliminar {{ item.ingrediente.nombre }}">
-              <img [src]="getImagePath(item.ingrediente.imagen)" [alt]="item.ingrediente.nombre">
+              <img [src]="getImagePath(item.ingrediente.imagen)"
+                   [alt]="item.ingrediente.nombre"
+                   [attr.data-imagen]="item.ingrediente.imagen">
             </div>
 
           </div>

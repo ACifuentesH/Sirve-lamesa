@@ -2,9 +2,6 @@
   <!-- Header -->
   <header class="game-header">
     <h1 class="font-title font-title-watermelon">Sirve la Mesa</h1>
-    <div class="escenario-info">
-      <span class="font-text">Estás sirviendo: <strong>{{ getNombreEscenario() }}</strong></span>
-    </div>
     <div class="participante-info">
       <span class="font-text">Participante #{{ authService.getParticipante()?.pk_participante }}</span>
     </div>
@@ -32,31 +29,33 @@
       </app-personajes>
     </aside>
 
-    <!-- Centro: Plato e Ingredientes -->
-    <main class="plato-section">
-      <div class="personaje-actual-info" *ngIf="personajeActual">
-        <h3 class="font-title font-title-watermelon">Sirviendo a: <span class="font-text">{{ personajeActual.nombre }}</span></h3>
+    <!-- Columna principal: mesa arriba, alimentos en banda horizontal debajo (ancho = hueco a la derecha de personajes) -->
+    <div class="game-main-column">
+      <div class="mesa-servicio" aria-label="Área de servicio">
+        <div class="personaje-actual-info" *ngIf="personajeActual">
+          <h3 class="font-title font-title-watermelon">Sirviendo a: <span class="font-text">{{ personajeActual.nombre }}</span></h3>
+        </div>
+        <div class="plato-area plato-area--play">
+          <app-plato-drop-zone
+            [ingredientesEnPlato]="ingredientesEnPlato"
+            [personajeActual]="personajeActual"
+            (ingredienteAgregado)="onIngredienteAgregado($event)"
+            (ingredienteEliminado)="onIngredienteEliminado($event)"
+            (platoServido)="onPlatoServido($event)"
+            (limpiarSolicitado)="onLimpiarPlato()">
+          </app-plato-drop-zone>
+        </div>
       </div>
 
-      <app-plato-drop-zone
-        [ingredientesEnPlato]="ingredientesEnPlato"
-        [personajeActual]="personajeActual"
-        (ingredienteAgregado)="onIngredienteAgregado($event)"
-        (ingredienteEliminado)="onIngredienteEliminado($event)"
-        (platoServido)="onPlatoServido($event)"
-        (limpiarSolicitado)="onLimpiarPlato()">
-      </app-plato-drop-zone>
-
-      <!-- Panel de ingredientes debajo de la mesa -->
-      <aside class="ingredientes-panel">
-        <h2 class="font-title font-title-watermelon">Ingredientes</h2>
+      <aside class="ingredientes-panel ingredientes-panel--below" aria-label="Alimentos por categoría">
+        <h2 class="ingredientes-panel__titulo font-title font-title-watermelon">Alimentos</h2>
         <app-ingredientes
           [ingredientes]="ingredientes"
           [escenarioActual]="escenarioActual"
           (ingredienteSeleccionado)="onIngredienteSeleccionado($event)">
         </app-ingredientes>
       </aside>
-    </main>
+    </div>
   </div>
 
   <!-- Pantalla de juego completado -->

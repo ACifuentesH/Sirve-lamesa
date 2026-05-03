@@ -3,7 +3,7 @@
   background: var(--color-azul-claro);
   display: flex;
   flex-direction: column;
-  overflow: hidden; // Sin scroll
+  overflow: hidden;
 }
 
 // Header
@@ -75,39 +75,58 @@
   }
 }
 
-// Contenido principal
+// Contenido principal: personajes | todo el hueco restante (mesa + banda de alimentos)
 .game-content {
   flex: 1;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
   gap: 15px;
   padding: 15px;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   width: 100%;
-  overflow: hidden; // Sin scroll
-  min-height: 0; // Permite que el grid se ajuste
+  overflow: hidden;
+  min-height: 0;
 }
 
-// Panel de ingredientes debajo de la mesa
+// Banda de alimentos bajo la mesa: ancho = columna principal
 .ingredientes-panel {
-  background: var(--color-azul-claro);
-  border-radius: 15px;
-  padding: 15px;
-  overflow: hidden; // Sin scroll
-  display: flex;
-  flex-direction: column;
-  min-height: 0; // Permite que el flex se ajuste
-  width: 100%;
+  &--below {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    background: transparent;
+    border-radius: 0;
+    padding: 10px 0 4px;
+    margin: 0;
+    border: none;
+    border-top: 1px solid rgba(82, 165, 206, 0.28);
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    overflow: visible;
 
-  h2 {
+    app-ingredientes {
+      flex: 0 0 auto;
+      min-height: auto;
+      min-width: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  &__titulo {
     color: var(--color-azul);
-    margin-bottom: 15px;
-    text-align: center;
-    font-size: 1.5em;
+    margin: 0 0 8px;
+    text-align: left;
+    font-size: 1.05em;
     flex-shrink: 0;
     font-weight: 700;
-    
+    letter-spacing: 0.02em;
+    padding-left: 2px;
+
     &.font-title-watermelon {
       font-family: 'Watermelon', sans-serif !important;
       font-weight: normal !important;
@@ -119,18 +138,17 @@
 .personajes-panel {
   background: var(--color-azul-claro);
   border-radius: 15px;
-  padding: 15px;
-  overflow-y: auto; // Scrollable
-  overflow-x: hidden;
+  padding: 10px 8px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0; // Permite que el flex se ajuste
+  min-height: 0;
 
   h2 {
     color: var(--color-azul);
-    margin-bottom: 15px;
+    margin-bottom: 6px;
     text-align: center;
-    font-size: 1.5em;
+    font-size: 1.2em;
     flex-shrink: 0;
     font-weight: 700;
     
@@ -141,41 +159,84 @@
   }
 }
 
-// Sección central
-.plato-section {
+// Columna principal: apila mesa (arriba) y alimentos (abajo, ancho completo)
+.game-main-column {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  overflow: hidden;
+  align-items: stretch;
+  justify-content: center;
+  gap: 4px;
   min-height: 0;
+  min-width: 0;
+  overflow: visible;
+  width: 100%;
+}
+
+.mesa-servicio {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 0;
+  overflow: visible;
+  padding: 0 0 6px;
+  width: 100%;
+}
+
+.plato-area {
+  &--play {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: visible;
+
+    app-plato-drop-zone {
+      width: 100%;
+      max-width: min(920px, 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: visible;
+    }
+  }
 }
 
 .personaje-actual-info {
-  text-align: center;
+  position: relative;
+  text-align: left;
   background: transparent;
-  padding: 0;
+  padding: 0 4px 0 2px;
   border-radius: 0;
   flex-shrink: 0;
   border: none;
+  width: 100%;
 
   h3 {
+    position: absolute;
+    left: 384px;
+    top: 90px;
     color: var(--color-azul);
     margin: 0;
     font-size: 1.2em;
     font-weight: 700;
-    display: inline;
-    
+    display: block;
+    line-height: 1.3;
+
     &.font-title-watermelon {
       font-family: 'Watermelon', sans-serif !important;
       font-weight: normal !important;
     }
-    
+
     span {
       color: var(--color-azul);
       font-size: 1em;
-      font-weight: 400;
+      font-weight: 600;
     }
   }
 }
@@ -263,19 +324,38 @@
 // Responsive
 @media (max-width: 1200px) {
   .game-content {
-    grid-template-columns: 250px 1fr 250px;
+    grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
   }
 }
 
 @media (max-width: 992px) {
   .game-content {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: minmax(0, 1fr);
   }
 
-  .ingredientes-panel,
   .personajes-panel {
-    max-height: 300px;
+    max-height: 220px;
+  }
+
+  .game-main-column {
+    min-height: 0;
+  }
+
+  .mesa-servicio {
+    flex: 1 1 auto;
+    padding-top: 6px;
+  }
+
+  .ingredientes-panel--below {
+    max-height: 40vh;
+    flex-shrink: 0;
+    padding-top: 8px;
+  }
+
+  .ingredientes-panel__titulo {
+    text-align: center;
+    padding-left: 0;
   }
 }
 

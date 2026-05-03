@@ -6,6 +6,7 @@ export interface Decision {
   personaje_tipo: string;
   personaje_edad_rango: string;
   personaje_sexo: string;
+  personaje_imc_representado?: string | null;
   fk_plato?: number;
   plato_id?: number; // Para compatibilidad
   fk_bebida?: number;
@@ -32,6 +33,7 @@ export interface CreateDecisionDto {
   personaje_tipo: string;
   personaje_edad_rango: string;
   personaje_sexo: string;
+  personaje_imc_representado?: string | null;
   plato_id?: number;
   bebida_id?: number;
   componentes_servidos: ComponenteServido[];

@@ -1,0 +1,229 @@
+<div class="admin-wrapper">
+
+  <!-- ═══════════ HEADER ═══════════ -->
+  <header class="admin-header">
+    <button class="btn-back font-text" (click)="goBack()">← Salir</button>
+    <h1 class="font-title font-title-watermelon">Panel de Administración</h1>
+    <div class="header-meta font-text">
+      <span class="badge-count">{{ rawData.length }} registros totales</span>
+    </div>
+  </header>
+
+  <!-- ═══════════ LOADING ═══════════ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p class="font-text">Cargando datos…</p>
+  </div>
+
+  <div class="error-state font-text" *ngIf="error">
+    ⚠️ {{ error }}
+  </div>
+
+  <!-- ═══════════ BODY ═══════════ -->
+  <div class="admin-body" *ngIf="!loading && !error">
+
+    <!-- ── FILTERS BAR — participante only ── -->
+    <div class="filters-bar">
+      <div class="filters-grid">
+
+        <div class="filter-item">
+          <label class="font-text">Sexo del participante</label>
+          <select class="font-text" [(ngModel)]="filters.participanteSexo" (change)="applyFilters()">
+            <option value="">Todos</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label class="font-text">Edad del participante</label>
+          <select class="font-text" [(ngModel)]="filters.participanteEdad" (change)="applyFilters()">
+            <option value="">Todos</option>
+            <option *ngFor="let r of participanteEdadRangos" [value]="r">{{ r }} años</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label class="font-text">IMC del participante</label>
+          <select class="font-text" [(ngModel)]="filters.participanteIMC" (change)="applyFilters()">
+            <option value="">Todos</option>
+            <option value="bajo">Bajo peso (&lt;18.5)</option>
+            <option value="normal">Normal (18.5–24.9)</option>
+            <option value="sobrepeso">Sobrepeso (25–29.9)</option>
+            <option value="obesidad">Obesidad (≥30)</option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn-reset font-text" (click)="resetFilters()">
+            ✕ Limpiar
+            <span *ngIf="activeFiltersCount() > 0" class="badge-active">{{ activeFiltersCount() }}</span>
+          </button>
+          <span class="filter-count font-text">{{ filteredData.length }} decisiones</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── TABS ── -->
+    <div class="admin-tabs">
+      <button *ngFor="let tab of tabs"
+              class="tab-btn font-text"
+              [class.active]="activeTab === tab.id"
+              (click)="setTab(tab.id)">
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         TAB: GRÁFICOS
+    ════════════════════════════════════════════ -->
+    <div class="tab-panel" [hidden]="activeTab !== 'graficos'">
+
+      <!-- Stats cards -->
+      <div class="cards-row">
+        <div class="stat-card">
+          <div class="stat-value font-title">{{ stats.decisiones }}</div>
+          <div class="stat-label font-text">Decisiones</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value font-title">{{ stats.participantes }}</div>
+          <div class="stat-label font-text">Participantes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value font-title">{{ stats.sesiones }}</div>
+          <div class="stat-label font-text">Sesiones</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value font-title">{{ round(stats.promedioGramos) }}g</div>
+          <div class="stat-label font-text">Promedio por plato</div>
+        </div>
+      </div>
+
+      <!-- 6 charts — 2 columns -->
+      <div class="charts-grid cols-2">
+
+        <div class="chart-card">
+          <h3 class="chart-title font-title">Promedio (g) por Edad del Personaje</h3>
+          <div class="chart-box"><canvas #edadChart></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title font-title">Promedio (g) por Edad — Masculino vs Femenino</h3>
+          <div class="chart-box"><canvas #mfEdadChart></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title font-title">Promedio (g) por Categoría — según Sexo del Personaje</h3>
+          <div class="chart-box"><canvas #catSexoPerChart></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title font-title">Distribución por Categoría (g)</h3>
+          <div class="chart-box"><canvas #catChart></canvas></div>
+        </div>
+
+        <div class="chart-card tall">
+          <h3 class="chart-title font-title">Top 10 Alimentos — Frecuencia</h3>
+          <div class="chart-box"><canvas #topCountChart></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h3 class="chart-title font-title">Sexo del Participante</h3>
+          <div class="chart-box"><canvas #partSexoChart></canvas></div>
+        </div>
+
+      </div>
+
+      <div class="empty-hint font-text" *ngIf="stats.decisiones === 0">
+        No hay decisiones que coincidan con los filtros aplicados.
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════
+         TAB: DATOS
+    ════════════════════════════════════════════ -->
+    <div class="tab-panel" [hidden]="activeTab !== 'datos'">
+
+      <!-- Export cards -->
+      <div class="export-cards">
+        <div class="export-card">
+          <div class="export-icon">🟢</div>
+          <h3 class="font-title">Exportar Excel</h3>
+          <p class="font-text">Descarga todos los datos en formato .xlsx, compatible con Microsoft Excel y Google Sheets.</p>
+          <button class="btn-dl btn-dl--excel font-text" (click)="downloadExcel()">↓ Descargar Excel</button>
+        </div>
+        <div class="export-card">
+          <div class="export-icon">📊</div>
+          <h3 class="font-title">Exportar CSV</h3>
+          <p class="font-text">Descarga todos los datos en formato CSV. Incluye información de participantes, sesiones, personajes y alimentos servidos.</p>
+          <button class="btn-dl btn-dl--csv font-text" (click)="downloadCSV()">↓ Descargar CSV</button>
+        </div>
+        <div class="export-card">
+          <div class="export-icon">&#123; &#125;</div>
+          <h3 class="font-title">Exportar JSON</h3>
+          <p class="font-text">Descarga todos los datos en formato JSON estructurado, ideal para análisis con Python, R u otras herramientas.</p>
+          <button class="btn-dl btn-dl--json font-text" (click)="downloadJSON()">↓ Descargar JSON</button>
+        </div>
+      </div>
+
+      <!-- Table toolbar: count + pagination -->
+      <div class="table-toolbar font-text">
+        <span class="toolbar-count">{{ filteredData.length }} registros</span>
+        <div class="pagination-controls">
+          <button class="btn-page font-text" (click)="prevPage()" [disabled]="tablePage === 0">‹ Anterior</button>
+          <span>{{ tablePage + 1 }} / {{ totalPages || 1 }}</span>
+          <button class="btn-page font-text" (click)="nextPage()" [disabled]="tablePage >= totalPages - 1">Siguiente ›</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr class="font-text">
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Escenario</th>
+              <th>Personaje</th>
+              <th>Sexo P.</th>
+              <th>Edad P.</th>
+              <th>IMC P.</th>
+              <th>Participante</th>
+              <th>Sexo Part.</th>
+              <th>IMC Part.</th>
+              <th>Total (g)</th>
+              <th>Alimentos servidos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of tableData" class="font-text">
+              <td>{{ row.pk_decision }}</td>
+              <td>{{ formatFecha(row.timestamp_decision) }}</td>
+              <td><span class="badge-escenario" [attr.data-esc]="row.escenario">{{ escenarioLabel(row.escenario) }}</span></td>
+              <td>{{ row.personaje_tipo }}</td>
+              <td>{{ sexoLabel(row.personaje_sexo) }}</td>
+              <td>{{ row.personaje_edad_rango }}</td>
+              <td>{{ row.personaje_imc_representado || '—' }}</td>
+              <td>#{{ row.participante_id }}</td>
+              <td>{{ sexoLabel(row.participante_sexo) }}</td>
+              <td>{{ row.participante_imc ? (+row.participante_imc).toFixed(1) : '—' }}</td>
+              <td class="col-gramos">{{ row.cantidad_total_gramos ? (+row.cantidad_total_gramos).toFixed(0) + 'g' : '—' }}</td>
+              <td class="col-alimentos">{{ formatComps(row.componentes_servidos) }}</td>
+            </tr>
+            <tr *ngIf="tableData.length === 0">
+              <td colspan="12" class="font-text empty-row">Sin datos para mostrar</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-controls bottom font-text">
+        <button class="btn-page font-text" (click)="prevPage()" [disabled]="tablePage === 0">‹ Anterior</button>
+        <span>Página {{ tablePage + 1 }} de {{ totalPages || 1 }}</span>
+        <button class="btn-page font-text" (click)="nextPage()" [disabled]="tablePage >= totalPages - 1">Siguiente ›</button>
+      </div>
+    </div>
+
+  </div><!-- /admin-body -->
+</div><!-- /admin-wrapper -->

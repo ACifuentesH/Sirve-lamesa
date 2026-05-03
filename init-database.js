@@ -3,14 +3,17 @@
 // resetear o crear la estructura de la base de datos por primera vez
 
 require('dotenv').config();
+try {
+  require('dns').setDefaultResultOrder('ipv4first');
+} catch (_) {
+  /* Node < 17 */
+}
 const { Pool } = require('pg');
 const fs = require('fs').promises;
 const path = require('path');
+const { getPgPoolConfig } = require('./database-pool-config');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/sirve_la_mesa',
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+const pool = new Pool(getPgPoolConfig());
 
 async function initDatabase() {
   try {
@@ -34,7 +37,9 @@ async function initDatabase() {
       'database/decisiones_porcionamiento.sql',
       'database/seed_data.sql',
       'database/migrations/001_ampliar_campo_navegador.sql',
-      'database/migrations/002_anonimizar_participantes.sql'
+      'database/migrations/002_anonimizar_participantes.sql',
+      'database/migrations/003_personajes_retratos.sql',
+      'database/migrations/004_pedro_imagen_pedro_png.sql'
     ];
 
     console.log('📂 Archivos SQL a ejecutar:');

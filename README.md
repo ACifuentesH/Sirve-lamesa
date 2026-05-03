@@ -112,7 +112,7 @@ npm install
 Crea un archivo `.env` en la raíz del proyecto:
 
 ```env
-# Base de datos
+# Base de datos (local o Supabase — ver abajo)
 DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/sirve_la_mesa
 
 # Servidor
@@ -123,7 +123,21 @@ NODE_ENV=development
 CLIENT_URL=http://localhost:4200
 ```
 
-### 4. Crear la Base de Datos
+#### Base de datos en Supabase (recomendado para desplegar online)
+
+El backend solo usa **PostgreSQL** (cliente `pg`). Supabase te da una instancia Postgres en la nube; no hace falta el SDK de Supabase en este proyecto.
+
+1. Crea un proyecto en [Supabase](https://supabase.com/dashboard).
+2. En el proyecto abre **Connect** (o **Settings → Database**) y copia una **Connection string** en formato **URI**.
+3. **En Windows o si aparece `getaddrinfo ENOENT` con `db.xxx.supabase.co`:** la conexión **directa** suele usar **IPv6**. Muchas redes no la tienen bien; en ese caso usa la cadena **Session pooler** (puerto **5432**, host `aws-0-REGION.pooler.supabase.com`, usuario `postgres.TU_PROJECT_REF`). [Documentación de Supabase](https://supabase.com/docs/guides/database/connecting-to-postgres) lo explica como alternativa **IPv4**.
+4. Sustituye `[YOUR-PASSWORD]` y pega en `.env` como `DATABASE_URL=...` (si la URL contiene `supabase`, el servidor activa SSL).
+5. No necesitas crear una base llamada `sirve_la_mesa`: en Supabase la base por defecto suele llamarse **`postgres`**; el `DATABASE_URL` del panel ya apunta ahí.
+6. **Una sola vez**, con ese `.env`, ejecuta en tu máquina `npm run init-db` para crear tablas y datos iniciales (⚠️ borra tablas previas del esquema si existían).
+7. En tu hosting (Railway, Render, VPS, etc.), define las mismas variables de entorno (`DATABASE_URL`, `PORT`, `NODE_ENV=production`, `CLIENT_URL` con la URL pública de tu front si aplica).
+
+### 4. Crear la Base de Datos (solo PostgreSQL local)
+
+Si usas Postgres en tu PC y no Supabase:
 
 ```powershell
 # Conectar a PostgreSQL y crear la base de datos
@@ -162,6 +176,8 @@ npm run dev
 ```powershell
 npm run dev:angular
 ```
+
+Las peticiones a `/api` se reenvían al backend usando el mismo **`PORT`** definido en el `.env` de la raíz (`angular-app/src/proxy.conf.js`). Debes tener **las dos terminales** en marcha a la vez; si solo corre Angular, verás `ECONNREFUSED` en consola.
 
 Luego accede a:
 - **Juego:** http://localhost:4200

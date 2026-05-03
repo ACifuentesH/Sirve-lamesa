@@ -1,0 +1,96 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap");
+@font-face { font-family: "Watermelon"; src: url("/assets/fonts/Gildsley DEMO.otf") format("opentype"); }
+:root { --color-verde:#6b9b7a; --color-verde-oscuro:#4a7a5a; --color-azul:#52a5ce; --color-azul-claro:#f8ffc9; --color-rosa:#ff7bac; --color-naranja:#ef6f3c; --color-blanco:#fff; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:"Montserrat",sans-serif; background:var(--color-blanco); height:100vh; overflow:hidden; }
+#root { height:100vh; }
+.font-title{font-family:"Montserrat",sans-serif;font-weight:700}.font-title-watermelon{font-family:"Watermelon",sans-serif!important;font-weight:normal!important}.font-text{font-family:"Montserrat",sans-serif;font-weight:400}
+.login-container{background:#fff;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;position:relative;overflow-x:hidden}.login-container::before{content:"";position:fixed;inset:0;background-image:linear-gradient(0deg,rgba(82,165,206,.25) 50%,transparent 50%),linear-gradient(90deg,rgba(82,165,206,.25) 50%,transparent 50%),linear-gradient(0deg,rgba(184,206,232,.15) 50%,transparent 50%),linear-gradient(90deg,rgba(184,206,232,.15) 50%,transparent 50%);background-size:80px 80px,80px 80px,160px 160px,160px 160px;z-index:0}.picnic-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}.title-container{position:relative;z-index:1;margin-bottom:30px}
+h1.font-title-watermelon{color:#25533f;text-align:center;font-size:3em;font-weight:normal;text-shadow:2px 2px 4px rgba(37,83,63,.2);margin:0}
+.container{background:linear-gradient(135deg,#fff 0%,#f8f8f8 100%);border-radius:50%;width:500px;height:500px;padding:60px 40px;position:relative;z-index:1;box-shadow:0 15px 35px rgba(37,83,63,.3);display:flex;flex-direction:column;justify-content:center;align-items:center}.form-group{margin-bottom:18px;width:100%;max-width:300px}label{display:block;color:#25533f;font-weight:bold;margin-bottom:8px}input[type="number"]{width:100%;padding:14px 16px;border:3px solid #25533f;border-radius:8px;font-weight:bold;color:#25533f}.radio-group{display:flex;gap:20px;margin-top:10px}.radio-option{display:flex;align-items:center;gap:8px}.button-container{position:relative;z-index:1;margin-top:30px;display:flex;justify-content:center}.btn-continue{padding:18px 50px;background:#ff7bac;color:#fff;border:none;border-radius:50px;font-size:1.2em;font-weight:bold;cursor:pointer}.btn-continue:disabled{opacity:.6;cursor:not-allowed}.error-alert{background:#ffebee;color:#c62828;padding:10px 15px;border-radius:5px;margin-top:15px;font-size:.9em;width:100%;max-width:300px;text-align:center}
+.game-container{height:100vh;background:var(--color-azul-claro);display:flex;flex-direction:column;overflow:hidden}.game-header{background:var(--color-verde);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}.game-header h1{font-size:2em;margin:0}.participante-info{background:rgba(255,255,255,.2);padding:8px 16px;border-radius:20px}
+.mensajes-container{position:fixed;top:100px;left:50%;transform:translateX(-50%);z-index:1000;width:400px}.mensaje-exito,.mensaje-error{padding:15px 20px;border-radius:10px;text-align:center;font-weight:bold;margin-bottom:10px}.mensaje-exito{background:var(--color-verde);color:#fff}.mensaje-error{background:var(--color-naranja);color:#fff}
+.game-content{flex:1;display:grid;grid-template-columns:minmax(300px,340px) minmax(0,1fr);gap:15px;padding:15px;width:100%;overflow-y:auto;min-height:0}.personajes-panel{padding:15px;overflow-y:auto;display:flex;flex-direction:column;min-height:0}.personajes-panel h2{color:var(--color-azul);margin-bottom:15px;text-align:center;font-size:1.5em}
+.game-main-column{flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:4px;min-height:0;min-width:0;overflow:visible;width:100%}.mesa-servicio{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:4px;overflow:visible;padding:70px 0 6px;width:100%}.personaje-actual-info h3{color:var(--color-azul);margin:0;font-size:1.2em}
+.plato-area--play{flex:1 1 auto;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:visible}.ingredientes-panel--below{width:100%;padding:10px 0 4px;border-top:1px solid rgba(82,165,206,.28);display:flex;flex-direction:column}.ingredientes-panel__titulo{color:var(--color-azul);margin:0 0 8px;font-size:1.05em;padding-left:2px}
+.personajes-container{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 18px;padding:12px 10px}.personaje-card{display:flex;flex-direction:column;align-items:center;gap:12px;padding:8px}.personaje-card.clickable{cursor:pointer}.personaje-card.clickable:hover{transform:scale(1.05)}.personaje-card.activo .personaje-imagen-container{border:4px solid var(--color-rosa);box-shadow:0 0 15px rgba(255,123,172,.6);transform:scale(1.1)}.personaje-card.servido{opacity:.6}.personaje-imagen-container{position:relative;width:108px;height:108px;border-radius:50%;border:4px solid var(--color-azul);overflow:hidden;background:var(--color-azul-claro)}.personaje-imagen{position:absolute;left:5px;top:5px;width:100%;height:100%;object-fit:cover}.estado-overlay{position:absolute;inset:0;background:rgba(37,83,63,.8);display:flex;align-items:center;justify-content:center}.check-icon{color:#fff;font-size:1.5em;font-weight:bold}.personaje-nombre{font-size:1.15em;font-weight:bold;color:var(--color-verde);text-align:center;max-width:130px}
+.scene-wrapper{width:100%;display:flex;flex-direction:column;align-items:center;gap:0;padding-top:24px}.scene-container{width:100%;background:#f8ffc9;border-radius:15px;padding:30px 8px 8px;display:flex;align-items:center;justify-content:center}.table-scene{position:relative;width:100%;min-height:clamp(260px,36vh,420px);max-height:clamp(300px,42vh,470px);display:flex;align-items:flex-end;justify-content:center;padding:20px 0 20px}.table-container{position:relative;width:100%;max-width:800px;display:flex;justify-content:center}.table-with-mantel{position:relative;width:100%;max-width:700px;margin:0 auto}.personaje-image{position:absolute;width:clamp(390px,48vw,590px);height:auto;bottom:calc(50% + 84px);left:50%;transform:translateX(-50%);z-index:0;pointer-events:none}.mesa-image{width:100%;max-width:700px;display:block;margin:0 auto;position:relative;z-index:1}.mantel-image{position:absolute;width:50%;max-width:280px;top:47%;left:50%;transform:translate(-50%,-50%);z-index:2}.plate-container{position:absolute;width:280px;height:280px;top:47%;left:50%;transform:translate(-50%,-50%);z-index:3}.plate-image{width:100%;height:100%;object-fit:contain}.plate-area{position:absolute;inset:0;border-radius:50%;z-index:4}.food-on-plate{position:absolute;cursor:pointer;z-index:6}.food-on-plate img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(2px 2px 4px rgba(0,0,0,.2))}
+.button-container{position:relative;z-index:100;margin-top:-90px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;width:100%}.cantidad-total{display:flex;align-items:center;gap:8px;background:var(--color-azul-claro);padding:6px 15px;border-radius:25px;border:2px solid var(--color-azul)}.cantidad-total .label{color:var(--color-azul);font-weight:600;font-size:.85em}.cantidad-total .value{font-size:1.1em;color:var(--color-azul);font-weight:700}.btn{padding:6px 18px;border:none;border-radius:50px;font-size:.85em;font-weight:bold;cursor:pointer;text-transform:uppercase}.btn-primary{background:#ff7bac;color:#fff}.clear-plate-btn{background:#ef6f3c;color:#fff}
+.ingredientes-alacena{display:flex;flex-direction:row;gap:8px;width:100%;padding:2px 0 6px}.ingredientes-alacena__vacio{margin:auto;text-align:center;color:var(--color-verde);padding:12px}.categoria-seccion{flex:1 1 0;display:flex;flex-direction:column;gap:4px;padding:6px 6px 8px;border-radius:10px;border:1px solid transparent}.categoria-seccion--proteina{background:rgba(107,155,122,.24);border-color:rgba(107,155,122,.42)}.categoria-seccion--carbohidrato{background:rgba(82,165,206,.22);border-color:rgba(82,165,206,.4)}.categoria-seccion--vegetal{background:rgba(239,111,60,.14);border-color:rgba(239,111,60,.38)}.categoria-seccion--fruta{background:rgba(255,123,172,.2);border-color:rgba(255,123,172,.42)}.categoria-seccion__header{display:flex;align-items:center;justify-content:center;gap:4px;border-bottom:1px solid rgba(37,83,63,.1);padding-bottom:2px}.categoria-seccion__titulo{font-size:.58rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--color-azul)}.categoria-seccion__items{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 5px;padding:4px 2px 2px}.food-item{width:74px;height:74px;display:flex;align-items:center;justify-content:center;background:transparent;cursor:grab}.food-item img{width:74px;height:74px;object-fit:contain}
+.progreso-container{background:var(--color-azul-claro);padding:10px 15px;flex-shrink:0}.barra-progreso{height:10px;background:rgba(82,165,206,.25);border-radius:999px;max-width:360px;overflow:hidden}.barra-progreso-fill{height:100%;background:var(--color-azul)}.loading-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(248,255,201,.85);z-index:2000}.loading-spinner{border:4px solid var(--color-azul-claro);border-top:4px solid var(--color-azul);border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin:20px auto}.juego-completado{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}.completado-content{text-align:center;background:var(--color-azul-claro);padding:60px;border-radius:20px;max-width:600px;border:2px solid var(--color-azul)}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.food-item img[data-imagen="bistecs.png"],.food-item img[data-imagen="pasta.png"],.food-item img[data-imagen="granos.png"],.food-on-plate img[data-imagen="bistecs.png"],.food-on-plate img[data-imagen="pasta.png"],.food-on-plate img[data-imagen="granos.png"]{transform:scale(1.48)}.food-item img[data-imagen="arroz.png"],.food-on-plate img[data-imagen="arroz.png"]{transform:scale(1.1)}.food-item img[data-imagen="lechosa.png"],.food-on-plate img[data-imagen="lechosa.png"]{transform:scale(2.45)}.food-item img[data-imagen="brocoli.png"],.food-item img[data-imagen="lechuga.png"],.food-item img[data-imagen="platano.png"],.food-item img[data-imagen="pina.png"],.food-on-plate img[data-imagen="brocoli.png"],.food-on-plate img[data-imagen="lechuga.png"],.food-on-plate img[data-imagen="platano.png"],.food-on-plate img[data-imagen="pina.png"]{transform:scale(2.88)}
+
+/* Responsive layout */
+@media (max-width: 1366px) {
+  .game-content { grid-template-columns: minmax(260px, 300px) minmax(0, 1fr); }
+  .personaje-imagen-container { width: 92px; height: 92px; }
+  .personaje-nombre { font-size: 1em; max-width: 112px; }
+  .personaje-image { width: clamp(290px, 35vw, 430px); bottom: calc(50% + 18px); }
+  .plate-container { width: 240px; height: 240px; }
+}
+
+@media (max-width: 1100px) {
+  .game-header { gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .game-header h1 { font-size: 1.6em; }
+  .game-content { grid-template-columns: 1fr; gap: 10px; }
+  .personajes-panel { max-height: 220px; padding: 10px; }
+  .personajes-container { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .personaje-imagen-container { width: 78px; height: 78px; border-width: 3px; }
+  .personaje-nombre { font-size: .88em; max-width: 90px; }
+  .mesa-servicio { padding-top: 8px; }
+  .scene-container { padding-top: 8px; }
+  .table-scene { min-height: clamp(220px, 40vh, 340px); max-height: none; }
+  .personaje-image { width: clamp(250px, 45vw, 360px); bottom: calc(50% + 8px); }
+  .plate-container { width: 210px; height: 210px; }
+  .button-container { margin-top: -62px; gap: 8px; }
+}
+
+@media (max-width: 768px) {
+  body { overflow: auto; }
+  #root { height: auto; min-height: 100vh; }
+  .container { width: min(92vw, 420px); height: auto; min-height: 420px; border-radius: 28px; padding: 28px 24px; }
+  h1.font-title-watermelon { font-size: 2.2em; }
+  .radio-group { flex-direction: column; gap: 10px; }
+  .btn-continue { width: 100%; padding: 14px 20px; font-size: 1em; }
+
+  .game-header { padding: 10px 12px; }
+  .game-header h1 { font-size: 1.35em; }
+  .participante-info, .escenario-info { font-size: .9em; }
+  .game-content { padding: 10px; gap: 8px; }
+  .personajes-container { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ingredientes-panel__titulo { text-align: center; padding-left: 0; }
+  .ingredientes-alacena { overflow-x: auto; padding-bottom: 10px; }
+  .categoria-seccion { min-width: 230px; }
+
+  .scene-container { border-radius: 12px; padding: 8px 4px 4px; }
+  .table-container { max-width: 100%; }
+  .table-with-mantel { max-width: 100%; }
+  .mesa-image { max-width: 100%; }
+  .mantel-image { width: 46%; }
+  .personaje-image { width: clamp(210px, 58vw, 300px); bottom: calc(50% + 6px); }
+  .plate-container { width: 175px; height: 175px; }
+  .button-container { margin-top: -42px; }
+  .cantidad-total { padding: 5px 10px; }
+  .cantidad-total .label { font-size: .76em; }
+  .cantidad-total .value { font-size: .95em; }
+  .btn { padding: 7px 12px; font-size: .76em; }
+}
+
+@media (max-width: 480px) {
+  .title-container { margin-bottom: 16px; }
+  .container { width: 94vw; min-height: 380px; padding: 22px 16px; }
+  .form-group { margin-bottom: 12px; }
+  input[type="number"] { padding: 10px 12px; font-size: .95em; }
+  .game-header h1 { font-size: 1.2em; }
+  .personajes-container { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .personaje-imagen-container { width: 70px; height: 70px; }
+  .personaje-nombre { font-size: .8em; max-width: 78px; }
+  .table-scene { min-height: 230px; }
+  .personaje-image { width: clamp(185px, 64vw, 245px); bottom: calc(50% + 2px); }
+  .plate-container { width: 150px; height: 150px; }
+  .ingredientes-alacena { gap: 6px; }
+  .categoria-seccion { min-width: 200px; padding: 5px; }
+  .food-item { width: 62px; height: 62px; }
+  .food-item img { width: 62px; height: 62px; }
+}

@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS Decisiones_porcionamiento (
     personaje_tipo VARCHAR(50) NOT NULL, -- 'niño', 'niña', 'adolescente_hombre', 'adolescente_mujer', 'adulto_joven_hombre', 'adulto_joven_mujer', 'adulto_hombre', 'adulto_mujer'
     personaje_edad_rango VARCHAR(20), -- '6-11', '12-17', '18-25', '30-50'
     personaje_sexo VARCHAR(1) CHECK (personaje_sexo IN ('M', 'F')),
+    personaje_imc_representado VARCHAR(20), -- normopeso | sobrepeso | no_aplica (copiado del personaje al decidir)
     
     -- Qué se sirvió
     FK_plato INTEGER REFERENCES Plato(PK_plato),
