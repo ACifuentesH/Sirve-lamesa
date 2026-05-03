@@ -365,8 +365,39 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   nextPage(): void { if (this.tablePage < this.totalPages - 1) this.tablePage++; }
 
   // ── export ─────────────────────────────────────────────────────
-  downloadCSV():  void { window.open('/api/exportar/csv',  '_blank'); }
-  downloadJSON(): void { window.open('/api/exportar/json', '_blank'); }
+  downloadCSV(): void {
+    this.api.obtenerExportacionCSV().subscribe({
+      next: csv => {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `sirve-la-mesa_datos_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      },
+      error: () => {
+        this.error = 'No se pudo generar el CSV. Comprueba Supabase y las políticas RLS.';
+      }
+    });
+  }
+
+  downloadJSON(): void {
+    this.api.obtenerExportacionJSON().subscribe({
+      next: payload => {
+        const blob = new Blob([JSON.stringify(payload, null, 2)], {
+          type: 'application/json;charset=utf-8'
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `sirve-la-mesa_datos_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      },
+      error: () => {
+        this.error = 'No se pudo generar el JSON. Comprueba Supabase y las políticas RLS.';
+      }
+    });
+  }
 
   downloadExcel(): void {
     const rows = this.rawData.map((d: any) => ({

@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "build:prod": "ng build --configuration production"
+    "build:prod": "ng build --configuration production",
+    "build:vercel": "node scripts/inject-supabase-env.mjs && ng build --configuration production"
   },
   "private": true,
   "dependencies": {
@@ -21,6 +22,7 @@
     "@angular/platform-browser": "^19.0.6",
     "@angular/platform-browser-dynamic": "^19.0.6",
     "@angular/router": "^19.0.6",
+    "@supabase/supabase-js": "^2.49.1",
     "chart.js": "^4.5.1",
     "rxjs": "~7.8.1",
     "tslib": "^2.8.1",
@@ -28,6 +30,7 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
+    "@types/node": "^22.10.0",
     "@angular-devkit/build-angular": "^19.0.6",
     "@angular/cli": "^19.0.6",
     "@angular/compiler-cli": "^19.0.6",

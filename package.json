@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "npm run build:angular",
     "dev": "nodemon server.js",
     "dev:angular": "cd angular-app && npm start",
     "dev:react": "cd react-app && npm run dev",
