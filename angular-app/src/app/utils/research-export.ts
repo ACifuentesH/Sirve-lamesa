@@ -22,6 +22,7 @@ export interface ExportRow {
   sesion_fecha_inicio: string;
   sesion_fecha_fin: string;
   sesion_duracion_segundos: string | number;
+  tiempo_total_completacion_segundos: string | number;
   sesion_estado: string;
   decision_id: number;
   escenario: string;
@@ -116,6 +117,7 @@ export function buildExportRows(
       sesion_fecha_inicio: s?.fecha_inicio ?? '',
       sesion_fecha_fin: s?.fecha_fin ?? '',
       sesion_duracion_segundos: s?.duracion_total_segundos ?? '',
+      tiempo_total_completacion_segundos: s?.duracion_total_segundos ?? '',
       sesion_estado: s?.estado ?? '',
       decision_id: d.pk_decision,
       escenario: d.escenario,
@@ -154,6 +156,7 @@ const ENCABEZADOS: Record<keyof ExportRow, string> = {
   sesion_fecha_inicio: 'Fecha Inicio Sesión',
   sesion_fecha_fin: 'Fecha Fin Sesión',
   sesion_duracion_segundos: 'Duración Sesión (seg)',
+  tiempo_total_completacion_segundos: 'Tiempo Total Completación (seg)',
   sesion_estado: 'Estado Sesión',
   decision_id: 'ID Decisión',
   escenario: 'Escenario',

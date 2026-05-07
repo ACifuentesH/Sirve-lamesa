@@ -30,6 +30,10 @@ export class ApiService {
         0
       );
     }
+    const tiempoDecisionMs = Number.isFinite(Number(datos.tiempo_decision_ms))
+      ? Math.max(0, Math.round(Number(datos.tiempo_decision_ms)))
+      : null;
+
     return {
       fk_sesion: datos.sesion_id,
       escenario: datos.escenario,
@@ -41,7 +45,7 @@ export class ApiService {
       fk_bebida: datos.bebida_id ?? null,
       componentes_servidos: datos.componentes_servidos,
       cantidad_total_gramos: cantidad_total,
-      tiempo_decision_ms: datos.tiempo_decision_ms,
+      tiempo_decision_ms: tiempoDecisionMs,
       orden_servicio: datos.orden_servicio,
       notas: datos.notas ?? null
     };
@@ -687,7 +691,9 @@ export class ApiService {
         participante_imc: p?.imc,
         sesion_id: s?.pk_sesion,
         sesion_estado: s?.estado,
-        sesion_fecha_inicio: s?.fecha_inicio
+        sesion_fecha_inicio: s?.fecha_inicio,
+        sesion_duracion_segundos: s?.duracion_total_segundos ?? null,
+        tiempo_total_completacion_segundos: s?.duracion_total_segundos ?? null
       };
     });
 

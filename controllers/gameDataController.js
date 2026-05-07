@@ -205,6 +205,10 @@ class GameDataController {
       }, 0);
     }
 
+    const tiempoDecisionMs = Number.isFinite(Number(tiempo_decision_ms))
+      ? Math.max(0, Math.round(Number(tiempo_decision_ms)))
+      : null;
+
     const query = `
       INSERT INTO Decisiones_porcionamiento (
         FK_sesion, escenario,
@@ -222,7 +226,7 @@ class GameDataController {
       personaje_imc_representado || null,
       plato_id, bebida_id,
       JSON.stringify(componentes_servidos), cantidad_total,
-      tiempo_decision_ms, orden_servicio, notas
+      tiempoDecisionMs, orden_servicio, notas
     ];
 
     const result = await this.pool.query(query, values);
@@ -336,6 +340,7 @@ class GameDataController {
         s.fecha_inicio AS sesion_fecha_inicio,
         s.fecha_fin AS sesion_fecha_fin,
         s.duracion_total_segundos AS sesion_duracion_segundos,
+        s.duracion_total_segundos AS tiempo_total_completacion_segundos,
         s.estado AS sesion_estado,
         d.pk_decision,
         d.escenario,
@@ -420,6 +425,7 @@ class GameDataController {
         sesion_fecha_inicio: row.sesion_fecha_inicio || '',
         sesion_fecha_fin: row.sesion_fecha_fin || '',
         sesion_duracion_segundos: row.sesion_duracion_segundos || '',
+        tiempo_total_completacion_segundos: row.tiempo_total_completacion_segundos || '',
         sesion_estado: row.sesion_estado || '',
         // Decisión
         decision_id: row.pk_decision,
@@ -468,6 +474,7 @@ class GameDataController {
       sesion_fecha_inicio: 'Fecha Inicio Sesión',
       sesion_fecha_fin: 'Fecha Fin Sesión',
       sesion_duracion_segundos: 'Duración Sesión (seg)',
+      tiempo_total_completacion_segundos: 'Tiempo Total Completación (seg)',
       sesion_estado: 'Estado Sesión',
       decision_id: 'ID Decisión',
       escenario: 'Escenario',
@@ -535,7 +542,8 @@ class GameDataController {
         p.imc              AS participante_imc,
         s.pk_sesion        AS sesion_id,
         s.estado           AS sesion_estado,
-        s.fecha_inicio     AS sesion_fecha_inicio
+        s.fecha_inicio     AS sesion_fecha_inicio,
+        s.duracion_total_segundos AS sesion_duracion_segundos
       FROM Decisiones_porcionamiento d
       INNER JOIN Sesiones_juego      s ON d.fk_sesion        = s.pk_sesion
       INNER JOIN Participantes       p ON s.fk_participante  = p.pk_participante

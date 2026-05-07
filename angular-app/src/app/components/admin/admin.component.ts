@@ -60,7 +60,14 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   participanteEdadRangos: string[] = [];
 
   // ── stats ──────────────────────────────────────────────────────
-  stats = { decisiones: 0, participantes: 0, sesiones: 0, promedioGramos: 0 };
+  stats = {
+    decisiones: 0,
+    participantes: 0,
+    sesiones: 0,
+    promedioGramos: 0,
+    promedioTiempoDecisionMs: 0,
+    promedioTiempoCompletacionSegundos: 0
+  };
 
   // ── table ──────────────────────────────────────────────────────
   tablePage = 0;
@@ -163,6 +170,31 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stats.sesiones      = new Set(d.map((x: any) => x.sesion_id)).size;
     const g = d.map((x: any) => +x.cantidad_total_gramos || 0).filter(v => v > 0);
     this.stats.promedioGramos = g.length ? g.reduce((a, b) => a + b, 0) / g.length : 0;
+
+    const tiemposDecision = d
+      .map((x: any) => Number(x.tiempo_decision_ms))
+      .filter((n: number) => Number.isFinite(n) && n >= 0);
+    this.stats.promedioTiempoDecisionMs = tiemposDecision.length
+      ? tiemposDecision.reduce((a: number, b: number) => a + b, 0) / tiemposDecision.length
+      : 0;
+
+    const tiempoSesionById = new Map<number, number>();
+    d.forEach((row: any) => {
+      const sesionId = Number(row.sesion_id);
+      const tiempo = Number(
+        row.tiempo_total_completacion_segundos ?? row.sesion_duracion_segundos
+      );
+      if (!Number.isFinite(sesionId) || !Number.isFinite(tiempo) || tiempo < 0) {
+        return;
+      }
+      if (!tiempoSesionById.has(sesionId)) {
+        tiempoSesionById.set(sesionId, tiempo);
+      }
+    });
+    const tiemposSesion = [...tiempoSesionById.values()];
+    this.stats.promedioTiempoCompletacionSegundos = tiemposSesion.length
+      ? tiemposSesion.reduce((a: number, b: number) => a + b, 0) / tiemposSesion.length
+      : 0;
   }
 
   // ── shared helpers ─────────────────────────────────────────────
@@ -610,5 +642,15 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     return new Date(ts).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
   round(n: number): string { return n ? n.toFixed(1) : '—'; }
+  formatMs(ms: number): string {
+    if (!ms || ms < 0) return '—';
+    if (ms < 1000) return `${Math.round(ms)} ms`;
+    return `${(ms / 1000).toFixed(1)} s`;
+  }
+  formatSeconds(seconds: number): string {
+    if (!seconds || seconds < 0) return '—';
+    if (seconds < 60) return `${Math.round(seconds)} s`;
+    return `${(seconds / 60).toFixed(1)} min`;
+  }
   activeFiltersCount(): number { return Object.values(this.filters).filter(v => v !== '').length; }
 }

@@ -99,6 +99,14 @@
           <div class="stat-value font-title">{{ round(stats.promedioGramos) }}g</div>
           <div class="stat-label font-text">Promedio por plato</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-value font-title">{{ formatMs(stats.promedioTiempoDecisionMs) }}</div>
+          <div class="stat-label font-text">Tiempo promedio por plato</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value font-title">{{ formatSeconds(stats.promedioTiempoCompletacionSegundos) }}</div>
+          <div class="stat-label font-text">Tiempo total promedio (sesión)</div>
+        </div>
       </div>
 
       <!-- Gráfico principal — ancho completo -->
