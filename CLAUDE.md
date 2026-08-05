@@ -1,5 +1,11 @@
 # Sirve la Mesa
 
+## Flujo de trabajo
+
+- Una rama por tarea. Los PRs pueden apuntar a `develop` o directamente a `main`.
+- `main` no tiene protección técnica (repo privado en plan free): la regla es disciplina de equipo — nada se commitea directo a `main`, todo entra por PR.
+- **Ningún PR se mergea sin la aprobación explícita de Daniel (DanCas03).** Los agentes preparan el PR, lo dejan abierto y se detienen ahí.
+
 ## Agent skills
 
 ### Issue tracker
