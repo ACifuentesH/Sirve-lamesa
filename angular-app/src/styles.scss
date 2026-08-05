@@ -1,3 +1,5 @@
+@use './styles/tokens' as tokens;
+
 /* Global Styles */
 
 /** Cursor durante arrastre custom de ingredientes (sin API nativa drag). */
@@ -57,7 +59,7 @@ body.is-grabbing-drag * {
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: tokens.$font-sans;
   background: var(--color-blanco);
   height: 100vh;
   overflow: hidden; // Sin scroll en toda la página

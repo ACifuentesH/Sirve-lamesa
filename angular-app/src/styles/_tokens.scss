@@ -1,0 +1,67 @@
+// ============================================================
+// Design tokens institucionales — Fase 0 (issue #3)
+// Fuente única de verdad para color, tipografía y espaciado.
+// La paleta es provisional hasta recibir la marca de la Fundación:
+// se cambia AQUÍ y en ningún otro sitio.
+// Congelado tras la Fase 0: cambios solo por acuerdo de ambas vías.
+// ============================================================
+
+// --- Tipografía (documento: sans-serif limpia, Open Sans) ---
+$font-sans: 'Open Sans', 'Segoe UI', Roboto, Arial, sans-serif;
+$font-size-sm: 0.875rem;   // 14px — ayudas y notas
+$font-size-base: 1rem;     // 16px — cuerpo
+$font-size-lg: 1.125rem;   // 18px — banner, botones principales
+$font-size-xl: 1.375rem;   // 22px — subtítulos
+$font-size-2xl: 1.75rem;   // 28px — títulos de pantalla
+$font-weight-regular: 400;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$line-height-base: 1.5;
+
+// --- Paleta institucional: azul + grises sobre fondo claro ---
+$color-primary: #1e5fa8;        // acciones principales
+$color-primary-dark: #164a85;   // hover/activo
+$color-primary-light: #eaf2fb;  // banner informativo (§3: azul claro)
+$color-info-border: #b9d4ef;    // borde sutil del banner
+$color-text: #1f2937;
+$color-text-muted: #6b7280;
+$color-bg: #ffffff;             // fondo base
+$color-bg-alt: #f5f7fa;         // gris muy claro alternativo
+$color-border: #d1d5db;
+$color-success: #2e7d32;
+$color-error: #b3261e;
+$color-disabled: #9ca3af;
+
+// --- Espaciado (escala de 4 px) ---
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-5: 1.5rem;
+$space-6: 2rem;
+$space-7: 3rem;
+$space-8: 4rem;
+
+// --- Bordes y sombras ---
+$radius-sm: 4px;
+$radius-md: 8px;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+$shadow-modal: 0 8px 30px rgba(0, 0, 0, 0.25);
+
+// Custom properties para uso directo en templates.
+// Prefijo --sm- para no chocar con las variables legacy (--color-*).
+:root {
+  --sm-font-sans: #{$font-sans};
+  --sm-color-primary: #{$color-primary};
+  --sm-color-primary-dark: #{$color-primary-dark};
+  --sm-color-primary-light: #{$color-primary-light};
+  --sm-color-info-border: #{$color-info-border};
+  --sm-color-text: #{$color-text};
+  --sm-color-text-muted: #{$color-text-muted};
+  --sm-color-bg: #{$color-bg};
+  --sm-color-bg-alt: #{$color-bg-alt};
+  --sm-color-border: #{$color-border};
+  --sm-color-success: #{$color-success};
+  --sm-color-error: #{$color-error};
+  --sm-color-disabled: #{$color-disabled};
+}
