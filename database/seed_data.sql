@@ -1,3 +1,8 @@
+-- ⚠️ LEGACY (issue #5): este seed corresponde al modelo anterior (menú de
+-- El Solar del Este y 7 personajes con imc_representado). Sus ON CONFLICT DO
+-- NOTHING no tienen target UNIQUE (salvo Menu): reejecutarlo DUPLICA filas.
+-- No volver a ejecutarlo. Lo reemplazan los seeds nuevos de la Vía B
+-- (seed_personajes.sql y seed_catalogo_alimentos.sql, issues #14 y #15).
 -- Datos iniciales del menú basados en el anexo del proyecto
 -- Menú del restaurante El Solar del Este, Las Mercedes
 
