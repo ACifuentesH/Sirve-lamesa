@@ -1,0 +1,86 @@
+<main class="registro">
+  <form class="tarjeta" [formGroup]="form" (ngSubmit)="continuar()" novalidate>
+    <h1>Registro del participante</h1>
+    <p class="intro">Completa estos datos para comenzar. Tus respuestas se registran de forma anónima.</p>
+
+    <div class="grilla">
+      <div class="campo">
+        <label for="edad">Edad</label>
+        <input id="edad" type="number" formControlName="edad" min="16" max="99" />
+        <small class="error" *ngIf="esInvalido('edad')">Ingresa una edad entre 16 y 99 años.</small>
+      </div>
+
+      <div class="campo">
+        <label for="peso">Peso (kg)</label>
+        <input id="peso" type="number" formControlName="peso_kg" min="30" max="250" step="0.1" />
+        <small class="error" *ngIf="esInvalido('peso_kg')">Ingresa un peso entre 30 y 250 kg (1 decimal).</small>
+      </div>
+
+      <div class="campo">
+        <label for="estatura">Estatura (cm)</label>
+        <input id="estatura" type="number" formControlName="altura_cm" min="100" max="230" />
+        <small class="error" *ngIf="esInvalido('altura_cm')">Ingresa una estatura entre 100 y 230 cm.</small>
+      </div>
+
+      <div class="campo">
+        <label for="genero">Género</label>
+        <select id="genero" formControlName="genero">
+          <option [ngValue]="null" disabled>Selecciona…</option>
+          <option *ngFor="let g of generos" [ngValue]="g.value">{{ g.label }}</option>
+        </select>
+        <small class="error" *ngIf="esInvalido('genero')">Selecciona una opción.</small>
+      </div>
+
+      <div class="campo">
+        <label for="nivel">Nivel de Estudios</label>
+        <select id="nivel" formControlName="nivel_estudios">
+          <option [ngValue]="null" disabled>Selecciona…</option>
+          <option *ngFor="let n of nivelesEstudios" [ngValue]="n.value">{{ n.label }}</option>
+        </select>
+        <small class="error" *ngIf="esInvalido('nivel_estudios')">Selecciona una opción.</small>
+      </div>
+
+      <div class="campo" *ngIf="muestraSemestre">
+        <label for="semestre">Semestre o año que cursa</label>
+        <input id="semestre" type="text" formControlName="semestre_o_anio" placeholder="Ej.: 5to semestre" maxlength="40" />
+        <small class="error" *ngIf="esInvalido('semestre_o_anio')">Indica el semestre o año que cursas.</small>
+      </div>
+
+      <div class="campo">
+        <label for="etnia">Autoidentificación Étnica</label>
+        <select id="etnia" formControlName="etnia">
+          <option [ngValue]="null" disabled>Selecciona…</option>
+          <option *ngFor="let e of etnias" [ngValue]="e.value">{{ e.label }}</option>
+        </select>
+        <small class="error" *ngIf="esInvalido('etnia')">Selecciona una opción.</small>
+      </div>
+
+      <div class="campo">
+        <label for="regionOrigen">Región de origen</label>
+        <select id="regionOrigen" formControlName="region_origen">
+          <option [ngValue]="null" disabled>Selecciona…</option>
+          <option *ngFor="let r of regiones" [ngValue]="r">{{ r }}</option>
+        </select>
+        <small class="error" *ngIf="esInvalido('region_origen')">Selecciona una opción.</small>
+      </div>
+
+      <div class="campo">
+        <label for="regionResidencia">Región donde vive actualmente</label>
+        <select id="regionResidencia" formControlName="region_residencia">
+          <option [ngValue]="null" disabled>Selecciona…</option>
+          <option *ngFor="let r of regiones" [ngValue]="r">{{ r }}</option>
+        </select>
+        <small class="error" *ngIf="esInvalido('region_residencia')">Selecciona una opción.</small>
+      </div>
+    </div>
+
+    <label class="consentimiento">
+      <input type="checkbox" formControlName="consentimiento_informado" />
+      <span>He leído y acepto participar voluntariamente en este estudio. Entiendo que mis
+      datos se registran de forma anónima y se usan exclusivamente con fines de investigación.</span>
+    </label>
+    <small class="error" *ngIf="esInvalido('consentimiento_informado')">Debes aceptar para continuar.</small>
+
+    <button class="continuar" type="submit" [disabled]="form.invalid">Continuar</button>
+  </form>
+</main>

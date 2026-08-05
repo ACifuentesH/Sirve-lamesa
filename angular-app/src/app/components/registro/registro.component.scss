@@ -1,0 +1,105 @@
+@use '../../../styles/tokens' as t;
+
+.registro {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: t.$color-bg-alt;
+  padding: t.$space-5;
+}
+
+.tarjeta {
+  width: min(720px, 100%);
+  background: t.$color-bg;
+  border: 1px solid t.$color-border;
+  border-radius: t.$radius-md;
+  box-shadow: t.$shadow-sm;
+  padding: t.$space-6;
+
+  h1 {
+    font-size: t.$font-size-2xl;
+    font-weight: t.$font-weight-bold;
+    color: t.$color-text;
+  }
+
+  .intro {
+    margin: t.$space-2 0 t.$space-5;
+    color: t.$color-text-muted;
+  }
+}
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: t.$space-4;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-1;
+
+  label {
+    font-size: t.$font-size-sm;
+    font-weight: t.$font-weight-semibold;
+    color: t.$color-text;
+  }
+
+  input,
+  select {
+    font-family: t.$font-sans;
+    font-size: t.$font-size-base;
+    color: t.$color-text;
+    background: t.$color-bg;
+    border: 1px solid t.$color-border;
+    border-radius: t.$radius-sm;
+    padding: t.$space-2 t.$space-3;
+
+    &:focus-visible {
+      outline: 2px solid t.$color-primary;
+      outline-offset: 1px;
+    }
+  }
+}
+
+.error {
+  color: t.$color-error;
+  font-size: t.$font-size-sm;
+}
+
+.consentimiento {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$space-2;
+  margin-top: t.$space-5;
+  font-size: t.$font-size-sm;
+  color: t.$color-text;
+
+  input {
+    margin-top: 3px;
+    accent-color: t.$color-primary;
+  }
+}
+
+.continuar {
+  margin-top: t.$space-5;
+  width: 100%;
+  font-family: t.$font-sans;
+  font-size: t.$font-size-lg;
+  font-weight: t.$font-weight-semibold;
+  color: t.$color-bg;
+  background: t.$color-primary;
+  border: none;
+  border-radius: t.$radius-sm;
+  padding: t.$space-3 t.$space-4;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: t.$color-primary-dark;
+  }
+
+  &:disabled {
+    background: t.$color-disabled;
+    cursor: not-allowed;
+  }
+}
