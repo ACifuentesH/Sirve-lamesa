@@ -1,0 +1,30 @@
+<!-- Texto literal del Anexo D (protocolo experimental): no parafrasear. -->
+<main class="onboarding">
+  <article class="tarjeta">
+    <h1>Estudio sobre Entornos Digitales y Decisiones Alimentarias Cotidianas</h1>
+
+    <p>Bienvenido/a a esta plataforma de simulación. Agradecemos enormemente tu participación en este estudio académico, cuyo objetivo es evaluar cómo las personas interactúan con interfaces digitales al tomar decisiones sobre el servicio y distribución de alimentos en el día a día.</p>
+
+    <p><strong>¿En qué consiste la tarea?</strong> A continuación, se te presentará un escenario interactivo en el que deberás preparar un plato de comida para un usuario simulado.</p>
+
+    <p>Para realizar la tarea con éxito, por favor ten en cuenta las siguientes indicaciones:</p>
+
+    <ul>
+      <li><strong>Lee el contexto:</strong> En la parte superior de la pantalla aparecerá una solicitud específica. Allí se te indicará el nombre de la persona a la que debes servirle y el tipo de comida del día (por ejemplo: Desayuno, Almuerzo o Cena).</li>
+      <li><strong>Selecciona los alimentos:</strong> Explora el catálogo de opciones disponibles en el menú lateral.</li>
+      <li><strong>Sirve las porciones:</strong> Utiliza los controles de la interfaz para añadir y distribuir los alimentos en el plato en las cantidades que consideres adecuadas según el contexto provisto.</li>
+      <li><strong>Finaliza con seguridad:</strong> Una vez que sientas que el plato está listo y equilibrado de acuerdo a tu criterio, presiona el botón "Finalizar Tarea" para registrar tus datos.</li>
+    </ul>
+
+    <p>Esta es una tarea de simulación basada en tu intuición y criterio cotidiano. No existen respuestas correctas o incorrectas. Te pedimos que actúes con la mayor naturalidad posible.</p>
+
+    <button
+      type="button"
+      class="iniciar"
+      [disabled]="!habilitado"
+      (click)="iniciarSimulacion()">
+      INICIAR SIMULACIÓN
+    </button>
+    <p class="cuenta-atras" *ngIf="!habilitado" aria-live="polite">Disponible en {{ segundosRestantes }} s…</p>
+  </article>
+</main>

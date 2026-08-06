@@ -1,0 +1,72 @@
+@use '../../../styles/tokens' as t;
+
+.onboarding {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: t.$color-bg-alt;
+  padding: t.$space-5;
+}
+
+.tarjeta {
+  width: min(760px, 100%);
+  background: t.$color-bg;
+  border: 1px solid t.$color-border;
+  border-radius: t.$radius-md;
+  box-shadow: t.$shadow-sm;
+  padding: t.$space-6;
+
+  h1 {
+    font-size: t.$font-size-2xl;
+    font-weight: t.$font-weight-bold;
+    color: t.$color-text;
+    margin-bottom: t.$space-4;
+  }
+
+  p,
+  li {
+    color: t.$color-text;
+    line-height: t.$line-height-base;
+  }
+
+  p {
+    margin-bottom: t.$space-4;
+  }
+
+  ul {
+    margin: 0 0 t.$space-4;
+    padding-left: t.$space-5;
+    display: grid;
+    gap: t.$space-2;
+  }
+
+  .cuenta-atras {
+    margin: t.$space-2 0 0;
+    text-align: center;
+    font-size: t.$font-size-sm;
+    color: t.$color-text-muted;
+  }
+}
+
+.iniciar {
+  display: block;
+  margin: t.$space-5 auto 0;
+  font-family: t.$font-sans;
+  font-size: t.$font-size-lg;
+  font-weight: t.$font-weight-semibold;
+  color: t.$color-bg;
+  background: t.$color-primary;
+  border: none;
+  border-radius: t.$radius-sm;
+  padding: t.$space-3 t.$space-6;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: t.$color-primary-dark;
+  }
+
+  &:disabled {
+    background: t.$color-disabled;
+    cursor: not-allowed;
+  }
+}
