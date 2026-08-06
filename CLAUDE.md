@@ -10,12 +10,12 @@
 
 ### Issue tracker
 
-Issues are tracked in GitHub Issues (`ACifuentesH/Sirve-lamesa`) via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+Issues are tracked in GitHub Issues (`ACifuentesH/Sirve-lamesa`) via the `gh` CLI. See `.claude/docs/issue-tracker.md`.
 
 ### Triage labels
 
-The five canonical triage roles use their default names as labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+The five canonical triage roles use their default names as labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `.claude/docs/triage-labels.md`.
 
 ### Domain docs
 
-Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root. See `.claude/docs/domain.md`.
