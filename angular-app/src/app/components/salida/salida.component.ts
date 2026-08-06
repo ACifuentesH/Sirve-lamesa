@@ -1,26 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { environment } from '../../../environments/environment';
+import { ParticipanteService } from '../../services/participante.service';
 
-// Stub de Fase 0 (issue #4). Lo implementa la Vía A en el issue #11.
+// Vía A (issue #11): pantalla final sostenida con el texto literal del Anexo E.
+// Reemplaza el cierre abrupto del flujo viejo (auto-redirect de 3 s): estática,
+// sin temporizador; el participante decide cuándo salir.
 @Component({
   selector: 'app-salida',
   standalone: true,
-  template: `
-    <main class="f0-stub">
-      <h1>Simulación completada</h1>
-      <p>Pantalla en construcción — Vía A, issue #11.</p>
-    </main>
-  `,
-  styles: [`
-    .f0-stub {
-      min-height: 100vh;
-      display: grid;
-      place-content: center;
-      text-align: center;
-      gap: 0.75rem;
-      background: var(--sm-color-bg);
-      color: var(--sm-color-text);
-    }
-    p { color: var(--sm-color-text-muted); }
-  `]
+  templateUrl: './salida.component.html',
+  styleUrls: ['./salida.component.scss']
 })
-export class SalidaComponent {}
+export class SalidaComponent implements OnInit {
+  private readonly participanteService = inject(ParticipanteService);
+
+  ngOnInit(): void {
+    // Al montarse se limpia el estado de la sesión: si el participante pulsa
+    // "atrás", el flujo ya no tiene datos con los que reabrir el plato enviado.
+    this.participanteService.limpiar();
+  }
+
+  regresarALaFundacion(): void {
+    // PENDIENTE (issue #1): mientras la Fundación no entregue la URL definitiva,
+    // environment.urlFundacion queda vacío y el botón no navega a ningún lado.
+    if (environment.urlFundacion) {
+      window.location.href = environment.urlFundacion;
+    }
+  }
+}

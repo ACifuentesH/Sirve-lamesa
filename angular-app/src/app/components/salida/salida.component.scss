@@ -1,0 +1,50 @@
+@use '../../../styles/tokens' as t;
+
+.salida {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: t.$color-bg-alt;
+  padding: t.$space-5;
+}
+
+.tarjeta {
+  width: min(640px, 100%);
+  background: t.$color-bg;
+  border: 1px solid t.$color-border;
+  border-radius: t.$radius-md;
+  box-shadow: t.$shadow-sm;
+  padding: t.$space-6;
+  text-align: center;
+
+  h1 {
+    font-size: t.$font-size-2xl;
+    font-weight: t.$font-weight-bold;
+    color: t.$color-text;
+    margin-bottom: t.$space-4;
+  }
+
+  p {
+    color: t.$color-text;
+    line-height: t.$line-height-base;
+    margin-bottom: t.$space-4;
+  }
+}
+
+.regresar {
+  display: block;
+  margin: t.$space-5 auto 0;
+  font-family: t.$font-sans;
+  font-size: t.$font-size-lg;
+  font-weight: t.$font-weight-semibold;
+  color: t.$color-bg;
+  background: t.$color-primary;
+  border: none;
+  border-radius: t.$radius-sm;
+  padding: t.$space-3 t.$space-6;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$color-primary-dark;
+  }
+}
