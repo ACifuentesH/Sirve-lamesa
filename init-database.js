@@ -30,16 +30,36 @@ async function initDatabase() {
     await new Promise(resolve => setTimeout(resolve, 3000));
     console.log('');
     
+    // Las migraciones se descubren leyendo la carpeta: enumerarlas a mano dejaba
+    // fuera las nuevas al agregarlas. El prefijo numérico con ceros hace que el
+    // orden alfabético sea el orden de aplicación.
+    const migrationsDir = path.join(__dirname, 'database', 'migrations');
+    const nombresMigraciones = (await fs.readdir(migrationsDir))
+      .filter(name => name.endsWith('.sql'))
+      .sort();
+
+    // Una migración marcada con "-- @manual" cambia el modelo de acceso y solo es
+    // válida cuando el flujo de la app ya está al día. Aplicarla aquí, contra un
+    // DATABASE_URL que apunte a Supabase, dejaría el simulador sin escritura.
+    const migrations = [];
+    const migracionesManuales = [];
+    for (const name of nombresMigraciones) {
+      const ruta = `database/migrations/${name}`;
+      const contenido = await fs.readFile(path.join(migrationsDir, name), 'utf8');
+      if (contenido.includes('-- @manual')) {
+        migracionesManuales.push(ruta);
+      } else {
+        migrations.push(ruta);
+      }
+    }
+
     const sqlFiles = [
       'database/schema.sql',
       'database/participantes.sql',
       'database/sesiones_juego.sql',
       'database/decisiones_porcionamiento.sql',
       'database/seed_data.sql',
-      'database/migrations/001_ampliar_campo_navegador.sql',
-      'database/migrations/002_anonimizar_participantes.sql',
-      'database/migrations/003_personajes_retratos.sql',
-      'database/migrations/004_pedro_imagen_pedro_png.sql'
+      ...migrations
     ];
 
     console.log('📂 Archivos SQL a ejecutar:');
@@ -47,6 +67,12 @@ async function initDatabase() {
       console.log(`   ${index + 1}. ${file}`);
     });
     console.log('');
+
+    if (migracionesManuales.length > 0) {
+      console.log('⏭️  Migraciones omitidas (marcadas como @manual):');
+      migracionesManuales.forEach(file => console.log(`   - ${file}`));
+      console.log('');
+    }
 
     for (const file of sqlFiles) {
       try {
