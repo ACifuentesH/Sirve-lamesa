@@ -10,8 +10,7 @@ import { Personaje } from '../../../models/contrato';
  * cuando se está decidiendo dónde servir.
  *
  * Si la imagen falta, cae a la inicial del nombre en lugar de dejar el icono de
- * imagen rota. Las 8 fotos son un entregable aparte (tarea B1) y el simulador tiene
- * que ser usable antes de que lleguen.
+ * imagen rota.
  */
 @Component({
   selector: 'app-avatar-personaje',
