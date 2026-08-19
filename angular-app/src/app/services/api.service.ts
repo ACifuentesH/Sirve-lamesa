@@ -3,7 +3,7 @@ import { Observable, from, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
-import { buildExportRows, generarCSV } from '../utils/research-export';
+import { FilaVista, buildExportRows, generarCSV } from '../utils/research-export';
 
 function pgErr(e: PostgrestError | null): string {
   return e?.message || 'Error de Supabase';
@@ -707,20 +707,17 @@ export class ApiService {
     };
   }
 
-  /** CSV con BOM UTF-8 (misma lógica que el backend). */
+  /** CSV con BOM UTF-8, una fila por decisión. */
   obtenerExportacionCSV(): Observable<string> {
-    return from(this.fetchExportBundle()).pipe(
-      map(({ decisiones, sesionesByPk, participantesByPk, componentes }) => {
-        const rows = buildExportRows(decisiones, sesionesByPk, participantesByPk, componentes);
-        return generarCSV(rows);
-      })
+    return from(this.fetchVistaRespuestas()).pipe(
+      map(filas => generarCSV(buildExportRows(filas)))
     );
   }
 
   obtenerExportacionJSON(): Observable<{ success: boolean; exportado_en: string; total_registros: number; data: unknown[] }> {
-    return from(this.fetchExportBundle()).pipe(
-      map(({ decisiones, sesionesByPk, participantesByPk, componentes }) => {
-        const data = buildExportRows(decisiones, sesionesByPk, participantesByPk, componentes);
+    return from(this.fetchVistaRespuestas()).pipe(
+      map(filas => {
+        const data = buildExportRows(filas);
         return {
           success: true,
           exportado_en: new Date().toISOString(),
@@ -731,58 +728,19 @@ export class ApiService {
     );
   }
 
-  private async fetchExportBundle() {
-    const { data: decisiones, error: e1 } = await this.client
-      .from('decisiones_porcionamiento')
-      .select('*')
-      .order('fk_sesion')
-      .order('orden_servicio');
+  /**
+   * La vista respuestas_experimento ya cruza participante, sesión y decisión, y viene
+   * ordenada. Solo la lee un investigador de la lista blanca (migración 013): si
+   * devuelve cero filas sin error, lo que falta es la sesión, no los datos.
+   */
+  private async fetchVistaRespuestas(): Promise<FilaVista[]> {
+    const { data, error } = await this.client.from('respuestas_experimento').select('*');
 
-    if (e1) {
-      throw new Error(pgErr(e1));
-    }
-    const dlist = decisiones || [];
-    const sesionIds = [...new Set(dlist.map((d: any) => d.fk_sesion))];
-    let sesiones: any[] = [];
-    if (sesionIds.length) {
-      const { data, error } = await this.client
-        .from('sesiones_juego')
-        .select('*')
-        .in('pk_sesion', sesionIds);
-      if (error) {
-        throw new Error(pgErr(error));
-      }
-      sesiones = data || [];
-    }
-    const partIds = [...new Set(sesiones.map((s: any) => s.fk_participante))];
-    let participantes: any[] = [];
-    if (partIds.length) {
-      const { data, error } = await this.client
-        .from('participantes')
-        .select('*')
-        .in('pk_participante', partIds);
-      if (error) {
-        throw new Error(pgErr(error));
-      }
-      participantes = data || [];
-    }
-    const { data: componentes, error: e2 } = await this.client
-      .from('componentes')
-      .select('pk_alimento, nombre, categoria, unidad');
-
-    if (e2) {
-      throw new Error(pgErr(e2));
+    if (error) {
+      throw new Error(pgErr(error));
     }
 
-    const sesionesByPk = new Map(sesiones.map((s: any) => [s.pk_sesion, s]));
-    const participantesByPk = new Map(participantes.map((p: any) => [p.pk_participante, p]));
-
-    return {
-      decisiones: dlist,
-      sesionesByPk,
-      participantesByPk,
-      componentes: componentes || []
-    };
+    return (data ?? []) as FilaVista[];
   }
 
   // ===================================
