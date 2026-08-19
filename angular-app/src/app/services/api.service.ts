@@ -618,93 +618,15 @@ export class ApiService {
   // ADMIN + EXPORT
   // ===================================
 
-  obtenerDatosAdmin(): Observable<any> {
-    return from(this.buildAdminDatos()).pipe(
-      map(data => ({ success: true, data }))
+  /**
+   * El panel lee la misma vista que el CSV. Cero filas sin error es un estudio
+   * vacío o una sesión de investigador que aún no está en la lista blanca, no un
+   * fallo de red.
+   */
+  obtenerDatosAdmin(): Observable<{ success: true; data: FilaVista[] }> {
+    return from(this.fetchVistaRespuestas()).pipe(
+      map(filas => ({ success: true, data: filas }))
     );
-  }
-
-  private async buildAdminDatos() {
-    const { data: decisionesRaw, error: e1 } = await this.client
-      .from('decisiones_porcionamiento')
-      .select('*')
-      .order('timestamp_decision', { ascending: false });
-
-    if (e1) {
-      throw new Error(pgErr(e1));
-    }
-    const decisiones = decisionesRaw || [];
-    const sesionIds = [...new Set(decisiones.map((d: any) => d.fk_sesion))];
-    let sesiones: any[] = [];
-    if (sesionIds.length) {
-      const { data, error } = await this.client
-        .from('sesiones_juego')
-        .select('*')
-        .in('pk_sesion', sesionIds);
-      if (error) {
-        throw new Error(pgErr(error));
-      }
-      sesiones = data || [];
-    }
-    const partIds = [...new Set(sesiones.map((s: any) => s.fk_participante))];
-    let participantes: any[] = [];
-    if (partIds.length) {
-      const { data, error } = await this.client
-        .from('participantes')
-        .select('*')
-        .in('pk_participante', partIds);
-      if (error) {
-        throw new Error(pgErr(error));
-      }
-      participantes = data || [];
-    }
-
-    const sesByPk = new Map(sesiones.map((s: any) => [s.pk_sesion, s]));
-    const partByPk = new Map(participantes.map((p: any) => [p.pk_participante, p]));
-
-    const decisionesMapped = decisiones.map((d: any) => {
-      const s = sesByPk.get(d.fk_sesion);
-      const p = s ? partByPk.get(s.fk_participante) : null;
-      return {
-        pk_decision: d.pk_decision,
-        escenario: d.escenario,
-        personaje_tipo: d.personaje_tipo,
-        personaje_edad_rango: d.personaje_edad_rango,
-        personaje_sexo: d.personaje_sexo,
-        personaje_imc_representado: d.personaje_imc_representado,
-        componentes_servidos: d.componentes_servidos,
-        cantidad_total_gramos: d.cantidad_total_gramos,
-        tiempo_decision_ms: d.tiempo_decision_ms,
-        orden_servicio: d.orden_servicio,
-        timestamp_decision: d.timestamp_decision,
-        participante_id: p?.pk_participante,
-        participante_sexo: p?.sexo,
-        participante_edad: p?.edad,
-        participante_peso_kg: p?.peso_kg,
-        participante_altura_cm: p?.altura_cm,
-        participante_imc: p?.imc,
-        sesion_id: s?.pk_sesion,
-        sesion_estado: s?.estado,
-        sesion_fecha_inicio: s?.fecha_inicio,
-        sesion_duracion_segundos: s?.duracion_total_segundos ?? null,
-        tiempo_total_completacion_segundos: s?.duracion_total_segundos ?? null
-      };
-    });
-
-    const { data: componentes_catalogo, error: e2 } = await this.client
-      .from('componentes')
-      .select('pk_alimento, nombre, categoria, unidad')
-      .order('categoria')
-      .order('nombre');
-
-    if (e2) {
-      throw new Error(pgErr(e2));
-    }
-
-    return {
-      decisiones: decisionesMapped,
-      componentes_catalogo: componentes_catalogo || []
-    };
   }
 
   /** CSV con BOM UTF-8, una fila por decisión. */

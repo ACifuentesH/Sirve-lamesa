@@ -15,7 +15,7 @@
  * salir de aquí: una que se omita desaparece del build y rompe la compilación de quien
  * la lea.
  */
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -62,7 +62,9 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY ?? '';
 const urlFundacion = process.env.URL_FUNDACION ?? '';
 
 const destino = esDev ? 'environment.ts' : 'environment.prod.ts';
-const out = join(root, 'src', 'environments', destino);
+const envDir = join(root, 'src', 'environments');
+mkdirSync(envDir, { recursive: true });
+const out = join(envDir, destino);
 
 const contents = `/* Generado por scripts/inject-supabase-env.mjs. No editar a mano ni versionar. */
 export const environment = {

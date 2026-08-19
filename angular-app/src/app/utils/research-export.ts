@@ -94,8 +94,32 @@ export interface ExportRow {
   timestamp_decision: string;
 }
 
+/** Un alimento del JSONB, listo para gráficos del panel. */
+export interface AlimentoEnPlato {
+  nombre: string;
+  tipo: string;
+  gramos: number;
+}
+
+/**
+ * Acepta el contrato nuevo (tipo + peso_total_g) y el JSONB viejo
+ * (cantidad_gramos), para que el panel no se caiga con las 47 decisiones
+ * recogidas antes de la RPC.
+ */
+export function parseAlimentos(componentes: unknown): AlimentoEnPlato[] {
+  return comoArreglo(componentes).map(item => {
+    const tipo = String(item?.tipo || item?.categoria || '').toLowerCase();
+    const conocido = (TIPOS as readonly string[]).includes(tipo);
+    return {
+      nombre: String(item?.nombre || item?.slug || 'sin nombre'),
+      tipo: conocido ? tipo : 'otro',
+      gramos: Number(item?.peso_total_g ?? item?.cantidad_gramos) || 0
+    };
+  });
+}
+
 /** El JSONB puede llegar como arreglo o como texto según el driver. */
-function comoArreglo(valor: unknown): any[] {
+export function comoArreglo(valor: unknown): any[] {
   if (Array.isArray(valor)) {
     return valor;
   }
@@ -193,7 +217,7 @@ export function buildExportRows(filas: FilaVista[]): ExportRow[] {
   });
 }
 
-const ENCABEZADOS: Record<keyof ExportRow, string> = {
+export const ENCABEZADOS: Record<keyof ExportRow, string> = {
   participante_id: 'ID Participante',
   participante_edad: 'Edad Participante',
   participante_genero: 'Género Participante',
