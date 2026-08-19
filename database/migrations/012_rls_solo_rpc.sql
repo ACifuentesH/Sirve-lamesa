@@ -92,6 +92,10 @@ $do$;
 
 ---------------------------------------------------------------------------
 -- 4. Rol authenticated: el investigador lee los datos del estudio
+--
+-- Las políticas las define la 013 contra la lista blanca (es_investigador()); aquí
+-- solo se aseguran los GRANT. No se recrean: hacerlo con USING (true), como estaba
+-- escrito antes de la 013, habría reabierto la lectura a cualquier cuenta registrada.
 ---------------------------------------------------------------------------
 DO $do$
 BEGIN
@@ -99,18 +103,6 @@ BEGIN
     RAISE NOTICE 'rol authenticated inexistente (Postgres local): se omite';
     RETURN;
   END IF;
-
-  EXECUTE 'DROP POLICY IF EXISTS "sirve_auth_select_participantes" ON participantes';
-  EXECUTE 'CREATE POLICY "sirve_auth_select_participantes" ON participantes
-             FOR SELECT TO authenticated USING (true)';
-
-  EXECUTE 'DROP POLICY IF EXISTS "sirve_auth_select_sesiones" ON sesiones_juego';
-  EXECUTE 'CREATE POLICY "sirve_auth_select_sesiones" ON sesiones_juego
-             FOR SELECT TO authenticated USING (true)';
-
-  EXECUTE 'DROP POLICY IF EXISTS "sirve_auth_select_decisiones" ON decisiones_porcionamiento';
-  EXECUTE 'CREATE POLICY "sirve_auth_select_decisiones" ON decisiones_porcionamiento
-             FOR SELECT TO authenticated USING (true)';
 
   EXECUTE 'GRANT SELECT ON participantes             TO authenticated';
   EXECUTE 'GRANT SELECT ON sesiones_juego            TO authenticated';

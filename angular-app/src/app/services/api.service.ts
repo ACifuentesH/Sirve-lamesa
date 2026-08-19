@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, from, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { createClient, PostgrestError, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+import { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
 import { buildExportRows, generarCSV } from '../utils/research-export';
 
 function pgErr(e: PostgrestError | null): string {
@@ -13,13 +13,7 @@ function pgErr(e: PostgrestError | null): string {
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly client: SupabaseClient;
-
-  constructor() {
-    this.client = createClient(environment.supabaseUrl, environment.supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false }
-    });
-  }
+  private readonly client: SupabaseClient = inject(SupabaseService).client;
 
   private decisionInsertPayload(datos: any) {
     let cantidad_total = 0;

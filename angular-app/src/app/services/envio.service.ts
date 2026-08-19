@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, throwError, timer } from 'rxjs';
 import { finalize, retry, tap, timeout } from 'rxjs/operators';
-import { createClient, PostgrestError, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+import { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
 import { PayloadEnvio, RespuestaEnvio, RPC_REGISTRAR_RESPUESTA } from '../models/contrato';
 
 /**
@@ -47,7 +47,7 @@ const CLAVE_RESPALDO = 'sirve.envio.pendiente';
 // servidor confirma. Si el participante recarga tras un fallo, el payload sigue ahí.
 @Injectable({ providedIn: 'root' })
 export class EnvioService {
-  private readonly client: SupabaseClient;
+  private readonly client: SupabaseClient = inject(SupabaseService).client;
 
   private readonly isSubmittingSubject = new BehaviorSubject<boolean>(false);
   private readonly isSuccessSubject = new BehaviorSubject<boolean>(false);
@@ -59,12 +59,6 @@ export class EnvioService {
 
   /** El payload vive en memoria mientras haya un envío sin confirmar. */
   private pendiente: PayloadEnvio | null = null;
-
-  constructor() {
-    this.client = createClient(environment.supabaseUrl, environment.supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false }
-    });
-  }
 
   get isSubmitting(): boolean {
     return this.isSubmittingSubject.value;
