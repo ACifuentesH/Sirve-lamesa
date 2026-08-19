@@ -8,7 +8,8 @@ import { investigadorGuard } from './guards/investigador.guard';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./components/login/login.module').then(m => m.LoginModule)
+    redirectTo: 'registro',
+    pathMatch: 'full'
   },
   {
     path: 'juego',

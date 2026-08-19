@@ -1,0 +1,72 @@
+<nav class="menu" aria-label="Catálogo de alimentos">
+  @if (cargando) {
+    <p class="estado">Cargando menú…</p>
+  } @else if (error) {
+    <p class="estado estado--error">{{ error }}</p>
+  } @else {
+    <div class="pestanas" role="tablist">
+      @for (grupo of pestanas; track grupo) {
+        <button
+          type="button"
+          role="tab"
+          class="pestana"
+          [class.pestana--activa]="grupo === pestanaActiva"
+          [attr.aria-selected]="grupo === pestanaActiva"
+          (click)="seleccionarPestana(grupo)"
+        >
+          {{ grupo }}
+        </button>
+      }
+    </div>
+
+    <ul class="lista" role="tabpanel">
+      @for (alimento of alimentosDePestana(); track alimento.id) {
+        <li class="item">
+          <button
+            type="button"
+            class="alimento"
+            [disabled]="enTope(alimento.id)"
+            [attr.title]="enTope(alimento.id) ? 'Máximo 4 porciones de un mismo alimento' : alimento.nombre"
+            (click)="onAgregar(alimento)"
+          >
+            <span class="foto">
+              <img
+                [src]="alimento.imagen"
+                [alt]="alimento.nombre"
+                width="256"
+                height="256"
+                loading="lazy"
+                (error)="$any($event.target).style.display = 'none'"
+              />
+            </span>
+            <span class="nombre">{{ alimento.nombre }}</span>
+            <span class="unidad">{{ alimento.unidad_display }}</span>
+          </button>
+
+          @if (mostrarContador(alimento.id)) {
+            <div class="contador" role="group" [attr.aria-label]="'Porciones de ' + alimento.nombre">
+              <button
+                type="button"
+                class="paso"
+                [disabled]="porcionesDe(alimento.id) <= 0"
+                (click)="onQuitar(alimento)"
+              >
+                −
+              </button>
+              <span class="cantidad">{{ porcionesDe(alimento.id) }}</span>
+              <button
+                type="button"
+                class="paso"
+                [disabled]="enTope(alimento.id)"
+                [title]="enTope(alimento.id) ? 'Máximo 4 porciones de un mismo alimento' : 'Añadir porción'"
+                (click)="onAgregar(alimento)"
+              >
+                +
+              </button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</nav>

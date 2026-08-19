@@ -53,13 +53,23 @@ async function initDatabase() {
       }
     }
 
+    // Los datos de referencia van al final: el catálogo de alimentos necesita la
+    // tabla que crea la migración 006, y sin ellos la RPC rechaza todo envío porque
+    // valida cada alimento contra el catálogo.
+    const seedsDir = path.join(__dirname, 'database', 'seeds');
+    const semillas = (await fs.readdir(seedsDir))
+      .filter(name => name.endsWith('.sql'))
+      .sort()
+      .map(name => `database/seeds/${name}`);
+
     const sqlFiles = [
       'database/schema.sql',
       'database/participantes.sql',
       'database/sesiones_juego.sql',
       'database/decisiones_porcionamiento.sql',
       'database/seed_data.sql',
-      ...migrations
+      ...migrations,
+      ...semillas
     ];
 
     console.log('📂 Archivos SQL a ejecutar:');

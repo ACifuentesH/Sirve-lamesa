@@ -1,0 +1,73 @@
+@if (soloReintento) {
+  <main class="reintento">
+    <h1>Tu respuesta no se llegó a guardar</h1>
+    <p>{{ errorEnvio?.mensaje ?? 'Error de conexión. Por favor, inténtalo de nuevo' }}</p>
+    <button type="button" class="principal" [disabled]="isSubmitting" (click)="reintentar()">
+      Inténtalo de nuevo
+    </button>
+  </main>
+} @else {
+  <div class="pagina">
+    @if (asignacion) {
+      <app-banner-contexto
+        [personaje]="asignacion.personaje"
+        [momentoDia]="asignacion.momento_dia"
+      />
+    }
+
+    @if (errorEnvio) {
+      <div class="banner-error" role="alert">
+        <span>{{ errorEnvio.mensaje }}</span>
+        <button type="button" class="principal" [disabled]="isSubmitting" (click)="reintentar()">
+          Inténtalo de nuevo
+        </button>
+      </div>
+    }
+
+    @if (cargando) {
+      <p class="estado">Preparando la simulación…</p>
+    } @else if (errorCarga) {
+      <p class="estado estado--error">{{ errorCarga }}</p>
+    } @else if (asignacion) {
+      <main class="tablero">
+        <app-avatar-personaje [personaje]="asignacion.personaje" />
+
+        <section class="servicio">
+          <div class="escena">
+            <app-plato-canvas [items]="plato.items()" [alimentos]="alimentos" />
+            <app-contenedor-bebida
+              [bebida]="plato.bebida()?.alimento ?? null"
+              [porciones]="plato.bebida()?.porciones ?? 0"
+            />
+          </div>
+
+          @if (alertaVacio) {
+            <p class="alerta" role="alert">{{ alertaVacio }}</p>
+          }
+
+          <button type="button" class="principal finalizar" [disabled]="isSubmitting" (click)="finalizar()">
+            Finalizar Tarea
+          </button>
+        </section>
+
+        <app-menu-lateral
+          [momentoDia]="asignacion.momento_dia"
+          [porcionesPorId]="porcionesPorId"
+          [tocados]="plato.tocados()"
+          (agregar)="agregar($event)"
+          (quitar)="quitar($event)"
+          (cambioPestana)="onCambioPestana($event)"
+        />
+      </main>
+    }
+  </div>
+}
+
+@if (mostrandoModal && personaje) {
+  <app-confirmacion-modal
+    [nombrePersonaje]="personaje.nombre"
+    [isSubmitting]="isSubmitting"
+    (confirmado)="onConfirmarEnvio()"
+    (cancelado)="onCancelarModal()"
+  />
+}
