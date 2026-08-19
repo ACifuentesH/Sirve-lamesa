@@ -140,3 +140,10 @@ angular-app/node_modules/
 angular-app/dist/
 angular-app/package-lock.json
 angular-app/.angular/cache/
+
+# Entornos de Angular: los genera scripts/inject-supabase-env.mjs a partir de .env
+# o de las variables del despliegue. Fuera de git para que ninguna clave se versione
+# (el repositorio es público). Se crean con `npm run config`, que ya corre solo antes
+# de start y de los builds.
+angular-app/src/environments/environment.ts
+angular-app/src/environments/environment.prod.ts

@@ -1,14 +1,25 @@
 -- =============================================================================
--- Sirve la Mesa — RLS para usar solo Angular + Supabase (clave anon en el navegador)
+-- RETIRADO — NO EJECUTAR. Se conserva solo como registro de lo que hubo aplicado.
 -- =============================================================================
--- ADVERTENCIA DE SEGURIDAD: estas políticas permiten a cualquiera con la URL del
--- proyecto y la anon key leer/insertar/actualizar datos (equivalente a tener el
--- Express expuesto sin autenticación). Úsalo solo si ese riesgo es aceptable para
--- tu estudio (p. ej. URL no pública, datos ya anonimizados, etc.).
+-- Estas políticas dan a `anon` acceso total (FOR ALL, USING true) a participantes,
+-- sesiones_juego y decisiones_porcionamiento. Como la clave anon viaja en el
+-- navegador y estuvo versionada en un repositorio público, esto equivalía a publicar
+-- el estudio entero: cualquiera podía leerlo, alterarlo o borrarlo.
 --
--- Cómo aplicar: Supabase Dashboard → SQL → New query → pegar → Run.
--- Requisito: tablas ya creadas en public (mismo esquema que database/*.sql).
+-- El ADR-0001 prohíbe expresamente este modelo. El RLS vigente son las migraciones
+-- 009 (acotar a anon) y 013 (lectura solo para investigadores de la lista blanca); el
+-- cierre definitivo, cuando el envío pase por la RPC, es la 012.
+--
+-- El bloque siguiente aborta el archivo a propósito: en el editor SQL todo corre en
+-- una transacción, así que nada de lo que hay debajo llega a aplicarse.
 -- =============================================================================
+
+DO $$
+BEGIN
+  RAISE EXCEPTION
+    'supabase_rls_anon.sql está retirado: reabriría el estudio a la clave anon. Aplica las migraciones 009 y 013 (ver docs/adr/0001-supabase-sin-express.md).';
+END
+$$;
 
 ALTER TABLE participantes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sesiones_juego ENABLE ROW LEVEL SECURITY;

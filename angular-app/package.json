@@ -3,13 +3,18 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "config": "node scripts/inject-supabase-env.mjs --dev && node scripts/inject-supabase-env.mjs",
+    "prestart": "npm run config",
     "start": "ng serve --configuration development",
+    "prebuild": "npm run config",
     "build": "ng build",
+    "prewatch": "npm run config",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
+    "prebuild:prod": "npm run config",
     "build:prod": "ng build --configuration production",
-    "build:vercel": "node scripts/inject-supabase-env.mjs && ng build --configuration production"
+    "build:vercel": "npm run config && ng build --configuration production"
   },
   "private": true,
   "dependencies": {
