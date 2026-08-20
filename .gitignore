@@ -147,3 +147,6 @@ angular-app/.angular/cache/
 # de start y de los builds.
 angular-app/src/environments/environment.ts
 angular-app/src/environments/environment.prod.ts
+# Worktrees de agentes: los crea el harness bajo .claude/ y son checkouts
+# completos del repo. Sin esta linea, un `git add -A` en la raiz los commitea.
+.claude/worktrees/
