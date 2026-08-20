@@ -5,6 +5,9 @@ import { investigadorGuard } from './guards/investigador.guard';
 
 // Congelado tras la Fase 0 (0.6, issue #4): este archivo se editó una sola vez con
 // todas las rutas; cambios posteriores solo por acuerdo de ambas vías.
+// Excepción acordada (issue #34): renombre de /admin a /investigadores. Se mantiene
+// una redirección explícita desde /admin -- sin ella, el wildcard de abajo manda
+// cualquier marcador o enlace viejo a /registro sin explicación, un 404 silencioso.
 const routes: Routes = [
   {
     path: '',
@@ -18,9 +21,14 @@ const routes: Routes = [
   },
   {
     // El panel expone el estudio completo: exige sesión de investigador (issue #7).
-    path: 'admin',
-    loadChildren: () => import('./components/admin/admin.module').then(m => m.AdminModule),
+    path: 'investigadores',
+    loadChildren: () => import('./components/investigador/investigador.module').then(m => m.InvestigadorModule),
     canActivate: [investigadorGuard]
+  },
+  {
+    // Ruta vieja (issue #34): puede seguir en marcadores o notas del equipo.
+    path: 'admin',
+    redirectTo: 'investigadores'
   },
   // Flujo nuevo (stubs de Fase 0; cada vía implementa el suyo)
   {

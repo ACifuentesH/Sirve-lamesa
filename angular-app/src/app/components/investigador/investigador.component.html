@@ -1,6 +1,6 @@
-<div class="admin-wrapper">
+<div class="investigador-wrapper">
 
-  <header class="admin-header">
+  <header class="investigador-header">
     <button class="btn-back font-text" (click)="cerrarSesion()">← Salir</button>
     <h1 class="font-title">Panel de análisis</h1>
     <div class="header-meta font-text">
@@ -17,7 +17,7 @@
     {{ error }}
   </div>
 
-  <div class="admin-body" *ngIf="!loading && !error">
+  <div class="investigador-body" *ngIf="!loading && !error">
 
     <div class="filters-bar">
       <div class="filters-grid">
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <div class="admin-tabs">
+    <div class="investigador-tabs">
       <button *ngFor="let tab of tabs"
               class="tab-btn font-text"
               [class.active]="activeTab === tab.id"

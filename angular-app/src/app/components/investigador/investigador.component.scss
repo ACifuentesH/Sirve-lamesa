@@ -1,6 +1,6 @@
 // ─── Layout ───────────────────────────────────────────────────────────
 
-.admin-wrapper {
+.investigador-wrapper {
   height: 100vh;
   overflow-y: auto;
   background:
@@ -14,7 +14,7 @@
 
 // ─── Header ───────────────────────────────────────────────────────────
 
-.admin-header {
+.investigador-header {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -95,7 +95,7 @@
 
 // ─── Body ─────────────────────────────────────────────────────────────
 
-.admin-body {
+.investigador-body {
   flex: 1;
   padding: 20px 24px 40px;
   display: flex;
@@ -200,7 +200,7 @@
 
 // ─── Tabs ─────────────────────────────────────────────────────────────
 
-.admin-tabs {
+.investigador-tabs {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -553,9 +553,9 @@
 // ─── Responsive ───────────────────────────────────────────────────────
 
 @media (max-width: 768px) {
-  .admin-body { padding: 12px 12px 28px; gap: 12px; }
-  .admin-header { padding: 12px 14px; }
-  .admin-header h1 { font-size: 1.35em; }
+  .investigador-body { padding: 12px 12px 28px; gap: 12px; }
+  .investigador-header { padding: 12px 14px; }
+  .investigador-header h1 { font-size: 1.35em; }
   .badge-count { display: none; }
   .charts-grid.cols-3 { grid-template-columns: 1fr; }
   .data-table { font-size: 0.75em; }
@@ -565,9 +565,9 @@
 @media (max-width: 480px) {
   .filters-grid { flex-direction: column; }
   .filter-actions { margin-left: 0; width: 100%; justify-content: space-between; }
-  .admin-tabs { gap: 4px; }
+  .investigador-tabs { gap: 4px; }
   .tab-btn { padding: 7px 12px; font-size: 0.8em; }
-  .admin-header { flex-direction: column; text-align: center; }
+  .investigador-header { flex-direction: column; text-align: center; }
   .charts-grid.cols-2,
   .charts-grid.cols-3 { grid-template-columns: 1fr; }
   .chart-card--span2 { grid-column: span 1; }

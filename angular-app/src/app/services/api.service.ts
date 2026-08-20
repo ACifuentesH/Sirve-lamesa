@@ -615,7 +615,7 @@ export class ApiService {
   }
 
   // ===================================
-  // ADMIN + EXPORT
+  // INVESTIGADOR + EXPORT
   // ===================================
 
   /**
@@ -623,7 +623,7 @@ export class ApiService {
    * vacío o una sesión de investigador que aún no está en la lista blanca, no un
    * fallo de red.
    */
-  obtenerDatosAdmin(): Observable<{ success: true; data: FilaVista[] }> {
+  obtenerDatosInvestigador(): Observable<{ success: true; data: FilaVista[] }> {
     return from(this.fetchVistaRespuestas()).pipe(
       map(filas => ({ success: true, data: filas }))
     );
