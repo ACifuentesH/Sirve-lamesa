@@ -166,10 +166,16 @@ export class SimuladorComponent implements OnInit {
   }
 
   reintentar(): void {
+    // El `error` vacío no sobra: sin él, RxJS 7 trata el fallo como error no
+    // gestionado y lo relanza al manejador global del navegador. El mensaje que
+    // ve el participante ya lo publica el EnvioService en `errorEnvio`.
     this.envio.reintentar().subscribe({
       next: () => {
         this.asignacionService.limpiar();
         void this.router.navigate(['/salida']);
+      },
+      error: () => {
+        /* el banner lo pinta errorEnvio */
       }
     });
   }
