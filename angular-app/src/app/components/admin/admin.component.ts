@@ -9,6 +9,7 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import * as XLSX from 'xlsx';
 import { ApiService } from '../../services/api.service';
 import { InvestigadorService } from '../../services/investigador.service';
+import { MOMENTOS_DIA, TIPOS_ALIMENTO } from '../../models/contrato';
 import {
   ENCABEZADOS,
   ExportRow,
@@ -46,11 +47,8 @@ const CAT_LABEL: Record<string, string> = {
   otro: 'Otro'
 };
 
-const CATS = ['proteina', 'carbohidrato', 'vegetal', 'fruta', 'lacteo'] as const;
-
 const PERFIL_ORDEN = ['Niño', 'Niña', 'Joven', 'Adulto', 'Adulto Mayor'];
 const EDAD_PART_RANGOS = ['<18', '18-25', '26-35', '36-50', '51+'];
-const MOMENTOS = ['desayuno', 'almuerzo', 'cena'] as const;
 
 const GENERO_PART_LABEL: Record<string, string> = {
   masculino: 'Masculino',
@@ -176,7 +174,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.generosParticipante = [...new Set(
       this.rawData.map(d => d.participante_genero).filter((g): g is string => !!g)
     )].sort();
-    this.momentosPresentes = MOMENTOS.filter(m =>
+    this.momentosPresentes = MOMENTOS_DIA.filter(m =>
       this.rawData.some(d => d.momento_dia === m)
     );
   }
@@ -405,10 +403,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.upsert('momento', this.momentoRef, {
       type: 'bar',
       data: {
-        labels: MOMENTOS.map(m => this.momentoLabel(m)),
+        labels: MOMENTOS_DIA.map(m => this.momentoLabel(m)),
         datasets: [{
           label: 'Promedio (g)',
-          data: MOMENTOS.map(m => Math.round(this.avgGramos(this.filteredData.filter(d => d.momento_dia === m)))),
+          data: MOMENTOS_DIA.map(m => Math.round(this.avgGramos(this.filteredData.filter(d => d.momento_dia === m)))),
           backgroundColor: PALETTE[3]
         }]
       },
@@ -424,8 +422,8 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   private chartCatPorSexoPersonaje(): void {
     const countM = this.filteredData.filter(d => d.personaje_genero === 'M').length || 1;
     const countF = this.filteredData.filter(d => d.personaje_genero === 'F').length || 1;
-    const totM: Record<string, number> = Object.fromEntries(CATS.map(c => [c, 0]));
-    const totF: Record<string, number> = Object.fromEntries(CATS.map(c => [c, 0]));
+    const totM: Record<string, number> = Object.fromEntries(TIPOS_ALIMENTO.map(c => [c, 0]));
+    const totF: Record<string, number> = Object.fromEntries(TIPOS_ALIMENTO.map(c => [c, 0]));
 
     this.filteredData.forEach(d => {
       const dest = d.personaje_genero === 'M' ? totM : d.personaje_genero === 'F' ? totF : null;
@@ -438,10 +436,10 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.upsert('catSexoPer', this.catSexoPerRef, {
       type: 'bar',
       data: {
-        labels: CATS.map(c => CAT_LABEL[c]),
+        labels: TIPOS_ALIMENTO.map(c => CAT_LABEL[c]),
         datasets: [
-          { label: 'Personaje masculino', data: CATS.map(c => Math.round(totM[c] / countM)), backgroundColor: PALETTE[0] },
-          { label: 'Personaje femenino', data: CATS.map(c => Math.round(totF[c] / countF)), backgroundColor: PALETTE[2] }
+          { label: 'Personaje masculino', data: TIPOS_ALIMENTO.map(c => Math.round(totM[c] / countM)), backgroundColor: PALETTE[0] },
+          { label: 'Personaje femenino', data: TIPOS_ALIMENTO.map(c => Math.round(totF[c] / countF)), backgroundColor: PALETTE[2] }
         ]
       },
       options: {
