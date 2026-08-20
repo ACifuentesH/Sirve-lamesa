@@ -12,10 +12,7 @@
  * reflejando el catálogo vigente el día en que se recogió.
  */
 
-/** Tipos del catálogo (migración 006). `bebida` no aparece: nunca va en el plato. */
-const TIPOS = ['proteina', 'carbohidrato', 'vegetal', 'fruta', 'lacteo'] as const;
-
-type Tipo = (typeof TIPOS)[number];
+import { TIPOS_ALIMENTO, TipoAlimento } from '../models/contrato';
 
 /** Columnas de la vista respuestas_experimento que consume el export. */
 export interface FilaVista {
@@ -109,7 +106,7 @@ export interface AlimentoEnPlato {
 export function parseAlimentos(componentes: unknown): AlimentoEnPlato[] {
   return comoArreglo(componentes).map(item => {
     const tipo = String(item?.tipo || item?.categoria || '').toLowerCase();
-    const conocido = (TIPOS as readonly string[]).includes(tipo);
+    const conocido = (TIPOS_ALIMENTO as readonly string[]).includes(tipo);
     return {
       nombre: String(item?.nombre || item?.slug || 'sin nombre'),
       tipo: conocido ? tipo : 'otro',
@@ -164,13 +161,13 @@ export function buildExportRows(filas: FilaVista[]): ExportRow[] {
     const alimentos = comoArreglo(fila.componentes_servidos);
 
     const porTipo: Record<string, string[]> = { otro: [] };
-    for (const tipo of TIPOS) {
+    for (const tipo of TIPOS_ALIMENTO) {
       porTipo[tipo] = [];
     }
 
     for (const item of alimentos) {
       const tipo = texto(item?.tipo).toLowerCase();
-      const destino = (TIPOS as readonly string[]).includes(tipo) ? (tipo as Tipo) : 'otro';
+      const destino = (TIPOS_ALIMENTO as readonly string[]).includes(tipo) ? (tipo as TipoAlimento) : 'otro';
       porTipo[destino].push(describirAlimento(item));
     }
 

@@ -1,14 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, shareReplay } from 'rxjs';
-import { ASIGNACIONES_POR_PARTICIPANTE, MomentoDia, Personaje } from '../models/contrato';
+import { ASIGNACIONES_POR_PARTICIPANTE, MOMENTOS_DIA, MomentoDia, Personaje } from '../models/contrato';
 import { CatalogoService } from './catalogo.service';
 
 export interface Asignacion {
   personaje: Personaje;
   momento_dia: MomentoDia;
 }
-
-const MOMENTOS: MomentoDia[] = ['desayuno', 'almuerzo', 'cena'];
 
 /**
  * Asignación aleatoria de personaje y momento del día (§4.1, decisión 2 del plan).
@@ -35,7 +33,7 @@ export class AsignacionService {
           }
           return {
             personaje: pool[Math.floor(Math.random() * pool.length)],
-            momento_dia: MOMENTOS[Math.floor(Math.random() * MOMENTOS.length)]
+            momento_dia: MOMENTOS_DIA[Math.floor(Math.random() * MOMENTOS_DIA.length)]
           };
         }),
         shareReplay({ bufferSize: 1, refCount: false })
