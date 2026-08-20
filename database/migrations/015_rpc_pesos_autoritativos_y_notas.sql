@@ -1,5 +1,5 @@
--- Migración 015: el desglose por alimento también lo manda el servidor, y la
--- constancia se puede leer (issue #6, criterio de aceptación 4).
+-- Migración 015: el servidor manda sobre el desglose del plato, la constancia se
+-- puede leer, y un reenvío no duplica la respuesta (issues #6 y #12).
 --
 -- Auditoría de la 008 contra los cuatro criterios del issue #6: los tres primeros
 -- (inserción de 1+1+1 devolviendo ids, rollback sin huérfanos, rechazo descriptivo
@@ -29,11 +29,60 @@
 -- eso se trata como discrepancia y se deja constancia, en vez de descartar la
 -- participación por un bug del cliente.
 --
--- Idempotente (CREATE OR REPLACE). Sustituye a la función de la 008; aplicar
--- después de ella.
+-- ---------------------------------------------------------------------------
+-- Idempotencia del envío (issue #12)
+-- ---------------------------------------------------------------------------
+-- Un timeout del cliente no significa "no se guardó", sino "no sé si se guardó":
+-- la petición pudo llegar y la transacción confirmarse mientras se agotaban los
+-- 15 s del cliente. El issue #12 verificó, ejecutando el EnvioService real contra
+-- un Supabase falso, que hay tres caminos que reenvían (reintento automático tras
+-- timeout, botón manual y reenvío tras recarga) y que con 20 s de latencia se
+-- llegaban a escribir cuatro respuestas del mismo participante.
+--
+-- La mitad cliente ya está hecha: cada respuesta lleva un `envio_id` (UUID v4)
+-- que se guarda junto al respaldo en localStorage, lo reutilizan todos los caminos
+-- de reenvío y solo se borra tras confirmación. Viaja en la raíz del jsonb, fuera
+-- de `PayloadEnvio`, que sigue congelado por el issue #2.
+--
+-- Aquí va la otra mitad: la clave se guarda con un índice UNIQUE, y un reenvío
+-- devuelve los ids que ya se escribieron sin insertar nada.
+--
+-- Dónde vive la columna: en `Sesiones_juego`. Lo que se reenvía es la respuesta
+-- completa (participante + sesión + decisión), así que la unicidad tiene que
+-- cubrirla entera, y la sesión es la fila que la representa: cuelga del
+-- participante y de ella cuelgan las decisiones, de modo que desde ella se llega a
+-- los tres ids en un solo salto en cada sentido. Ponerla en
+-- `Decisiones_porcionamiento` sería más frágil: esa tabla tiene `orden_servicio` y
+-- el contrato deja abierta ASIGNACIONES_POR_PARTICIPANTE > 1 (issue #1), así que
+-- el día que un envío traiga varias decisiones un UNIQUE sobre la decisión
+-- rompería, mientras que sobre la sesión seguiría identificando el envío.
+--
+-- Compatibilidad: un `envio_id` ausente, nulo o mal formado NO tumba el envío. Se
+-- guarda NULL y se inserta como siempre — un índice UNIQUE de Postgres admite
+-- tantos NULL como haga falta, así que ni los históricos ni un cliente viejo
+-- chocan entre sí ni con nadie. Lo único que se pierde para ese envío es la
+-- protección contra duplicados, que es exactamente la situación de hoy: degradar
+-- es preferible a rechazar una participación real por un UUID mal formado.
+--
+-- Idempotente (CREATE OR REPLACE / IF NOT EXISTS). Sustituye a la función de la
+-- 008; aplicar después de ella.
 
 ---------------------------------------------------------------------------
--- 1. La función
+-- 1. La columna que identifica el envío
+---------------------------------------------------------------------------
+ALTER TABLE Sesiones_juego
+  ADD COLUMN IF NOT EXISTS envio_id UUID;
+
+-- UNIQUE y nullable, no PRIMARY KEY ni NOT NULL: las filas históricas no tienen
+-- envio_id y un cliente que no lo mande tiene que seguir pudiendo escribir.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_sesiones_envio_id
+  ON Sesiones_juego(envio_id);
+
+COMMENT ON COLUMN Sesiones_juego.envio_id IS
+  'UUID que genera el cliente por respuesta y reutiliza en cada reenvio (issue #12). Su indice UNIQUE es lo que impide que un timeout duplique la participacion. NULL en los historicos y en clientes que no lo mandan.';
+
+---------------------------------------------------------------------------
+-- 2. La función
 ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION registrar_respuesta_experimento(payload JSONB)
 RETURNS JSONB
@@ -52,6 +101,9 @@ DECLARE
   j_bebida       JSONB;
   j_clics        JSONB;
   j_item         JSONB;
+
+  -- Idempotencia del envío (issue #12)
+  v_envio_id     UUID;
 
   -- Participante
   v_edad     INTEGER;
@@ -139,6 +191,45 @@ BEGIN
   END IF;
   IF j_plato IS NULL OR jsonb_typeof(j_plato) <> 'object' THEN
     RAISE EXCEPTION 'falta la seccion "resultado_plato"';
+  END IF;
+
+  ---------------------------------------------------------------------------
+  -- 0.bis Reenvío: si esta respuesta ya se escribió, devolver lo que quedó
+  --
+  -- Va antes de validar el resto del payload a propósito. Si la respuesta ya está
+  -- en la base, el reenvío tiene que salir bien: lo guardado guardado está, y
+  -- fallar sobre ello solo provocaría más reintentos del cliente.
+  --
+  -- El CASE valida la forma del UUID en vez de castear a pelo porque `::UUID`
+  -- lanza sobre una cadena mal formada, y un envio_id roto no puede costar una
+  -- participación. Se acepta cualquier versión de UUID: exigir el nibble de v4 no
+  -- añade unicidad y sí formas de rechazar un envío legítimo.
+  ---------------------------------------------------------------------------
+  v_envio_id := CASE
+    WHEN jsonb_typeof(payload -> 'envio_id') = 'string'
+     AND payload ->> 'envio_id' ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+      THEN (payload ->> 'envio_id')::UUID
+    ELSE NULL
+  END;
+
+  IF v_envio_id IS NOT NULL THEN
+    SELECT s.fk_participante, s.pk_sesion, d.pk_decision
+      INTO v_participante_id, v_sesion_id, v_decision_id
+      FROM sesiones_juego s
+      LEFT JOIN decisiones_porcionamiento d ON d.fk_sesion = s.pk_sesion
+     WHERE s.envio_id = v_envio_id
+     ORDER BY d.orden_servicio, d.pk_decision
+     LIMIT 1;
+
+    IF FOUND THEN
+      RETURN jsonb_build_object(
+        'success',         TRUE,
+        'participante_id', v_participante_id,
+        'sesion_id',       v_sesion_id,
+        'decision_id',     v_decision_id,
+        'duplicado',       TRUE
+      );
+    END IF;
   END IF;
 
   ---------------------------------------------------------------------------
@@ -440,75 +531,127 @@ BEGIN
   ---------------------------------------------------------------------------
   -- 7. Inserciones. Todo esto es una sola transacción: cualquier RAISE
   --    anterior o posterior deshace el conjunto completo.
+  --
+  -- El bloque envuelve las tres para poder atender la carrera que el corto
+  -- circuito de arriba no ve: dos peticiones con el mismo envio_id a la vez. La
+  -- segunda no encuentra nada al consultar, porque la primera todavía no ha
+  -- confirmado, así que sigue adelante e intenta insertar; al llegar al índice
+  -- UNIQUE se queda esperando a que la primera resuelva, y entonces o bien
+  -- aquella confirmó y salta unique_violation —y aquí se devuelven sus ids— o
+  -- bien abortó y esta inserta con normalidad. El rollback al savepoint deshace
+  -- el participante recién escrito, así que tampoco por esta vía quedan
+  -- huérfanos.
   ---------------------------------------------------------------------------
-  INSERT INTO participantes (
-    edad, peso_kg, altura_cm, imc,
-    genero, nivel_estudios, semestre_o_anio, etnia,
-    region_origen, region_residencia,
-    consentimiento_informado
-  ) VALUES (
-    v_edad, v_peso, v_altura, v_imc,
-    v_genero, v_nivel, NULLIF(btrim(COALESCE(v_semestre, '')), ''), v_etnia,
-    v_reg_ori, v_reg_res,
-    TRUE
-  )
-  RETURNING pk_participante INTO v_participante_id;
-
-  -- fecha_inicio llega en ISO 8601 UTC; las columnas son TIMESTAMP sin zona,
-  -- así que se normaliza todo a UTC para que las duraciones sean comparables.
-  v_ahora := (now() AT TIME ZONE 'UTC');
-
   BEGIN
-    v_fecha_inicio := ((j_sesion ->> 'fecha_inicio')::TIMESTAMPTZ) AT TIME ZONE 'UTC';
-  EXCEPTION WHEN OTHERS THEN
-    RAISE EXCEPTION 'sesion.fecha_inicio no es una fecha ISO 8601 valida: %',
-      COALESCE(j_sesion ->> 'fecha_inicio', '(null)');
+    INSERT INTO participantes (
+      edad, peso_kg, altura_cm, imc,
+      genero, nivel_estudios, semestre_o_anio, etnia,
+      region_origen, region_residencia,
+      consentimiento_informado
+    ) VALUES (
+      v_edad, v_peso, v_altura, v_imc,
+      v_genero, v_nivel, NULLIF(btrim(COALESCE(v_semestre, '')), ''), v_etnia,
+      v_reg_ori, v_reg_res,
+      TRUE
+    )
+    RETURNING pk_participante INTO v_participante_id;
+
+    -- fecha_inicio llega en ISO 8601 UTC; las columnas son TIMESTAMP sin zona,
+    -- así que se normaliza todo a UTC para que las duraciones sean comparables.
+    v_ahora := (now() AT TIME ZONE 'UTC');
+
+    BEGIN
+      v_fecha_inicio := ((j_sesion ->> 'fecha_inicio')::TIMESTAMPTZ) AT TIME ZONE 'UTC';
+    EXCEPTION WHEN OTHERS THEN
+      RAISE EXCEPTION 'sesion.fecha_inicio no es una fecha ISO 8601 valida: %',
+        COALESCE(j_sesion ->> 'fecha_inicio', '(null)');
+    END;
+
+    IF v_fecha_inicio IS NULL THEN
+      v_fecha_inicio := v_ahora;
+    END IF;
+
+    -- Un reloj de cliente adelantado no debe producir duraciones negativas.
+    v_duracion := GREATEST(0, EXTRACT(EPOCH FROM (v_ahora - v_fecha_inicio))::INTEGER);
+
+    INSERT INTO sesiones_juego (
+      fk_participante, fecha_inicio, fecha_fin, duracion_total_segundos,
+      estado, dispositivo, navegador, resolucion_pantalla,
+      envio_id
+    ) VALUES (
+      v_participante_id, v_fecha_inicio, v_ahora, v_duracion,
+      'completada',
+      LEFT(COALESCE(j_sesion ->> 'dispositivo', 'web'), 50),
+      j_sesion ->> 'navegador',
+      NULLIF(LEFT(COALESCE(j_sesion ->> 'resolucion_pantalla', ''), 20), ''),
+      v_envio_id
+    )
+    RETURNING pk_sesion INTO v_sesion_id;
+
+    INSERT INTO decisiones_porcionamiento (
+      fk_sesion, escenario,
+      personaje_tipo, personaje_edad_rango, personaje_sexo,
+      fk_personaje, personaje_perfil_edad,
+      componentes_servidos, cantidad_total_gramos,
+      tiempo_decision_ms, tiempo_decision_segundos, orden_servicio,
+      secuencia_clics, total_bebida_ml, bebida_slug,
+      notas
+    ) VALUES (
+      v_sesion_id, v_momento,
+      -- La vista respuestas_experimento expone personaje_tipo como personaje_nombre.
+      LEFT(v_personaje_nombre, 50), v_edad_rango, v_personaje_genero,
+      v_personaje_id, v_perfil_edad,
+      v_alimentos_srv, v_total_servidor,
+      ROUND(v_segundos * 1000)::INTEGER, ROUND(v_segundos, 1), 1,
+      j_clics, v_bebida_ml, v_bebida_slug,
+      v_notas
+    )
+    RETURNING pk_decision INTO v_decision_id;
+
+  EXCEPTION WHEN unique_violation THEN
+    -- Sin envio_id la violación no puede ser la de nuestro índice: que suba tal
+    -- cual, sin disfrazarla de reenvío.
+    IF v_envio_id IS NULL THEN
+      RAISE;
+    END IF;
+
+    -- Esta consulta ve la fila de la otra transacción porque toma una instantánea
+    -- nueva: PostgREST trabaja en READ COMMITTED, y para que saltara
+    -- unique_violation aquella tuvo que confirmar antes.
+    SELECT s.fk_participante, s.pk_sesion, d.pk_decision
+      INTO v_participante_id, v_sesion_id, v_decision_id
+      FROM sesiones_juego s
+      LEFT JOIN decisiones_porcionamiento d ON d.fk_sesion = s.pk_sesion
+     WHERE s.envio_id = v_envio_id
+     ORDER BY d.orden_servicio, d.pk_decision
+     LIMIT 1;
+
+    -- Si la violación era de otra restricción no hay nada que devolver, y el
+    -- error original tiene que llegar al cliente entero.
+    IF NOT FOUND THEN
+      RAISE;
+    END IF;
+
+    RETURN jsonb_build_object(
+      'success',         TRUE,
+      'participante_id', v_participante_id,
+      'sesion_id',       v_sesion_id,
+      'decision_id',     v_decision_id,
+      'duplicado',       TRUE
+    );
   END;
 
-  IF v_fecha_inicio IS NULL THEN
-    v_fecha_inicio := v_ahora;
-  END IF;
-
-  -- Un reloj de cliente adelantado no debe producir duraciones negativas.
-  v_duracion := GREATEST(0, EXTRACT(EPOCH FROM (v_ahora - v_fecha_inicio))::INTEGER);
-
-  INSERT INTO sesiones_juego (
-    fk_participante, fecha_inicio, fecha_fin, duracion_total_segundos,
-    estado, dispositivo, navegador, resolucion_pantalla
-  ) VALUES (
-    v_participante_id, v_fecha_inicio, v_ahora, v_duracion,
-    'completada',
-    LEFT(COALESCE(j_sesion ->> 'dispositivo', 'web'), 50),
-    j_sesion ->> 'navegador',
-    NULLIF(LEFT(COALESCE(j_sesion ->> 'resolucion_pantalla', ''), 20), '')
-  )
-  RETURNING pk_sesion INTO v_sesion_id;
-
-  INSERT INTO decisiones_porcionamiento (
-    fk_sesion, escenario,
-    personaje_tipo, personaje_edad_rango, personaje_sexo,
-    fk_personaje, personaje_perfil_edad,
-    componentes_servidos, cantidad_total_gramos,
-    tiempo_decision_ms, tiempo_decision_segundos, orden_servicio,
-    secuencia_clics, total_bebida_ml, bebida_slug,
-    notas
-  ) VALUES (
-    v_sesion_id, v_momento,
-    -- La vista respuestas_experimento expone personaje_tipo como personaje_nombre.
-    LEFT(v_personaje_nombre, 50), v_edad_rango, v_personaje_genero,
-    v_personaje_id, v_perfil_edad,
-    v_alimentos_srv, v_total_servidor,
-    ROUND(v_segundos * 1000)::INTEGER, ROUND(v_segundos, 1), 1,
-    j_clics, v_bebida_ml, v_bebida_slug,
-    v_notas
-  )
-  RETURNING pk_decision INTO v_decision_id;
-
+  -- `duplicado` no forma parte de RespuestaEnvio (contrato congelado, issue #2) y
+  -- el cliente no necesita leerlo. Se añade porque distinguir un alta real de un
+  -- reenvío absorbido es justo lo que hará falta para auditar los duplicados que
+  -- motivaron todo esto, y una clave de más en el jsonb no rompe la interfaz de
+  -- TypeScript, que sencillamente no la mira.
   RETURN jsonb_build_object(
     'success',         TRUE,
     'participante_id', v_participante_id,
     'sesion_id',       v_sesion_id,
-    'decision_id',     v_decision_id
+    'decision_id',     v_decision_id,
+    'duplicado',       FALSE
   );
 END;
 $fn$;
@@ -517,7 +660,7 @@ COMMENT ON FUNCTION registrar_respuesta_experimento(JSONB) IS
   'Envio consolidado del experimento (ADR-0001). Valida el PayloadEnvio de docs/CONTRATO-DATOS.md, reconstruye el desglose del plato y sus gramos desde Catalogo_alimentos, y escribe participante, sesion y decision en una sola transaccion. Toda discrepancia con lo declarado por el cliente queda anotada en Decisiones_porcionamiento.notas.';
 
 ---------------------------------------------------------------------------
--- 2. Permisos
+-- 3. Permisos
 --
 -- CREATE OR REPLACE FUNCTION conserva el ACL existente, así que sobre una base
 -- que ya tenga la 008 esto no cambia nada. Se repite para que la migración valga
@@ -538,7 +681,7 @@ END
 $do$;
 
 ---------------------------------------------------------------------------
--- 3. La vista, con la constancia a la vista
+-- 4. La vista, con la constancia a la vista
 --
 -- Idéntica a la de la 007 salvo `notas`, añadida al final: CREATE OR REPLACE VIEW
 -- exige que las columnas previas conserven nombre, tipo y orden, y solo admite
