@@ -1,5 +1,16 @@
 # 🅰️ Guía de Integración Angular - Sirve la Mesa
 
+> **Nota de vigencia (agosto 2026, issue #23 / A9):** este documento describe
+> la integración original Angular ↔ Express ↔ PostgreSQL. La app ya no usa
+> ese camino: `angular-app/` habla directo con Supabase desde el navegador y
+> se despliega como build estático (Vercel), pensado para incrustarse en un
+> `<iframe>` en el sitio de la Fundación. Para configuración de variables de
+> entorno ver `CONFIGURACION.md`; para el despliegue y la incrustación en
+> `<iframe>` ver `docs/INTEGRACION-IFRAME.md`. La sección "Build para
+> Producción" de más abajo está corregida para reflejar esto; el resto del
+> documento (componentes, flujo de datos vía Express) describe la
+> arquitectura anterior y puede no coincidir con el estado actual del código.
+
 ## 📦 Instalación Completa
 
 ### Paso 1: Instalar todas las dependencias
@@ -70,20 +81,24 @@ Accede a: http://localhost:4200
 npm start
 ```
 
-## 🏗️ Build para Producción
+## 🏗️ Build para Producción (vigente)
 
-### Build de Angular
+El camino real de despliegue **no** sirve el build desde Express. Es un build
+estático de Angular con rutas relativas (`base href="./"`, ya configurado en
+`angular-app/angular.json`), pensado para Vercel y para incrustarse en un
+`<iframe>` en el sitio de la Fundación.
+
 ```powershell
-npm run build:angular
+cd angular-app
+Copy-Item .env.example .env    # completar SUPABASE_URL / SUPABASE_ANON_KEY / URL_FUNDACION — ver CONFIGURACION.md
+npm install
+npm run build:prod             # o build:vercel, que además genera environment.prod.ts desde variables de entorno
 ```
 
-### Servir desde Express
-```powershell
-$env:NODE_ENV="production"
-npm start
-```
-
-La aplicación estará en: http://localhost:3000
+El resultado queda en `angular-app/dist/sirve-la-mesa/`, servible como
+archivos estáticos desde cualquier subdirectorio sin ajustes adicionales.
+Detalle completo del despliegue y el snippet de `<iframe>` para la Fundación:
+`docs/INTEGRACION-IFRAME.md`.
 
 ## 🧩 Componentes de la Aplicación
 
