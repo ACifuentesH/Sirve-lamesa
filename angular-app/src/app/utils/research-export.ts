@@ -259,14 +259,13 @@ export const ENCABEZADOS: Record<keyof ExportRow, string> = {
 };
 
 export function generarCSV(datos: ExportRow[]): string {
-  if (!datos?.length) {
-    return '';
-  }
   const campos = Object.keys(ENCABEZADOS) as (keyof ExportRow)[];
   // El BOM es lo que hace que Excel abra el archivo como UTF-8 y no rompa los acentos.
+  // Se escribe siempre, incluso con un estudio sin datos: un investigador que exporta
+  // con la BD en cero debe recibir un CSV valido con encabezados, no un archivo en blanco.
   let csv = '\uFEFF';
   csv += campos.map(c => `"${ENCABEZADOS[c]}"`).join(',') + '\n';
-  for (const fila of datos) {
+  for (const fila of datos ?? []) {
     const valores = campos.map(campo => {
       const bruto = fila[campo];
       const valor = bruto !== undefined && bruto !== null ? String(bruto) : '';
