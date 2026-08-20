@@ -99,7 +99,11 @@ function nuevoEnvioId(): string {
 // que es territorio del issue #6; el detalle está en el PR de este issue.
 @Injectable({ providedIn: 'root' })
 export class EnvioService {
-  private readonly client: SupabaseClient = inject(SupabaseService).client;
+  private readonly supabase = inject(SupabaseService);
+
+  private get client(): SupabaseClient {
+    return this.supabase.client;
+  }
 
   private readonly isSubmittingSubject = new BehaviorSubject<boolean>(false);
   private readonly isSuccessSubject = new BehaviorSubject<boolean>(false);

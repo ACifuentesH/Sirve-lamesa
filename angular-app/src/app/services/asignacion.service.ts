@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, shareReplay } from 'rxjs';
+import { Observable, map, shareReplay, tap } from 'rxjs';
 import { ASIGNACIONES_POR_PARTICIPANTE, MOMENTOS_DIA, MomentoDia, Personaje } from '../models/contrato';
 import { CatalogoService } from './catalogo.service';
 
@@ -36,6 +36,7 @@ export class AsignacionService {
             momento_dia: MOMENTOS_DIA[Math.floor(Math.random() * MOMENTOS_DIA.length)]
           };
         }),
+        tap({ error: () => { this.asignacion$ = undefined; } }),
         shareReplay({ bufferSize: 1, refCount: false })
       );
     }

@@ -27,7 +27,10 @@
     @if (cargando) {
       <p class="estado">Preparando la simulación…</p>
     } @else if (errorCarga) {
-      <p class="estado estado--error">{{ errorCarga }}</p>
+      <div class="estado estado--error">
+        <p>{{ errorCarga }}</p>
+        <button type="button" class="principal" (click)="reintentarCarga()">Reintentar</button>
+      </div>
     } @else if (asignacion) {
       <main class="tablero">
         <app-avatar-personaje [personaje]="asignacion.personaje" />

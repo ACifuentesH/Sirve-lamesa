@@ -50,6 +50,14 @@
 
 .estado--error {
   color: var(--sm-color-error);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.estado--error p {
+  margin: 0;
 }
 
 .banner-error {
