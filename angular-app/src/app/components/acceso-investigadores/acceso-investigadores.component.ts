@@ -30,7 +30,7 @@ export class AccesoInvestigadoresComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     // Con la sesión ya iniciada la pantalla no aporta nada: al panel directo.
     if (await this.investigador.estaAutorizado()) {
-      await this.router.navigate(['/admin']);
+      await this.router.navigate(['/investigadores']);
     }
   }
 
@@ -49,7 +49,7 @@ export class AccesoInvestigadoresComponent implements OnInit {
     this.enviando = false;
 
     if (resultado.ok) {
-      await this.router.navigate(['/admin']);
+      await this.router.navigate(['/investigadores']);
       return;
     }
 

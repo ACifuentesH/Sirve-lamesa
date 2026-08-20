@@ -72,13 +72,13 @@ const GENERO_PERS_LABEL: Record<string, string> = {
  * El IMC del personaje ya no se grafica: la matriz nueva no lo representa.
  */
 @Component({
-  selector: 'app-admin',
+  selector: 'app-investigador',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss']
+  templateUrl: './investigador.component.html',
+  styleUrls: ['./investigador.component.scss']
 })
-export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
+export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly api = inject(ApiService);
   private readonly investigador = inject(InvestigadorService);
   private readonly router = inject(Router);
@@ -148,7 +148,7 @@ export class AdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadData(): void {
-    this.api.obtenerDatosAdmin().subscribe({
+    this.api.obtenerDatosInvestigador().subscribe({
       next: res => {
         this.rawData = res.data ?? [];
         this.buildFilterOptions();
