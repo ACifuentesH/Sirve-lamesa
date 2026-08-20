@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, throwError, timer } from 'rxjs';
+import { BehaviorSubject, Observable, defer, throwError, timer } from 'rxjs';
 import { finalize, retry, tap, timeout } from 'rxjs/operators';
 import { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
@@ -38,6 +38,46 @@ const TIMEOUT_MS = 15000;
 
 const CLAVE_RESPALDO = 'sirve.envio.pendiente';
 
+/**
+ * Clave de idempotencia del envío. Es metadato de transporte, no un dato del
+ * experimento: por eso viaja junto al payload y no dentro de `PayloadEnvio`, que
+ * está congelado por el contrato de la Fase 0 (issue #2).
+ *
+ * Se acuña una sola vez por respuesta y la reutilizan TODOS los caminos de
+ * reenvío: el reintento automático del backoff, el botón "Inténtalo de nuevo" y
+ * el reenvío tras una recarga. Solo desaparece cuando el servidor confirma.
+ */
+type SobreRpc = PayloadEnvio & { envio_id: string };
+
+/** Forma del respaldo en localStorage: el payload y la clave que lo identifica. */
+interface RespaldoEnvio {
+  envio_id: string;
+  payload: PayloadEnvio;
+  guardado_en: string;
+}
+
+/**
+ * Identificador único del envío. `crypto.randomUUID` solo existe en contexto
+ * seguro (https o localhost); el respaldo cubre http plano en pruebas de campo.
+ */
+function nuevoEnvioId(): string {
+  const cripto = globalThis.crypto;
+
+  if (cripto?.randomUUID) {
+    return cripto.randomUUID();
+  }
+
+  if (cripto?.getRandomValues) {
+    const bytes = cripto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // versión 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // variante RFC 4122
+    const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+
+  return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 14)}`;
+}
+
 // Vía A (issue #12): única puerta de envío del experimento. Llama a la RPC
 // registrar_respuesta_experimento (ADR-0001), que escribe participante, sesión y
 // decisión en una sola transacción.
@@ -45,6 +85,18 @@ const CLAVE_RESPALDO = 'sirve.envio.pendiente';
 // La §6.2 exige que "si hay un fallo de red, el sistema no se cierra": de ahí el
 // respaldo en localStorage antes del primer intento, que solo se borra cuando el
 // servidor confirma. Si el participante recarga tras un fallo, el payload sigue ahí.
+//
+// SOBRE LA NO DUPLICACIÓN (criterio "el reintento tiene éxito y no duplica el
+// registro"): reenviar es seguro solo si el servidor sabe reconocer un reenvío.
+// Un timeout no significa "no se guardó", significa "no sé si se guardó": la
+// petición llegó y la transacción pudo confirmarse mientras se agotaban los 15 s.
+// Por eso cada respuesta lleva un `envio_id` estable que sobrevive al backoff, al
+// botón de reintento y a una recarga.
+//
+// La otra mitad es del servidor y NO está hecha: la RPC desplegada (migración 008)
+// inserta sin condiciones y no lee `envio_id`, así que hoy un reenvío tras un
+// timeout duplica participante + sesión + decisión. Cerrarlo exige tocar la RPC,
+// que es territorio del issue #6; el detalle está en el PR de este issue.
 @Injectable({ providedIn: 'root' })
 export class EnvioService {
   private readonly client: SupabaseClient = inject(SupabaseService).client;
@@ -59,6 +111,9 @@ export class EnvioService {
 
   /** El payload vive en memoria mientras haya un envío sin confirmar. */
   private pendiente: PayloadEnvio | null = null;
+
+  /** Clave de idempotencia del envío pendiente. Vive tanto como el payload. */
+  private envioId: string | null = null;
 
   get isSubmitting(): boolean {
     return this.isSubmittingSubject.value;
@@ -81,9 +136,12 @@ export class EnvioService {
       return throwError(() => this.errorEnvio ?? { causa: 'red', mensaje: MENSAJE_CONEXION } as FalloEnvio);
     }
 
-    this.pendiente = payload;
-    this.guardarRespaldo(payload);
-    return this.despachar(payload);
+    // Si ya hay una respuesta sin confirmar se conserva su clave: el participante
+    // puede haber retocado el plato tras un fallo, pero sigue siendo la única
+    // respuesta de esta sesión y el servidor debe poder reconocerla como tal.
+    const envioId = this.envioId ?? this.leerRespaldo()?.envio_id ?? nuevoEnvioId();
+
+    return this.despachar(payload, envioId);
   }
 
   /**
@@ -92,9 +150,11 @@ export class EnvioService {
    * primer intento y no después de fallar.
    */
   reintentar(): Observable<RespuestaEnvio> {
-    const payload = this.pendiente ?? this.leerRespaldo();
+    const respaldo = this.leerRespaldo();
+    const payload = this.pendiente ?? respaldo?.payload ?? null;
+    const envioId = this.envioId ?? respaldo?.envio_id ?? null;
 
-    if (!payload) {
+    if (!payload || !envioId) {
       return throwError(() => ({
         causa: 'validacion',
         mensaje: MENSAJE_RECHAZO,
@@ -102,8 +162,7 @@ export class EnvioService {
       } as FalloEnvio));
     }
 
-    this.pendiente = payload;
-    return this.despachar(payload);
+    return this.despachar(payload, envioId);
   }
 
   /** Permite ofrecer el reenvío tras una recarga (§A7). */
@@ -112,23 +171,38 @@ export class EnvioService {
   }
 
   obtenerEnvioPendiente(): PayloadEnvio | null {
-    return this.pendiente ?? this.leerRespaldo();
+    return this.pendiente ?? this.leerRespaldo()?.payload ?? null;
   }
 
   /** Descarta el envío pendiente. Solo para cerrar el flujo tras un éxito o un abandono. */
   limpiar(): void {
     this.pendiente = null;
+    this.envioId = null;
     this.borrarRespaldo();
     this.isSubmittingSubject.next(false);
     this.isSuccessSubject.next(false);
     this.errorEnvioSubject.next(null);
   }
 
-  private despachar(payload: PayloadEnvio): Observable<RespuestaEnvio> {
-    this.isSubmittingSubject.next(true);
-    this.errorEnvioSubject.next(null);
+  /**
+   * `defer` para que el estado global cambie al suscribirse y no al construir el
+   * observable: si nadie se suscribe, `isSubmitting` no puede quedarse en true y
+   * dejar la pantalla bloqueada para siempre.
+   */
+  private despachar(payload: PayloadEnvio, envioId: string): Observable<RespuestaEnvio> {
+    return defer(() => {
+      this.pendiente = payload;
+      this.envioId = envioId;
+      // El respaldo se escribe ANTES del primer intento: si la pestaña muere a
+      // mitad de la petición, el payload sigue en disco para ofrecer el reenvío.
+      this.guardarRespaldo(payload, envioId);
 
-    return this.intento(payload).pipe(
+      this.isSubmittingSubject.next(true);
+      this.isSuccessSubject.next(false);
+      this.errorEnvioSubject.next(null);
+
+      return this.intento(payload, envioId);
+    }).pipe(
       retry({
         count: RETRASOS_MS.length,
         delay: (fallo: FalloEnvio, numeroReintento) => {
@@ -143,6 +217,7 @@ export class EnvioService {
         next: () => {
           // El respaldo se borra solo con la confirmación del servidor en la mano.
           this.pendiente = null;
+          this.envioId = null;
           this.borrarRespaldo();
           this.isSuccessSubject.next(true);
         },
@@ -158,12 +233,17 @@ export class EnvioService {
    * petición abandonada seguiría viva y podría confirmarse en el servidor después
    * de que el reintento ya hubiera insertado la respuesta.
    */
-  private intento(payload: PayloadEnvio): Observable<RespuestaEnvio> {
+  private intento(payload: PayloadEnvio, envioId: string): Observable<RespuestaEnvio> {
+    // El `envio_id` viaja dentro del jsonb. La RPC desplegada solo lee las claves
+    // que conoce e ignora el resto, así que añadirlo no rompe nada hoy y deja el
+    // lado cliente listo para el día en que #6 lo use para deduplicar.
+    const sobre: SobreRpc = { ...payload, envio_id: envioId };
+
     return new Observable<RespuestaEnvio>(subscriber => {
       const controlador = new AbortController();
 
       this.client
-        .rpc(RPC_REGISTRAR_RESPUESTA, { payload })
+        .rpc(RPC_REGISTRAR_RESPUESTA, { payload: sobre })
         .abortSignal(controlador.signal)
         .then(
           ({ data, error }) => {
@@ -212,20 +292,48 @@ export class EnvioService {
     return { causa: 'red', mensaje: MENSAJE_CONEXION, detalle };
   }
 
-  private guardarRespaldo(payload: PayloadEnvio): void {
+  private guardarRespaldo(payload: PayloadEnvio, envioId: string): void {
     // Un localStorage lleno o deshabilitado (modo privado) no puede tumbar el envío:
     // el payload sigue en memoria, que es el camino normal.
+    const respaldo: RespaldoEnvio = {
+      envio_id: envioId,
+      payload,
+      guardado_en: new Date().toISOString()
+    };
+
     try {
-      localStorage.setItem(CLAVE_RESPALDO, JSON.stringify(payload));
+      localStorage.setItem(CLAVE_RESPALDO, JSON.stringify(respaldo));
     } catch {
       /* sin respaldo en disco; el envío continúa */
     }
   }
 
-  private leerRespaldo(): PayloadEnvio | null {
+  private leerRespaldo(): RespaldoEnvio | null {
     try {
       const crudo = localStorage.getItem(CLAVE_RESPALDO);
-      return crudo ? (JSON.parse(crudo) as PayloadEnvio) : null;
+      if (!crudo) {
+        return null;
+      }
+
+      const guardado = JSON.parse(crudo) as Partial<RespaldoEnvio> & Partial<PayloadEnvio>;
+
+      if (guardado?.payload && typeof guardado.envio_id === 'string') {
+        return guardado as RespaldoEnvio;
+      }
+
+      // Respaldo escrito antes de que existiera la clave de idempotencia: era el
+      // payload pelado. Se le acuña una ahora para no perder la respuesta; ese
+      // reenvío concreto no queda protegido contra duplicados, pero el caso solo
+      // se da si el despliegue pilla a un participante con un envío a medias.
+      if (guardado?.participante && guardado?.resultado_plato) {
+        return {
+          envio_id: nuevoEnvioId(),
+          payload: guardado as PayloadEnvio,
+          guardado_en: new Date().toISOString()
+        };
+      }
+
+      return null;
     } catch {
       return null;
     }
