@@ -2,37 +2,9 @@
 
 /* Global Styles */
 
-/** Cursor durante arrastre custom de ingredientes (sin API nativa drag). */
-body.is-grabbing-drag {
-  cursor: grabbing !important;
-  user-select: none !important;
-}
-
-body.is-grabbing-drag * {
-  cursor: grabbing !important;
-}
-
-// Importar fuentes custom
-@font-face {
-  font-family: 'Rocket Raccoon';
-  src: url('./assets/fonts/Rocket Raccoon Free.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Gildsley';
-  src: url('./assets/fonts/Gildsley DEMO.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Watermelon';
-  src: url('./assets/fonts/Gildsley DEMO.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
+// La tipografía institucional vive en `styles/_tokens.scss` (Fase 0, issue #3).
+// Las fuentes decorativas (Rocket Raccoon, Gildsley, Watermelon) se retiraron con la
+// escena vieja en el issue #24: solo las usaban las pantallas de arrastrar y soltar.
 
 // Variables de colores del proyecto
 :root {
@@ -71,19 +43,6 @@ body {
   font-weight: 700;
 }
 
-.font-title-watermelon {
-  font-family: 'Watermelon', sans-serif !important;
-  font-weight: normal !important;
-}
-
-// Asegurar que Watermelon se aplique a los títulos específicos
-h1.font-title-watermelon,
-h2.font-title-watermelon,
-h3.font-title-watermelon {
-  font-family: 'Watermelon', sans-serif !important;
-  font-weight: normal !important;
-}
-
 .font-text {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
@@ -103,93 +62,4 @@ h3.font-title-watermelon {
 ::-webkit-scrollbar-thumb {
   background: var(--color-azul);
   border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-verde);
-}
-
-// Ajuste fino de escala: PNGs con mucho transparente vs. los que ya llenan el cuadro.
-app-ingrediente .food-item img[data-imagen='bistecs.png'],
-app-ingrediente .food-item img[data-imagen='pasta.png'],
-app-ingrediente .food-item img[data-imagen='granos.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='bistecs.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='pasta.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='granos.png'] {
-  transform: scale(1.48);
-  transform-origin: center center;
-}
-
-// Arroz: un poco más pequeño que bistecs / pasta / granos
-app-ingrediente .food-item img[data-imagen='arroz.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='arroz.png'] {
-  transform: scale(1.1);
-  transform-origin: center center;
-}
-
-// Lechosa: grande (sin subir al mismo nivel que las cuatro de abajo)
-app-ingrediente .food-item img[data-imagen='lechosa.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='lechosa.png'] {
-  transform: scale(2.45);
-  transform-origin: center center;
-}
-
-// Brócoli, lechuga, plátano y piña: aún más grandes
-app-ingrediente .food-item img[data-imagen='brocoli.png'],
-app-ingrediente .food-item img[data-imagen='lechuga.png'],
-app-ingrediente .food-item img[data-imagen='platano.png'],
-app-ingrediente .food-item img[data-imagen='pina.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='brocoli.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='lechuga.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='platano.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='pina.png'] {
-  transform: scale(2.88);
-  transform-origin: center center;
-}
-
-// Tomate, pepino y fresa: se ven muy grandes en el lienzo; bajar un poco
-app-ingrediente .food-item img[data-imagen='tomate.png'],
-app-ingrediente .food-item img[data-imagen='pepino.png'],
-app-ingrediente .food-item img[data-imagen='fresa.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='tomate.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='pepino.png'],
-app-plato-drop-zone .food-on-plate img[data-imagen='fresa.png'] {
-  transform: scale(0.82);
-  transform-origin: center center;
-}
-
-// ─── Global micro-interaction keyframes ───────────────────────
-
-@keyframes food-hover-bounce {
-  0%   { transform: scale(1.05) rotate(-2.5deg); }
-  40%  { transform: scale(1.16) rotate(2deg); }
-  70%  { transform: scale(1.13) rotate(-0.8deg); }
-  100% { transform: scale(1.13) rotate(0deg); }
-}
-
-@keyframes character-bob {
-  0%, 100% { transform: scale(1.1) translateY(0px); }
-  50%       { transform: scale(1.1) translateY(-6px); }
-}
-
-@keyframes plate-glow-pulse {
-  0%, 100% {
-    filter: brightness(1.08) drop-shadow(0 0 8px rgba(255, 123, 172, 0.45));
-  }
-  50% {
-    filter: brightness(1.26) drop-shadow(0 0 24px rgba(255, 123, 172, 0.9))
-            drop-shadow(0 0 50px rgba(255, 123, 172, 0.35));
-  }
-}
-
-@keyframes ambient-drift {
-  0%, 100% { background-position: 0% 50%, 100% 0%, 50% 100%, 0 0; }
-  33%       { background-position: 50% 0%, 0% 100%, 100% 50%, 0 0; }
-  66%       { background-position: 100% 50%, 50% 0%, 0% 100%, 0 0; }
-}
-
-@keyframes pop-in {
-  0%   { transform: scale(0.6); opacity: 0; }
-  70%  { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
 }

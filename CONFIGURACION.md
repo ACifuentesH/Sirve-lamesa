@@ -1,82 +1,98 @@
-# 🔧 Guía de Configuración - Sirve la Mesa
+# Configuración
 
-## Paso 1: Configurar la Base de Datos en pgAdmin
+Para el panorama general y la arquitectura, ver [`README.md`](README.md). Esto es el
+paso a paso.
 
-Ya creaste la base de datos en pgAdmin. Ahora necesitas obtener la información de conexión:
+## Paso 1 — Instalar dependencias
 
-1. **Abre pgAdmin** y conecta a tu servidor PostgreSQL
-2. **Busca tu base de datos** (probablemente se llama `sirve_la_mesa` o similar)
-3. **Clic derecho en la base de datos → Properties** para ver los detalles
-
-### Información que necesitas:
-- **Host**: Generalmente `localhost` o `127.0.0.1`
-- **Puerto**: Generalmente `5432` (puerto por defecto de PostgreSQL)
-- **Nombre de la base de datos**: El nombre que le diste (ej: `sirve_la_mesa`)
-- **Usuario**: Generalmente `postgres` (o el usuario que configuraste)
-- **Contraseña**: La contraseña que configuraste para PostgreSQL
-
-## Paso 2: Crear el archivo .env
-
-Crea un archivo llamado `.env` en la raíz del proyecto con el siguiente contenido:
-
-```env
-NODE_ENV=development
-PORT=3000
-DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/nombre_base_datos
-CLIENT_URL=http://localhost:3000
-```
-
-### Ejemplo real:
-Si tu configuración es:
-- Usuario: `postgres`
-- Contraseña: `mipassword123`
-- Host: `localhost`
-- Puerto: `5432`
-- Base de datos: `sirve_la_mesa`
-
-Tu `DATABASE_URL` sería:
-```env
-DATABASE_URL=postgresql://postgres:mipassword123@localhost:5432/sirve_la_mesa
-```
-
-## Paso 3: Instalar dependencias
-
-Abre PowerShell en la carpeta del proyecto y ejecuta:
-
-```powershell
+```bash
 npm install
 ```
 
-## Paso 4: Iniciar el servidor
+Instala también las de `angular-app/` (lo hace el `postinstall` de la raíz).
 
-```powershell
+## Paso 2 — Crear el proyecto de Supabase
+
+En [supabase.com](https://supabase.com), crea un proyecto y anota:
+
+- **Project URL** — Project Settings → Data API.
+- **Clave publicable (anon)** — misma pantalla.
+- **Cadena de conexión** — botón *Connect*, o Project Settings → Database.
+
+> La clave que va en el `.env` es la **publicable/anon**, nunca la `service_role`:
+> esta última viaja al navegador con el bundle y daría acceso total al estudio.
+> Lo que protege los datos son las políticas RLS (migraciones 009 y 012–014), no el
+> secreto de la clave.
+
+## Paso 3 — Crear el `.env`
+
+Copia `.env.example` a `.env` y rellena:
+
+```env
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_ANON_KEY=...
+URL_FUNDACION=https://www.fundacionayudate...
+
+DATABASE_URL=postgresql://postgres.PROJECT_REF:TU_PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres
+```
+
+Dos usos distintos en un mismo archivo:
+
+| Variable | Para qué |
+|---|---|
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `URL_FUNDACION` | Se inyectan en `angular-app/src/environments/` antes de cada `start` y cada `build` |
+| `DATABASE_URL` | Solo para aplicar migraciones y seeds |
+
+**Verifica que el ref del proyecto sea el mismo en las dos.** Si `DATABASE_URL`
+apunta a un proyecto y `SUPABASE_URL` a otro, las migraciones se aplican donde no
+tocan y la aplicación arranca contra un esquema que no las tiene. Ya ocurrió una vez.
+
+`src/environments/environment.ts` y `environment.prod.ts` están en `.gitignore`
+porque los genera el script: no se editan a mano ni se versionan.
+
+## Paso 4 — Preparar la base de datos
+
+Ver [`INICIALIZACION-BD.md`](INICIALIZACION-BD.md).
+
+## Paso 5 — Levantar la aplicación
+
+```bash
 npm start
 ```
 
-El servidor:
-- Se conectará a tu base de datos
-- Creará automáticamente todas las tablas necesarias
-- Cargará los datos iniciales del menú
-- Estará disponible en `http://localhost:3000`
+En `http://localhost:4200`. La aplicación habla directamente con Supabase: no hay
+servidor propio que levantar, ni proxy, ni segundo terminal.
 
-## Paso 5: Verificar que todo funciona
+## Paso 6 — Comprobar
 
-1. Abre tu navegador en `http://localhost:3000`
-2. Ve a `http://localhost:3000/api/test-connection` para verificar la conexión a la BD
-3. Ve a `http://localhost:3000/api/health` para verificar el estado del servidor
+1. `http://localhost:4200/registro` carga el formulario de alta.
+2. `http://localhost:4200/simulador` muestra banner, avatar, menú y plato. Si el menú
+   sale vacío, faltan los seeds del paso 4.
+3. `http://localhost:4200/investigadores` pide sesión de investigador.
 
-## Solución de problemas
+## Problemas frecuentes
 
-### Error: "password authentication failed"
-- Verifica que la contraseña en `.env` sea correcta
-- Asegúrate de que el usuario tenga permisos en la base de datos
+**El menú lateral aparece vacío**
+El catálogo no está cargado, o `anon` no tiene SELECT sobre `catalogo_alimentos`.
+Ejecuta `database/seeds/seed_catalogo_alimentos.sql` y comprueba las migraciones 009
+y 012.
 
-### Error: "database does not exist"
-- Verifica que el nombre de la base de datos en `.env` coincida con el que creaste en pgAdmin
-- Asegúrate de que la base de datos esté creada antes de iniciar el servidor
+**"El pool de personajes está vacío"**
+Falta `database/seeds/seed_personajes.sql`. El simulador toma el pool de los
+personajes que tienen `slug`; los personajes viejos no lo tienen a propósito.
 
-### Error: "connection refused"
-- Verifica que PostgreSQL esté corriendo
-- Verifica que el puerto sea correcto (generalmente 5432)
-- Verifica que el host sea correcto (localhost o 127.0.0.1)
+**Los alimentos salen sin imagen**
+Las 34 imágenes del catálogo son marcadores provisionales mientras llega el material
+definitivo (issue #15). Ver `angular-app/src/assets/foods/README.md`.
 
+**El panel de investigadores devuelve cero filas sin error**
+O el estudio está vacío, o la cuenta no está en la lista blanca de investigadores
+(migración 013). No es un fallo de red.
+
+**`getaddrinfo ENOENT` al aplicar migraciones**
+La conexión directa `db.xxxxx.supabase.co` a veces solo resuelve por IPv6. Usa la
+cadena del *session pooler*, que es IPv4.
+
+**El build arranca sin credenciales**
+El script de inyección avisa por consola cuando genera los environments sin
+`SUPABASE_URL` o `SUPABASE_ANON_KEY`. Revisa que el `.env` esté en la raíz del repo.
