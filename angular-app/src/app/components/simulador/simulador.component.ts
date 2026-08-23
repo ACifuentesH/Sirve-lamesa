@@ -62,6 +62,19 @@ export class SimuladorComponent implements OnInit {
   soloReintento = false;
 
   ngOnInit(): void {
+    this.prepararSimulacion();
+  }
+
+  reintentarCarga(): void {
+    this.asignacionService.limpiar();
+    this.asignacion = null;
+    this.alimentos = [];
+    this.errorCarga = '';
+    this.cargando = true;
+    this.prepararSimulacion();
+  }
+
+  private prepararSimulacion(): void {
     const datos = this.participanteService.getDatosRegistro();
 
     if (!datos) {
@@ -74,27 +87,32 @@ export class SimuladorComponent implements OnInit {
       return;
     }
 
-    this.asignacionService
-      .obtenerAsignacion()
-      .pipe(
-        switchMap(asignacion => {
-          this.asignacion = asignacion;
-          return this.catalogoService.obtenerCatalogo(asignacion.momento_dia);
-        }),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: alimentos => {
-          this.alimentos = alimentos;
-          this.plato.registrarCatalogo(alimentos);
-          this.plato.iniciarTarea();
-          this.cargando = false;
-        },
-        error: err => {
-          this.errorCarga = err instanceof Error ? err.message : 'No se pudo preparar la simulación.';
-          this.cargando = false;
-        }
-      });
+    try {
+      this.asignacionService
+        .obtenerAsignacion()
+        .pipe(
+          switchMap(asignacion => {
+            this.asignacion = asignacion;
+            return this.catalogoService.obtenerCatalogo(asignacion.momento_dia);
+          }),
+          takeUntilDestroyed(this.destroyRef)
+        )
+        .subscribe({
+          next: alimentos => {
+            this.alimentos = alimentos;
+            this.plato.registrarCatalogo(alimentos);
+            this.plato.iniciarTarea();
+            this.cargando = false;
+          },
+          error: err => {
+            this.errorCarga = err instanceof Error ? err.message : 'No se pudo preparar la simulación.';
+            this.cargando = false;
+          }
+        });
+    } catch (err) {
+      this.errorCarga = err instanceof Error ? err.message : 'No se pudo preparar la simulación.';
+      this.cargando = false;
+    }
   }
 
   get personaje(): Personaje | null {

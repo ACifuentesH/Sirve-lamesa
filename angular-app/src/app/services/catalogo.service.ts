@@ -1,7 +1,17 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map, shareReplay } from 'rxjs';
+import { Observable, from, map, shareReplay, tap } from 'rxjs';
 import { AlimentoCatalogo, MomentoDia, Personaje } from '../models/contrato';
 import { SupabaseService } from './supabase.service';
+
+function lanzarErrorCarga(contexto: string, error: { message?: string } | null): never {
+  const detalle = error?.message ?? 'error desconocido';
+  if (/failed to fetch|load failed|networkerror|could not resolve/i.test(detalle)) {
+    throw new Error(
+      `No se pudo conectar al cargar ${contexto}. Revisa tu conexión e inténtalo de nuevo.`
+    );
+  }
+  throw new Error(`No se pudo cargar ${contexto}: ${detalle}`);
+}
 
 /**
  * Catálogo de alimentos y pool de personajes (Vía B, tarea B2).
@@ -16,8 +26,12 @@ import { SupabaseService } from './supabase.service';
  */
 @Injectable({ providedIn: 'root' })
 export class CatalogoService {
-  private readonly client = inject(SupabaseService).client;
+  private readonly supabase = inject(SupabaseService);
   private readonly cache = new Map<MomentoDia, Observable<AlimentoCatalogo[]>>();
+
+  private get client() {
+    return this.supabase.client;
+  }
 
   obtenerCatalogo(momento: MomentoDia): Observable<AlimentoCatalogo[]> {
     const cacheado = this.cache.get(momento);
@@ -34,10 +48,11 @@ export class CatalogoService {
     ).pipe(
       map(({ data, error }) => {
         if (error) {
-          throw new Error(`No se pudo cargar el catálogo de ${momento}: ${error.message}`);
+          lanzarErrorCarga(`el catálogo de ${momento}`, error);
         }
         return (data ?? []).map(fila => this.aAlimento(fila));
       }),
+      tap({ error: () => this.cache.delete(momento) }),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
@@ -60,7 +75,7 @@ export class CatalogoService {
     ).pipe(
       map(({ data, error }) => {
         if (error) {
-          throw new Error(`No se pudo cargar el pool de personajes: ${error.message}`);
+          lanzarErrorCarga('el pool de personajes', error);
         }
         return (data ?? []).map(fila => this.aPersonaje(fila));
       })

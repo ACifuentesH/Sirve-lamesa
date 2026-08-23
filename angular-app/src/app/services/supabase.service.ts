@@ -11,11 +11,37 @@ import { environment } from '../../environments/environment';
 // persistSession queda activo para que la sesión del investigador sobreviva a una
 // recarga del panel. El participante nunca inicia sesión, así que en su flujo no se
 // guarda nada.
+//
+// createClient se retrasa al primer uso: si la URL o la clave están mal, el error
+// lo atrapa el simulador al cargar el catálogo, en lugar de tumbar el bootstrap
+// de Angular al aceptar los términos.
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
-  readonly client: SupabaseClient = createClient(
-    environment.supabaseUrl,
-    environment.supabaseAnonKey,
-    { auth: { persistSession: true, autoRefreshToken: true } }
-  );
+  private instancia: SupabaseClient | null = null;
+
+  get client(): SupabaseClient {
+    if (this.instancia) {
+      return this.instancia;
+    }
+
+    const url = environment.supabaseUrl?.trim() ?? '';
+    const key = environment.supabaseAnonKey?.trim() ?? '';
+
+    if (!url || !key || url.includes('TU-PROYECTO') || key === 'sb_publishable_...') {
+      throw new Error(
+        'Faltan las credenciales de Supabase. Copia angular-app/.env.example a .env y vuelve a ejecutar npm start.'
+      );
+    }
+
+    try {
+      this.instancia = createClient(url, key, {
+        auth: { persistSession: true, autoRefreshToken: true }
+      });
+    } catch (err) {
+      const detalle = err instanceof Error ? err.message : 'configuración inválida';
+      throw new Error(`No se pudo iniciar la conexión con el estudio (${detalle}).`);
+    }
+
+    return this.instancia;
+  }
 }
