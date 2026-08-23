@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Prueba local de iframe — Sirve la Mesa</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+  header {
+    padding: 1rem 1.5rem;
+    background: #111827;
+    color: #f9fafb;
+  }
+  header h1 { margin: 0 0 0.25rem; font-size: 1.1rem; }
+  header p { margin: 0; font-size: 0.85rem; color: #9ca3af; }
+  .panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .panel label { font-size: 0.85rem; font-weight: 600; }
+  .panel input[type="text"] {
+    flex: 1 1 320px;
+    min-width: 240px;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  .panel button {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .panel button.secondary {
+    background: white;
+    color: #374151;
+    border-color: #d1d5db;
+  }
+  .panel button:hover { filter: brightness(0.95); }
+  .hint {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+    background: #fffbeb;
+    border-bottom: 1px solid #fde68a;
+  }
+  .hint code {
+    background: #fef3c7;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+  }
+  .stage {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  .frame-shell {
+    width: 100%;
+    max-width: 1280px;
+    height: 80vh;
+    min-height: 700px;
+    min-width: 360px;
+    background: white;
+    border: 2px dashed #9ca3af;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: max-width 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .frame-shell .size-tag {
+    font-size: 0.75rem;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+  }
+  iframe {
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fafafa;
+  }
+  .empty-state {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Prueba local de iframe — Simulador Sirve la Mesa</h1>
+  <p>Arnés standalone para el criterio "verificado embebido dentro de un &lt;iframe&gt;" del issue #23 (A9). No requiere build ni dependencias: es HTML/CSS/JS plano.</p>
+</header>
+
+<div class="panel">
+  <label for="src-input">URL del simulador:</label>
+  <input id="src-input" type="text" placeholder="http://localhost:8099/embed-demo/sub1/sub2/index.html">
+  <button id="load-btn">Cargar en el iframe</button>
+  <button id="reload-btn" class="secondary">Recargar</button>
+</div>
+
+<div class="panel">
+  <label>Tamaño del contenedor:</label>
+  <button class="secondary" data-width="375px">Móvil (375px)</button>
+  <button class="secondary" data-width="768px">Tablet (768px)</button>
+  <button class="secondary" data-width="1280px">Escritorio (1280px)</button>
+  <button class="secondary" data-width="100%">Ancho completo</button>
+</div>
+
+<p class="hint">
+  Este arnés no sirve el build por sí mismo. Primero compila
+  (<code>cd angular-app &amp;&amp; npx ng build --configuration production</code>,
+  la config de <code>angular-app/angular.json</code> ya deja <code>base href="./"</code>)
+  y sirve la carpeta <code>angular-app/dist/sirve-la-mesa/</code> (o una copia suya
+  en un subdirectorio anidado, para probar el criterio de rutas relativas) con
+  cualquier servidor estático plano — por ejemplo
+  <code>npx http-server angular-app/dist/sirve-la-mesa -p 8099</code> — y pega esa
+  URL arriba. También sirve para apuntar a una URL de Vercel ya desplegada.
+  El snippet exacto de <code>&lt;iframe&gt;</code> recomendado para la Fundación
+  está en <code>docs/INTEGRACION-IFRAME.md</code>; este arnés replica sus mismos
+  atributos (<code>title</code>, sin <code>allow</code> porque no hace falta hoy,
+  dimensiones mínimas).
+</p>
+
+<div class="stage">
+  <div class="frame-shell" id="frame-shell">
+    <div class="size-tag" id="size-tag">Ancho completo</div>
+    <div class="empty-state" id="empty-state">
+      Pega la URL del simulador arriba y hacé clic en "Cargar en el iframe".
+    </div>
+  </div>
+</div>
+
+<script>
+  const srcInput = document.getElementById('src-input');
+  const loadBtn = document.getElementById('load-btn');
+  const reloadBtn = document.getElementById('reload-btn');
+  const shell = document.getElementById('frame-shell');
+  const sizeTag = document.getElementById('size-tag');
+  const emptyState = document.getElementById('empty-state');
+  let iframeEl = null;
+
+  function currentSrc() {
+    return iframeEl ? iframeEl.getAttribute('src') : '';
+  }
+
+  function loadIframe(url) {
+    if (!url) return;
+    if (!iframeEl) {
+      emptyState.remove();
+      iframeEl = document.createElement('iframe');
+      iframeEl.title = 'Simulador Sirve la Mesa';
+      iframeEl.loading = 'eager';
+      shell.appendChild(iframeEl);
+    }
+    iframeEl.src = url;
+  }
+
+  loadBtn.addEventListener('click', () => loadIframe(srcInput.value.trim()));
+  srcInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loadIframe(srcInput.value.trim());
+  });
+  reloadBtn.addEventListener('click', () => {
+    const url = currentSrc();
+    if (url) loadIframe(url);
+  });
+
+  document.querySelectorAll('.panel button[data-width]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const width = btn.getAttribute('data-width');
+      shell.style.maxWidth = width;
+      sizeTag.textContent = btn.textContent;
+    });
+  });
+</script>
+</body>
+</html>

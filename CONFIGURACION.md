@@ -1,7 +1,9 @@
 # Configuración
 
 Para el panorama general y la arquitectura, ver [`README.md`](README.md). Esto es el
-paso a paso.
+paso a paso. Para incrustar el simulador en el sitio de la Fundación, ver
+[`docs/INTEGRACION-IFRAME.md`](docs/INTEGRACION-IFRAME.md) (el build de producción
+usa `base href="./"`).
 
 ## Paso 1 — Instalar dependencias
 
