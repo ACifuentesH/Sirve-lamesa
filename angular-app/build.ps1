@@ -13,7 +13,3 @@ Write-Host "🏗️ Ejecutando build de producción..." -ForegroundColor Yellow
 npm run build:prod
 
 Write-Host "✅ Build completado en dist/sirve-la-mesa/" -ForegroundColor Green
-Write-Host ""
-Write-Host "Para servir desde Express:" -ForegroundColor Cyan
-Write-Host "1. Asegúrate de que NODE_ENV=production"
-Write-Host "2. Ejecuta 'npm start' desde la carpeta raíz del proyecto"

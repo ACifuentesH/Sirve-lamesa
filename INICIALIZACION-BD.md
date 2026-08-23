@@ -1,196 +1,102 @@
-# 🗄️ Inicialización de Base de Datos - Sirve la Mesa
+# Inicialización de la base de datos
 
-## 📌 Cambio Importante
+El esquema vive en Supabase y se construye aplicando **migraciones en orden** y
+después los **seeds**. No hay un script que borre y recree el esquema: el que existía
+(`init-database.js`) se retiró en el issue #24 junto con el backend Express. Dejaba el
+estudio en un estado peligroso — arrancaba borrando todas las tablas, y hoy hay
+decisiones ya recogidas que se perderían.
 
-A partir de ahora, **el servidor ya NO inicializa automáticamente la base de datos** al arrancar. Esto permite que tus datos persistan entre reinicios del servidor.
+## Antes de empezar
 
----
+Comprueba que el ref del proyecto en `DATABASE_URL` es **el mismo** que el de
+`SUPABASE_URL` en tu `.env`. Ya ocurrió una vez que el `.env` apuntaba a un proyecto
+viejo: las migraciones se aplicaron ahí y la aplicación arrancó contra un esquema sin
+ellas, que es un fallo silencioso y molesto de encontrar.
 
-## 🚀 Comando de Inicialización
+## Migraciones
 
-Para crear o resetear la base de datos, usa:
+En `database/migrations/`, por número ascendente. Son acumulativas: cada una asume las
+anteriores.
 
-```powershell
-npm run init-db
+| Migración | Qué hace |
+|---|---|
+| `001_ampliar_campo_navegador.sql` | Amplía `navegador` para el user-agent completo |
+| `002_anonimizar_participantes.sql` | Retira los campos que identificaban al participante |
+| `003_personajes_retratos.sql` | Columnas de retrato en `personajes` |
+| `004_pedro_imagen_pedro_png.sql` | Corrección puntual de un retrato antiguo |
+| `005_perfil_sociodemografico.sql` | Perfil sociodemográfico del participante (A3) |
+| `006_catalogo_y_conducta.sql` | `catalogo_alimentos`, secuencia de clics y tipos de alimento |
+| `007_vista_respuestas_experimento.sql` | La vista que leen el panel y las exportaciones (ADR-0003) |
+| `008_rpc_registrar_respuesta_experimento.sql` | La RPC transaccional del envío (ADR-0001) |
+| `009_rls_endurecer_interim.sql` | Primer endurecimiento de RLS |
+| `011_fijar_search_path_calcular_duracion.sql` | Fija el `search_path` de la función de duración |
+| `012_rls_solo_rpc.sql` | La escritura del participante solo entra por la RPC |
+| `013_investigadores_lista_blanca.sql` | Solo un investigador de la lista blanca lee el estudio |
+| `014_retirar_politicas_auth_obsoletas.sql` | Retira políticas que quedaron sin uso |
+
+> No existe una migración `010`: el número se saltó y no falta nada.
+
+Aplícalas con el SQL editor del dashboard de Supabase, o con `psql`:
+
+```bash
+psql "$DATABASE_URL" -f database/migrations/001_ampliar_campo_navegador.sql
+# ...y así en orden hasta la 014
 ```
 
-Este comando:
-- ✅ Elimina todas las tablas existentes
-- ✅ Crea la estructura completa de la base de datos
-- ✅ Inserta los datos iniciales (seed data)
-- ✅ Muestra un resumen de las tablas creadas
+## Seeds
 
----
+Después de las migraciones, en este orden:
 
-## ⚠️ Cuándo usar este comando
-
-### ✅ Debes ejecutarlo en estos casos:
-
-1. **Primera vez que configuras el proyecto**
-   - Después de clonar el repositorio
-   - Después de instalar las dependencias
-
-2. **Cuando necesites resetear la base de datos**
-   - Tienes datos corruptos
-   - Quieres empezar de cero
-   - Actualizaste la estructura de las tablas
-
-3. **Después de cambios en la estructura**
-   - Modificaste `schema.sql`
-   - Agregaste nuevas tablas
-   - Cambiaste relaciones
-
-### ❌ NO lo ejecutes:
-
-- Cada vez que inicies el servidor
-- Si tienes datos importantes que quieres conservar
-- Durante el desarrollo normal (los datos ya persisten)
-
----
-
-## 🔄 Flujo de Trabajo Normal
-
-### Primera vez (configuración inicial):
-
-```powershell
-# 1. Instalar dependencias
-npm install
-
-# 2. Configurar variables de entorno
-# Copiar .env.example a .env y ajustar valores
-
-# 3. Inicializar base de datos (SOLO UNA VEZ)
-npm run init-db
-
-# 4. Iniciar servidor
-npm run dev
+```bash
+psql "$DATABASE_URL" -f database/seeds/seed_personajes.sql
+psql "$DATABASE_URL" -f database/seeds/seed_catalogo_alimentos.sql
 ```
 
-### Desarrollo diario:
+Los dos son **idempotentes**: se pueden volver a ejecutar y actualizan en lugar de
+duplicar. Y los dos se autocomprueban — terminan con un bloque que falla si los datos
+no cuadran:
 
-```powershell
-# Simplemente iniciar el servidor (los datos persisten)
-npm run dev
+- `seed_personajes.sql` exige 8 personajes, 4 perfiles de edad × 2 géneros.
+- `seed_catalogo_alimentos.sql` exige 11 / 12 / 11 alimentos y comprueba la suma de
+  los pesos contra los totales del Anexo B.
+
+Esa comprobación es deliberada: los pesos son datos de protocolo, un `30` escrito
+`300` no se nota en la interfaz e invalida el análisis en silencio. Si alguien edita
+un peso sin querer, la carga falla en lugar de pasar desapercibida.
+
+**Los personajes viejos no se borran.** Hay decisiones ya grabadas que los referencian
+por clave ajena. Se distinguen porque las filas nuevas son las únicas con `slug`, y es
+por ahí por donde el simulador arma el pool.
+
+## Comprobar que quedó bien
+
+```sql
+-- 8 personajes en el pool del estudio
+SELECT COUNT(*) FROM personajes WHERE slug IS NOT NULL;
+
+-- 11 / 12 / 11
+SELECT momento_dia, COUNT(*) FROM catalogo_alimentos GROUP BY momento_dia;
+
+-- La vista responde
+SELECT COUNT(*) FROM respuestas_experimento;
 ```
 
----
+## Problemas frecuentes
 
-## 📊 ¿Qué hace el script de inicialización?
+**`getaddrinfo ENOENT`**
+La conexión directa `db.xxxxx.supabase.co` a veces solo resuelve por IPv6. Usa la
+cadena del *session pooler*, que es IPv4. Ver `.env.example`.
 
-El script `init-database.js` ejecuta los siguientes archivos SQL en orden:
+**La conexión se queda colgada (504)**
+Proyecto pausado, red, o `PG_CONNECTION_TIMEOUT_MS` demasiado corto.
 
-1. **`database/schema.sql`**
-   - Elimina tablas existentes (DROP TABLE)
-   - Crea estructura de tablas con relaciones
-   - Define índices y constraints
+**Una migración falla diciendo que el objeto ya existe**
+Estaba aplicada. Las migraciones no llevan registro propio: apunta cuál fue la última
+que corriste.
 
-2. **`database/participantes.sql`**
-   - Define la tabla de participantes
+## Archivos relacionados
 
-3. **`database/sesiones_juego.sql`**
-   - Define la tabla de sesiones
-   - Crea triggers automáticos
-
-4. **`database/decisiones_porcionamiento.sql`**
-   - Define la tabla de decisiones
-   - Configura índices para JSONB
-
-5. **`database/seed_data.sql`**
-   - Inserta datos iniciales:
-     - Personajes sintéticos (8)
-     - Menús (Desayuno, Almuerzo, Cena)
-     - Bebidas (~19)
-     - Componentes/Ingredientes (~180)
-     - Platos del menú
-     - Relaciones entre entidades
-
----
-
-## 🛡️ Seguridad
-
-El script incluye:
-- ⏳ Pausa de 3 segundos antes de ejecutar (permite cancelar con Ctrl+C)
-- ⚠️ Advertencia clara sobre eliminación de datos
-- ✅ Confirmación de tablas creadas
-- 📝 Logs detallados del proceso
-
----
-
-## 🐛 Solución de Problemas
-
-### Error: "No se puede conectar a PostgreSQL"
-
-```powershell
-# Verificar que PostgreSQL esté corriendo
-# En servicios de Windows o con:
-pg_isready
-```
-
-### Error: "Database does not exist"
-
-```powershell
-# Crear la base de datos manualmente
-psql -U postgres
-CREATE DATABASE sirve_la_mesa;
-\q
-
-# Luego ejecutar
-npm run init-db
-```
-
-### Error: "Permission denied"
-
-```powershell
-# Verificar credenciales en .env
-# DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/sirve_la_mesa
-```
-
-### Quiero conservar algunos datos
-
-Si necesitas conservar ciertos datos:
-
-1. **Exporta los datos importantes primero:**
-   ```powershell
-   # Desde el panel admin (http://localhost:3000/admin)
-   # Hacer clic en "📥 Descargar CSV (Excel)"
-   ```
-
-2. **Ejecuta la inicialización:**
-   ```powershell
-   npm run init-db
-   ```
-
-3. **Reimporta los datos manualmente** usando SQL o la API
-
----
-
-## 📚 Archivos Relacionados
-
-- **`init-database.js`** - Script de inicialización (en la raíz)
-- **`server.js`** - Servidor principal (ya NO ejecuta init automáticamente)
-- **`database/*.sql`** - Scripts SQL de estructura y datos
-- **`package.json`** - Define el comando `npm run init-db`
-
----
-
-## 💡 Consejos
-
-1. **Backup de datos importantes**: Antes de ejecutar `npm run init-db`, exporta tus datos desde el panel admin.
-
-2. **Entorno de desarrollo vs producción**: En producción, usa migraciones en lugar de resetear toda la BD.
-
-3. **Versionamiento**: Los archivos SQL en `database/` están versionados en Git. Los datos NO.
-
-4. **Seed data personalizado**: Modifica `database/seed_data.sql` para agregar tus propios datos iniciales.
-
----
-
-## 📞 Soporte
-
-Si tienes problemas con la inicialización de la base de datos, verifica:
-
-1. ✅ PostgreSQL está corriendo
-2. ✅ Variables de entorno en `.env` son correctas
-3. ✅ Base de datos `sirve_la_mesa` existe
-4. ✅ Usuario tiene permisos suficientes
-5. ✅ No hay conexiones activas bloqueando las tablas
+- `database/migrations/` — esquema, vista y RPC
+- `database/seeds/` — 8 personajes y 34 alimentos
+- `database-pool-config.js` — arma la configuración de `pg` desde `DATABASE_URL`
+- `PLAN-DESARROLLO-UX-2026.md`, Anexo A — DDL de referencia; Anexo B — los 34 pesos

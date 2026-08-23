@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
 import { investigadorGuard } from './guards/investigador.guard';
 
 // Congelado tras la Fase 0 (0.6, issue #4): este archivo se editó una sola vez con
@@ -8,16 +7,16 @@ import { investigadorGuard } from './guards/investigador.guard';
 // Excepción acordada (issue #34): renombre de /admin a /investigadores. Se mantiene
 // una redirección explícita desde /admin -- sin ella, el wildcard de abajo manda
 // cualquier marcador o enlace viejo a /registro sin explicación, un 404 silencioso.
+// Excepción acordada (issue #24): se retiró /juego con el módulo legacy que servía.
+// Aquí no se deja redirección: /juego era la pantalla vieja de arrastrar y soltar, no
+// un renombre de la nueva, y mandar a un participante desde un enlace viejo a mitad
+// del flujo nuevo lo metería en la tarea sin registro ni onboarding. El wildcard lo
+// devuelve al principio, que es el único punto de entrada correcto.
 const routes: Routes = [
   {
     path: '',
     redirectTo: 'registro',
     pathMatch: 'full'
-  },
-  {
-    path: 'juego',
-    loadChildren: () => import('./components/game/game.module').then(m => m.GameModule),
-    canActivate: [AuthGuard]
   },
   {
     // El panel expone el estudio completo: exige sesión de investigador (issue #7).
