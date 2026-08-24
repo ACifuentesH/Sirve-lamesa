@@ -1,17 +1,25 @@
 /**
- * Credenciales de cliente del proyecto Sirve la Mesa.
+ * Reglas de credenciales de cliente del proyecto Sirve la Mesa.
  *
- * La clave publicable (sb_publishable_…) está pensada para ir en el bundle del
- * navegador: no es un secreto. La anon JWT sí lo era, y por eso salió de git.
- * Estas constantes son el respaldo cuando .env todavía tiene el placeholder de
- * .env.example (TU-PROYECTO / sb_publishable_...): copiar el ejemplo y arrancar
- * no debe dejar la simulación muda.
+ * Hasta el issue #45 este módulo traía un respaldo con la URL y la clave publicable
+ * REALES del proyecto, para que arrancar sin `.env` no dejara la simulación muda.
+ * Ese respaldo quedaba versionado en texto plano (justo lo que el README decía que
+ * no pasaba) y, además, la clave ya no es válida: el proyecto la rechaza con
+ * HTTP 401. Se retiró. `PLACEHOLDER_SUPABASE` ya NO es un valor que funcione: es
+ * solo el texto de plantilla de `.env.example`, para que el mensaje de error lo
+ * pueda citar.
  *
- * SUPABASE_URL / SUPABASE_ANON_KEY en el entorno o en .env mandan sobre esto.
+ * `esPlaceholderUrl` / `esPlaceholderKey` son la ÚNICA definición de la regla
+ * "esto todavía es el placeholder de la plantilla, no un valor real". La reutilizan:
+ *   - este script (Node, en build time — ver inject-supabase-env.mjs), y
+ *   - `SupabaseService` en el navegador (última línea de defensa: por si
+ *     `environment.ts` se generó, o quedó, con estos valores de plantilla).
+ * No hay Node ni navegador en este archivo (sin `fs`, sin DOM): es JS puro,
+ * por eso ambos lados pueden importarlo tal cual sin arrastrar nada del otro runtime.
  */
-export const SUPABASE_PROYECTO = {
-  url: 'https://kpkrriyluwbcajqmlfiw.supabase.co',
-  anonKey: 'sb_publishable_2Dc2TkYvxowdkRAMEWb93g_i8Wiivbn'
+export const PLACEHOLDER_SUPABASE = {
+  url: 'https://TU-PROYECTO.supabase.co',
+  key: 'sb_publishable_...'
 };
 
 export function esPlaceholderUrl(url) {
@@ -32,21 +40,8 @@ export function esPlaceholderKey(key) {
 
 /**
  * @param {{ url?: string, key?: string }} bruto
- * @returns {{ url: string, key: string, usoRespaldo: boolean }}
+ * @returns {boolean} true si falta alguna, o si sigue siendo el placeholder de la plantilla.
  */
-export function resolverCredencialesSupabase(bruto = {}) {
-  const url = (bruto.url ?? '').trim();
-  const key = (bruto.key ?? '').trim();
-  const urlVacia = esPlaceholderUrl(url);
-  const keyVacia = esPlaceholderKey(key);
-
-  if (!urlVacia && !keyVacia) {
-    return { url, key, usoRespaldo: false };
-  }
-
-  return {
-    url: urlVacia ? SUPABASE_PROYECTO.url : url,
-    key: keyVacia ? SUPABASE_PROYECTO.anonKey : key,
-    usoRespaldo: true
-  };
+export function credencialesSupabaseValidas(bruto = {}) {
+  return !esPlaceholderUrl(bruto.url) && !esPlaceholderKey(bruto.key);
 }
