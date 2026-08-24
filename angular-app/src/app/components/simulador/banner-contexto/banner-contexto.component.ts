@@ -35,13 +35,14 @@ import { TextoContexto, construirTextoContexto } from '../../../utils/texto-cont
         z-index: 100;
         width: 100%;
         box-sizing: border-box;
-        padding: 0.75rem 1.5rem;
+        padding: 0.65rem 1.75rem;
         background: var(--sm-color-primary-light);
         border-bottom: 1px solid var(--sm-color-info-border);
         color: var(--sm-color-text);
         font-family: var(--sm-font-sans);
-        font-size: 1.125rem;
-        line-height: 1.5;
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+        line-height: 1.45;
       }
 
       .encabezado {

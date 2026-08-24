@@ -1,23 +1,30 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { AlimentoCatalogo, ItemPlato } from '../../../models/contrato';
-import { posicionesDeItem, tamanoVisualPct } from '../../../utils/plato-cuadrantes';
+import {
+  esRecipiente,
+  OcupantePlato,
+  posicionesDeItem,
+  rotacionDePorcion,
+  tamanoVisualPct
+} from '../../../utils/plato-cuadrantes';
 
 interface PorcionVista {
   key: string;
   x: number;
   y: number;
   tamano: number;
+  rotacion: number;
   imagen: string;
   nombre: string;
+  recipiente: boolean;
 }
 
 /**
  * Canvas del plato en 4 cuadrantes (Vía B, tarea B7).
  *
  * El posicionamiento es determinista: misma secuencia de clics, misma disposición.
- * Las porciones del mismo alimento se escalonan 15 px; al quitar uno, los que
- * quedan no se mueven.
+ * Cada porción busca hueco libre; al quitar uno, los que quedan no se mueven.
  */
 @Component({
   selector: 'app-plato-canvas',
@@ -29,11 +36,14 @@ interface PorcionVista {
         @for (porcion of porciones; track porcion.key) {
           <img
             class="porcion"
+            [class.porcion--recipiente]="porcion.recipiente"
             [src]="porcion.imagen"
             [alt]="porcion.nombre"
             [style.left.%]="porcion.x"
             [style.top.%]="porcion.y"
             [style.width.%]="porcion.tamano"
+            [style.z-index]="porcion.recipiente ? 6 : 1"
+            [style.--giro]="porcion.rotacion + 'deg'"
             (error)="$any($event.target).style.visibility = 'hidden'"
           />
         }
@@ -49,7 +59,7 @@ interface PorcionVista {
 
       .plato {
         position: relative;
-        width: min(420px, 42vw, 70vh);
+        width: var(--plato-lado, min(380px, 38vw, 56vh));
         aspect-ratio: 1 / 1;
         border-radius: 50%;
         background:
@@ -61,19 +71,26 @@ interface PorcionVista {
       .porcion {
         position: absolute;
         height: auto;
-        transform: translate(-50%, -50%);
+        object-fit: contain;
+        --giro: 0deg;
+        transform: translate(-50%, -50%) rotate(var(--giro));
         pointer-events: none;
-        animation: aparecer 180ms ease-out;
+        animation: aparecer 220ms cubic-bezier(0.22, 1, 0.36, 1);
+        filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.1));
+      }
+
+      .porcion--recipiente {
+        filter: drop-shadow(0 3px 8px rgba(15, 23, 42, 0.12));
       }
 
       @keyframes aparecer {
         from {
           opacity: 0;
-          transform: translate(-50%, -50%) scale(0.85);
+          transform: translate(-50%, -50%) rotate(var(--giro)) scale(0.85);
         }
         to {
           opacity: 1;
-          transform: translate(-50%, -50%) scale(1);
+          transform: translate(-50%, -50%) rotate(var(--giro)) scale(1);
         }
       }
     `
@@ -99,11 +116,14 @@ export class PlatoCanvasComponent {
   private reconstruir(items: ItemPlato[], catalogo: Map<number, AlimentoCatalogo>): void {
     this.itemsCache = items;
     const vistas: PorcionVista[] = [];
+    const ocupados: OcupantePlato[] = [];
 
     for (const item of items) {
       const cat = catalogo.get(item.alimento_id);
-      const tamano = tamanoVisualPct(cat?.tipo ?? '');
-      const posiciones = posicionesDeItem(item, tamano);
+      const slug = cat?.slug ?? item.slug;
+      const tamano = tamanoVisualPct(slug, cat?.tipo ?? '');
+      const recipiente = esRecipiente(slug);
+      const posiciones = posicionesDeItem(item, tamano, ocupados);
 
       posiciones.forEach((pos, indice) => {
         vistas.push({
@@ -111,12 +131,15 @@ export class PlatoCanvasComponent {
           x: pos.x,
           y: pos.y,
           tamano,
+          rotacion: rotacionDePorcion(item, indice),
           imagen: cat?.imagen ?? '',
-          nombre: cat?.nombre ?? item.slug
+          nombre: cat?.nombre ?? item.slug,
+          recipiente
         });
+        ocupados.push({ x: pos.x, y: pos.y, tamano, slug, recipiente });
       });
     }
 
-    this.porciones = vistas;
+    this.porciones = vistas.sort((a, b) => Number(a.recipiente) - Number(b.recipiente));
   }
 }

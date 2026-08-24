@@ -1,11 +1,33 @@
 @use '../../../styles/tokens' as t;
 
 .registro {
+  position: relative;
   min-height: 100vh;
   display: grid;
   place-items: center;
   background: t.$color-bg-alt;
   padding: t.$space-5;
+}
+
+.acceso-admin {
+  position: absolute;
+  top: t.$space-5;
+  right: t.$space-5;
+  font-family: t.$font-sans;
+  font-size: t.$font-size-sm;
+  font-weight: t.$font-weight-semibold;
+  color: t.$color-primary;
+  text-decoration: none;
+  border: 1px solid t.$color-border;
+  background: t.$color-bg;
+  border-radius: t.$radius-sm;
+  padding: t.$space-2 t.$space-4;
+  box-shadow: t.$shadow-sm;
+
+  &:hover {
+    border-color: t.$color-primary;
+    background: t.$color-primary-light;
+  }
 }
 
 .tarjeta {

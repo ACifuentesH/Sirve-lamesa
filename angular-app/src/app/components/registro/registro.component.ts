@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Etnia, Genero, NivelEstudios, Participante } from '../../models/contrato';
 import { REGIONES } from '../../shared/regiones.const';
@@ -12,7 +12,7 @@ import { ParticipanteService } from '../../services/participante.service';
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.scss']
 })

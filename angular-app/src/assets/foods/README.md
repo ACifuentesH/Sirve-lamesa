@@ -1,42 +1,24 @@
 # Imágenes del catálogo de alimentos
 
-**Estado: las 34 imágenes de este árbol son marcadores provisionales, no material de
-estímulo.** Se ven como un cuadro gris con borde discontinuo y la palabra
-`PROVISIONAL`. Existen para que la pantalla de servicio se pueda validar de extremo a
-extremo mientras llegan las fotografías reales (issue #15, tarea B2 del plan).
-
-**No desplegar el experimento con estos archivos puestos.** El alimento que ve el
-participante es parte del estímulo: un marcador gris en lugar de una foto de comida
-cambia la tarea que se está midiendo.
-
-## Qué falta
-
-Las 34 fotografías reales, con estas restricciones del contrato de assets (§0.4 del
-plan y `AlimentoCatalogo.imagen`):
+Las 34 fotografías del Anexo B, en el formato del contrato de assets (§0.4):
 
 - Formato `.webp`, **256×256** exactos, **fondo transparente**.
 - El nombre del archivo es el `slug` del alimento, carácter por carácter.
 - La subcarpeta es el `momento_dia`: `desayuno/`, `almuerzo/` o `cena/`.
 - Ruta final tal como la guarda el seed: `assets/foods/<momento>/<slug>.webp`.
 
+`CatalogoService` lee la ruta desde `catalogo_alimentos.imagen`; el menú lateral y el
+plato la pintan tal cual. No hay que tocar seed ni código al sustituir un archivo.
+
 Un alimento aparece en dos momentos con slug distinto cuando cambia el peso o la
-preparación (`huevo` en desayuno contra `huevo-cocido` en cena): son dos archivos, no
-uno compartido.
+preparación (`huevo` en desayuno contra `huevo-cocido` en cena): son dos archivos.
+La arepa de desayuno y la de cena (`arepa-tortilla-maiz`, `arepa-pequena`)
+comparten la misma fotografía de origen.
 
-## Cómo reemplazarlos
+## Los 34 archivos
 
-Basta con sobrescribir cada `.webp` respetando nombre y carpeta; no hay que tocar el
-seed ni el código. `CatalogoService` lee la ruta desde `catalogo_alimentos.imagen` y
-el menú lateral la pinta tal cual.
-
-Cuando lleguen las 34 reales, borrar también `scripts/generar-placeholders-catalogo.mjs`
-y este README: dejan de tener sentido.
-
-## Los 34 archivos esperados
-
-La lista sale del seed (`database/seeds/seed_catalogo_alimentos.sql`), que es la única
-fuente de slugs y rutas. El peso en gramos no se documenta aquí a propósito: es el dato
-que el participante nunca debe ver.
+La lista sale del seed (`database/seeds/seed_catalogo_alimentos.sql`). El peso en
+gramos no se documenta aquí: es el dato que el participante nunca debe ver.
 
 ### Desayuno (11)
 
@@ -86,4 +68,3 @@ que el participante nunca debe ver.
 | `tomate-aguacate.webp` | Rodajas de Tomate y Aguacate | vegetal | 1 porción mixta |
 | `infusion-te.webp` | Taza de Infusión / Té Caliente (Aromática) | bebida | 1 taza |
 | `leche-descremada.webp` | Vaso de Leche descremada | bebida | 1 vaso |
-

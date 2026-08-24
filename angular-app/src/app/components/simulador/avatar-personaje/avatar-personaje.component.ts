@@ -43,6 +43,12 @@ import { Personaje } from '../../../models/contrato';
   `,
   styles: [
     `
+      :host {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
       .avatar {
         margin: 0;
         display: flex;
@@ -54,10 +60,10 @@ import { Personaje } from '../../../models/contrato';
       img,
       .marcador {
         width: 100%;
-        max-width: 260px;
+        max-width: 180px;
         aspect-ratio: 1 / 1;
         height: auto;
-        border-radius: 8px;
+        border-radius: 16px;
         background: var(--sm-color-bg-alt);
         object-fit: cover;
       }

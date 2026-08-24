@@ -33,8 +33,23 @@
 body {
   font-family: tokens.$font-sans;
   background: var(--color-blanco);
-  height: 100vh;
-  overflow: hidden; // Sin scroll en toda la página
+  min-height: 100dvh;
+}
+
+html,
+body,
+app-root {
+  height: 100%;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+}
+
+app-root > *:not(router-outlet) {
+  flex: 1;
+  min-height: 0;
 }
 
 // Clases utilitarias
@@ -48,18 +63,27 @@ body {
   font-weight: 400;
 }
 
-// Scrollbar personalizada
+// Scrollbar institucional (azul del sistema, no la paleta café vieja)
+html {
+  scrollbar-width: auto;
+  scrollbar-color: var(--sm-color-primary) var(--sm-color-primary-light);
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-azul-claro);
-  border-radius: 5px;
+  background: var(--sm-color-primary-light);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-azul);
-  border-radius: 5px;
+  background: var(--sm-color-primary);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sm-color-primary-dark);
 }

@@ -52,28 +52,41 @@ import { AlimentoCatalogo } from '../../../models/contrato';
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.65rem;
       }
 
       .vaso {
-        width: 110px;
-        height: 150px;
+        width: var(--vaso-ancho, clamp(160px, 18vw, 210px));
+        height: var(--vaso-alto, clamp(220px, 34vh, 300px));
         display: grid;
         place-items: center;
-        border: 2px dashed var(--sm-color-border);
-        border-radius: 8px 8px 16px 16px;
-        background: var(--sm-color-bg-alt);
+        border: 1px dashed color-mix(in srgb, var(--sm-color-border) 80%, transparent);
+        border-radius: 999px 999px 28px 28px;
+        background: color-mix(in srgb, var(--sm-color-bg-alt) 70%, transparent);
+        transition: border-color 180ms ease, background 180ms ease;
       }
 
       .vaso--lleno {
-        border-style: solid;
-        border-color: var(--sm-color-info-border);
-        background: var(--sm-color-primary-light);
+        border-style: none;
+        background: transparent;
       }
 
       .vaso img {
-        width: 80%;
-        height: auto;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        animation: servir 280ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      @keyframes servir {
+        from {
+          opacity: 0;
+          transform: translateY(8px) scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
       }
 
       .marcador {
@@ -86,20 +99,21 @@ import { AlimentoCatalogo } from '../../../models/contrato';
       .etiqueta {
         text-align: center;
         font-family: var(--sm-font-sans);
-        max-width: 140px;
+        max-width: 180px;
       }
 
       .nombre {
         display: block;
-        font-size: 0.875rem;
+        font-size: 0.8rem;
         font-weight: 600;
+        letter-spacing: 0.01em;
         color: var(--sm-color-text);
       }
 
       .detalle,
       .vacio {
         display: block;
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         color: var(--sm-color-text-muted);
       }
     `
