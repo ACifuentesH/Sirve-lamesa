@@ -15,7 +15,3 @@ echo "🏗️ Ejecutando build de producción..."
 npm run build:prod
 
 echo "✅ Build completado en dist/sirve-la-mesa/"
-echo ""
-echo "Para servir desde Express:"
-echo "1. Asegúrate de que NODE_ENV=production"
-echo "2. Ejecuta 'npm start' desde la carpeta raíz del proyecto"

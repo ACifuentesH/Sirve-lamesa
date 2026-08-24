@@ -1,100 +1,71 @@
-# Sirve la Mesa - Aplicación Angular
+# Sirve la Mesa — aplicación Angular
 
-## 🚀 Desarrollo
+La SPA del instrumento. Habla directamente con Supabase: no hay backend propio ni
+proxy. Para la arquitectura y el dominio, ver [`../README.md`](../README.md) y
+[`../CONTEXT.md`](../CONTEXT.md).
 
-### Prerrequisitos
-- Node.js >= 18
-- Angular CLI (se instalará automáticamente)
+## Desarrollo
 
-### Instalación
 ```bash
-cd angular-app
 npm install
+npm start          # http://localhost:4200
 ```
 
-### Servidor de desarrollo
-```bash
-npm start
-```
+`start` y `build` ejecutan antes `npm run config`, que genera
+`src/environments/environment.ts` y `environment.prod.ts` a partir del `.env` de la
+raíz del repositorio (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `URL_FUNDACION`).
 
-La aplicación estará disponible en `http://localhost:4200`. El proxy está configurado para redirigir las peticiones API a `http://localhost:3000`.
+Esos dos archivos **están fuera de git y no se editan a mano**: los reescribe el
+script en cada arranque. Si te faltan credenciales, el script avisa por consola y
+genera los environments vacíos.
 
-**Importante**: Asegúrate de que el servidor backend esté corriendo en el puerto 3000.
+## Build de producción
 
-## 🏗️ Build para Producción
-
-### Windows (PowerShell)
-```powershell
-.\build.ps1
-```
-
-### Linux/Mac
-```bash
-chmod +x build.sh
-./build.sh
-```
-
-### Manual
 ```bash
 npm run build:prod
 ```
 
-El build se generará en `dist/sirve-la-mesa/`.
+Sale en `dist/sirve-la-mesa/`.
 
-## 📁 Estructura del Proyecto
+## Estructura
 
 ```
-src/
-├── app/
-│   ├── components/
-│   │   ├── login/          # Formulario de inicio
-│   │   ├── game/           # Componente principal del juego
-│   │   ├── drag-drop/      # Componentes drag & drop
-│   │   ├── personajes/     # Tarjetas de personajes
-│   │   └── ingredientes/   # Panel de ingredientes
-│   ├── services/
-│   │   ├── api.service.ts
-│   │   ├── auth.service.ts
-│   │   └── game-data.service.ts
-│   ├── models/
-│   └── guards/
-├── assets/
-│   ├── fonts/              # Rocket Raccoon, Gildsley
-│   └── images/
-│       └── ingredientes/   # Imágenes de alimentos
-└── environments/
+src/app/
+├── components/
+│   ├── registro/                # alta anónima del participante
+│   ├── onboarding/              # instrucciones, botón bloqueado 5 s
+│   ├── simulador/               # la tarea de servicio
+│   │   ├── banner-contexto/     #   asignación, con concordancia gramatical
+│   │   ├── avatar-personaje/    #   retrato del personaje asignado
+│   │   ├── menu-lateral/        #   catálogo del momento, en pestañas del dato
+│   │   ├── plato-canvas/        #   reparto determinista en 4 cuadrantes
+│   │   └── contenedor-bebida/   #   la bebida, siempre fuera del plato
+│   ├── confirmacion-modal/      # confirmación de dos pasos
+│   ├── salida/                  # cierre sostenido
+│   ├── acceso-investigadores/   # sesión del investigador
+│   └── investigador/            # panel de análisis y exportación
+├── services/                    # Supabase, catálogo, asignación, plato, envío
+├── models/contrato/             # contrato de datos congelado (Fase 0)
+├── guards/                      # investigadorGuard
+└── utils/                       # cuadrantes, texto del banner, exportación
+
+src/assets/
+├── characters/                  # los 8 retratos del estudio (.webp 500×500)
+├── foods/                       # catálogo (.webp 256×256) — hoy, marcadores
+└── images/ingredientes/         # PNG de la escena vieja, aún sin retirar
 ```
 
-## 🎨 Assets Requeridos
+## Dos reglas que no se saltan
 
-### Fuentes
-Copiar desde `Sirve-lamesa/`:
-- `Rocket Raccoon Free.ttf`
-- `Gildsley DEMO.otf`
+- **Los gramos no se muestran nunca.** El participante ve la unidad de display
+  ("1 rebanada"). Exponer el peso sesgaría su decisión, y es el dato que sostiene todo
+  el análisis.
+- **`models/contrato/` está congelado.** Se acordó en la Fase 0 entre las dos vías;
+  cambiarlo requiere acuerdo, no un commit suelto.
 
-A la carpeta `src/assets/fonts/`.
+## Notas
 
-### Imágenes
-Copiar todos los archivos PNG desde `Sirve-lamesa/assets/` a `src/assets/images/ingredientes/`.
-
-## 🔧 Configuración
-
-### Desarrollo
-El archivo `src/proxy.conf.json` redirige las peticiones `/api` al backend en `localhost:3000`.
-
-### Producción
-En producción, la aplicación se sirve desde Express y las rutas API están en el mismo dominio.
-
-## 🐛 Solución de Problemas
-
-### Error de CORS
-- Verifica que el backend esté corriendo
-- Confirma que el proxy esté configurado correctamente
-
-### Fuentes no cargan
-- Asegúrate de copiar los archivos TTF/OTF a `src/assets/fonts/`
-- Verifica las rutas en `src/styles.scss`
-
-### Imágenes no aparecen
-- Copia todas las imágenes PNG a `src/assets/images/ingredientes/`
-- Verifica los nombres de archivo en `ingredientes-data.json`
+- Las imágenes de `assets/foods/` son **marcadores provisionales** hasta que llegue el
+  material definitivo (issue #15). Ver `src/assets/foods/README.md`.
+- `assets/images/ingredientes/` son los PNG del juego anterior. Se conservan a
+  propósito mientras el catálogo nuevo no tenga imágenes reales.

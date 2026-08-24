@@ -1,41 +1,27 @@
 {
   "name": "sirve-la-mesa",
   "version": "1.0.0",
-  "description": "Sistema backend para el juego de investigación 'Sirve la Mesa' - Estudio de porcionamiento de alimentos",
-  "main": "server.js",
+  "description": "Instrumento de investigación en psicología de la alimentación: mide el porcionamiento de un participante hacia personajes sintéticos. Angular + Supabase.",
+  "private": true,
   "scripts": {
-    "start": "node server.js",
-    "build": "npm run build:angular",
-    "dev": "nodemon server.js",
-    "dev:angular": "cd angular-app && npm start",
-    "dev:react": "cd react-app && npm run dev",
-    "build:angular": "cd angular-app && npm run build:prod",
-    "build:react": "cd react-app && npm run build",
-    "init-db": "node init-database.js",
-    "postinstall": "cd angular-app && npm install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cd angular-app && npm start",
+    "build": "cd angular-app && npm run build:prod",
+    "postinstall": "cd angular-app && npm install"
   },
   "dependencies": {
-    "express": "^4.21.2",
-    "pg": "^8.13.1",
-    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.9"
+    "pg": "^8.13.1"
   },
   "engines": {
     "node": ">=18.x"
   },
   "keywords": [
-    "godot",
-    "postgresql",
     "research",
-    "game",
     "psychology",
     "food",
-    "portioning"
+    "portioning",
+    "angular",
+    "supabase"
   ],
   "author": "Equipo Sirve la Mesa",
   "license": "MIT"

@@ -1,0 +1,125 @@
+.pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--sm-color-bg);
+  color: var(--sm-color-text);
+  font-family: var(--sm-font-sans);
+}
+
+.tablero {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) minmax(280px, 360px);
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem 2rem;
+  align-items: start;
+  max-width: 1366px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.servicio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.escena {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.alerta {
+  margin: 0;
+  color: var(--sm-color-error);
+  font-weight: 600;
+  text-align: center;
+}
+
+.estado {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--sm-color-text-muted);
+}
+
+.estado--error {
+  color: var(--sm-color-error);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.estado--error p {
+  margin: 0;
+}
+
+.banner-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.5rem;
+  background: #fdecea;
+  color: var(--sm-color-error);
+  border-bottom: 1px solid #f5c2c0;
+}
+
+.principal {
+  font-family: var(--sm-font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--sm-color-primary);
+  color: var(--sm-color-bg);
+  border: none;
+  border-radius: 4px;
+  padding: 0.7rem 1.25rem;
+  cursor: pointer;
+}
+
+.principal:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.principal:hover:not(:disabled) {
+  background: var(--sm-color-primary-dark);
+}
+
+.finalizar {
+  min-width: 220px;
+}
+
+.reintento {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--sm-color-bg);
+  font-family: var(--sm-font-sans);
+}
+
+.reintento h1 {
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.reintento p {
+  color: var(--sm-color-text-muted);
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .tablero {
+    grid-template-columns: 1fr;
+  }
+}

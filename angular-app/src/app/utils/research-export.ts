@@ -1,194 +1,272 @@
 /**
- * Exportación de datos de investigación (equivalente a exportarDatosCompletos + generarCSV del backend).
- * Corre en el navegador tras cargar decisiones + sesiones + participantes + catálogo de componentes.
+ * Exportación de datos de investigación (Vía A, issue #13).
+ *
+ * Se construye sobre la vista `respuestas_experimento` (migración 007), que ya
+ * entrega una fila por decisión con participante, sesión y contexto aplanados. Antes
+ * esto pedía cuatro tablas y las cruzaba en el navegador; el cruce ahora lo hace
+ * Postgres, que es quien sabe hacerlo.
+ *
+ * Los gramos por alimento salen del JSONB `componentes_servidos` y no de un catálogo
+ * aparte: cada elemento ya viaja con su tipo, su rótulo y su peso, tal como los
+ * congeló el contrato (AlimentoServido). Así el export de una respuesta vieja sigue
+ * reflejando el catálogo vigente el día en que se recogió.
  */
 
-const CATEGORIAS = ['proteina', 'carbohidrato', 'vegetal', 'fruta', 'salsa'] as const;
+import { TIPOS_ALIMENTO, TipoAlimento } from '../models/contrato';
+
+/** Columnas de la vista respuestas_experimento que consume el export. */
+export interface FilaVista {
+  decision_id: number;
+  participante_id: number;
+  participante_edad: number | null;
+  participante_peso_kg: number | string | null;
+  participante_altura_cm: number | string | null;
+  participante_imc: number | string | null;
+  participante_genero: string | null;
+  participante_nivel_estudios: string | null;
+  participante_semestre: string | null;
+  participante_etnia: string | null;
+  participante_region_origen: string | null;
+  participante_region_residencia: string | null;
+  personaje_id: number | null;
+  personaje_nombre: string | null;
+  personaje_perfil_edad: string | null;
+  personaje_edad_rango: string | null;
+  personaje_genero: string | null;
+  momento_dia: string | null;
+  tiempo_decision_segundos: number | string | null;
+  secuencia_clics: unknown;
+  componentes_servidos: unknown;
+  total_plato_gramos: number | string | null;
+  total_bebida_ml: number | string | null;
+  bebida_slug: string | null;
+  sesion_id: number;
+  fecha_inicio: string | null;
+  fecha_fin: string | null;
+  duracion_total_segundos: number | string | null;
+  sesion_estado: string | null;
+  dispositivo: string | null;
+  resolucion_pantalla: string | null;
+  timestamp_decision: string | null;
+}
 
 export interface ExportRow {
-  participante_id: number;
+  participante_id: number | string;
   participante_edad: number | string;
-  participante_sexo: string;
-  participante_peso_kg: string | number;
-  participante_altura_cm: string | number;
-  participante_imc: string | number;
-  participante_lugar_nacimiento: string;
-  participante_lugar_residencia: string;
-  participante_ocupacion: string;
-  participante_nivel_socioeconomico: string;
-  participante_eat26_score: string | number;
-  participante_fecha_registro: string;
-  sesion_id: number;
+  participante_genero: string;
+  participante_nivel_estudios: string;
+  participante_semestre: string;
+  participante_etnia: string;
+  participante_region_origen: string;
+  participante_region_residencia: string;
+  participante_peso_kg: number | string;
+  participante_altura_cm: number | string;
+  participante_imc: number | string;
+  sesion_id: number | string;
   sesion_fecha_inicio: string;
   sesion_fecha_fin: string;
-  sesion_duracion_segundos: string | number;
-  tiempo_total_completacion_segundos: string | number;
+  sesion_duracion_segundos: number | string;
   sesion_estado: string;
-  decision_id: number;
-  escenario: string;
-  personaje_tipo: string;
+  sesion_dispositivo: string;
+  sesion_resolucion: string;
+  decision_id: number | string;
+  momento_dia: string;
+  personaje_id: number | string;
+  personaje_nombre: string;
+  personaje_perfil_edad: string;
   personaje_edad_rango: string;
-  personaje_sexo: string;
-  personaje_imc_representado: string;
-  orden_servicio: string | number;
-  tiempo_decision_ms: string | number;
-  cantidad_total_gramos: string | number;
-  timestamp_decision: string;
+  personaje_genero: string;
+  tiempo_decision_segundos: number | string;
+  total_plato_gramos: number | string;
+  total_bebida_ml: number | string;
+  bebida_slug: string;
+  n_alimentos: number | string;
   proteinas: string;
   carbohidratos: string;
   vegetales: string;
   frutas: string;
-  salsas: string;
+  lacteos: string;
   otros: string;
+  secuencia_clics_json: string;
+  timestamp_decision: string;
 }
 
-function buildComponentesMap(componentes: any[]): Record<string, any> {
-  const map: Record<string, any> = {};
-  for (const comp of componentes) {
-    const id = comp.pk_alimento;
-    map[id] = comp;
-    if (comp.nombre) {
-      map[String(comp.nombre).toLowerCase()] = comp;
-    }
-  }
-  return map;
+/** Un alimento del JSONB, listo para gráficos del panel. */
+export interface AlimentoEnPlato {
+  nombre: string;
+  tipo: string;
+  gramos: number;
 }
 
-export function buildExportRows(
-  decisiones: any[],
-  sesionesByPk: Map<number, any>,
-  participantesByPk: Map<number, any>,
-  componentesCatalogo: any[]
-): ExportRow[] {
-  const componentesMap = buildComponentesMap(componentesCatalogo);
-
-  return decisiones.map((d: any) => {
-    const s = sesionesByPk.get(d.fk_sesion);
-    const p = s ? participantesByPk.get(s.fk_participante) : null;
-    let componentes: any[] = [];
-    const raw = d.componentes_servidos;
-    if (Array.isArray(raw)) {
-      componentes = raw;
-    } else if (typeof raw === 'string') {
-      try {
-        componentes = JSON.parse(raw);
-      } catch {
-        componentes = [];
-      }
-    }
-
-    const porCategoria: Record<string, string[]> = {};
-    for (const cat of CATEGORIAS) {
-      porCategoria[cat] = [];
-    }
-    porCategoria['otro'] = [];
-
-    for (const comp of componentes) {
-      let categoria = 'otro';
-      if (comp.componente_id && componentesMap[comp.componente_id]) {
-        categoria = componentesMap[comp.componente_id].categoria || 'otro';
-      } else if (comp.nombre && componentesMap[String(comp.nombre).toLowerCase()]) {
-        categoria = componentesMap[String(comp.nombre).toLowerCase()].categoria || 'otro';
-      }
-      const unidad = comp.unidad || 'g';
-      const cantidad = comp.cantidad_gramos || 0;
-      const texto = `${comp.nombre} (${cantidad}${unidad})`;
-      if (porCategoria[categoria]) {
-        porCategoria[categoria].push(texto);
-      } else {
-        porCategoria['otro'].push(texto);
-      }
-    }
-
+/**
+ * Acepta el contrato nuevo (tipo + peso_total_g) y el JSONB viejo
+ * (cantidad_gramos), para que el panel no se caiga con las 47 decisiones
+ * recogidas antes de la RPC.
+ */
+export function parseAlimentos(componentes: unknown): AlimentoEnPlato[] {
+  return comoArreglo(componentes).map(item => {
+    const tipo = String(item?.tipo || item?.categoria || '').toLowerCase();
+    const conocido = (TIPOS_ALIMENTO as readonly string[]).includes(tipo);
     return {
-      participante_id: p?.pk_participante ?? 0,
-      participante_edad: p?.edad ?? '',
-      participante_sexo: p?.sexo ?? '',
-      participante_peso_kg: p?.peso_kg ?? '',
-      participante_altura_cm: p?.altura_cm ?? '',
-      participante_imc: p?.imc ?? '',
-      participante_lugar_nacimiento: p?.lugar_nacimiento ?? '',
-      participante_lugar_residencia: p?.lugar_residencia ?? '',
-      participante_ocupacion: p?.ocupacion ?? '',
-      participante_nivel_socioeconomico: p?.nivel_socioeconomico ?? '',
-      participante_eat26_score: p?.eat26_score ?? '',
-      participante_fecha_registro: p?.fecha_registro ?? '',
-      sesion_id: s?.pk_sesion ?? 0,
-      sesion_fecha_inicio: s?.fecha_inicio ?? '',
-      sesion_fecha_fin: s?.fecha_fin ?? '',
-      sesion_duracion_segundos: s?.duracion_total_segundos ?? '',
-      tiempo_total_completacion_segundos: s?.duracion_total_segundos ?? '',
-      sesion_estado: s?.estado ?? '',
-      decision_id: d.pk_decision,
-      escenario: d.escenario,
-      personaje_tipo: d.personaje_tipo,
-      personaje_edad_rango: d.personaje_edad_rango ?? '',
-      personaje_sexo: d.personaje_sexo ?? '',
-      personaje_imc_representado: d.personaje_imc_representado ?? '',
-      orden_servicio: d.orden_servicio ?? '',
-      tiempo_decision_ms: d.tiempo_decision_ms ?? '',
-      cantidad_total_gramos: d.cantidad_total_gramos ?? '',
-      timestamp_decision: d.timestamp_decision ?? '',
-      proteinas: porCategoria['proteina'].join(', ') || '',
-      carbohidratos: porCategoria['carbohidrato'].join(', ') || '',
-      vegetales: porCategoria['vegetal'].join(', ') || '',
-      frutas: porCategoria['fruta'].join(', ') || '',
-      salsas: porCategoria['salsa'].join(', ') || '',
-      otros: porCategoria['otro'].join(', ') || ''
+      nombre: String(item?.nombre || item?.slug || 'sin nombre'),
+      tipo: conocido ? tipo : 'otro',
+      gramos: Number(item?.peso_total_g ?? item?.cantidad_gramos) || 0
     };
   });
 }
 
-const ENCABEZADOS: Record<keyof ExportRow, string> = {
+/** El JSONB puede llegar como arreglo o como texto según el driver. */
+export function comoArreglo(valor: unknown): any[] {
+  if (Array.isArray(valor)) {
+    return valor;
+  }
+  if (typeof valor === 'string') {
+    try {
+      const parseado = JSON.parse(valor);
+      return Array.isArray(parseado) ? parseado : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function comoTextoJson(valor: unknown): string {
+  if (valor === null || valor === undefined) {
+    return '';
+  }
+  return typeof valor === 'string' ? valor : JSON.stringify(valor);
+}
+
+function texto(valor: unknown): string {
+  return valor === null || valor === undefined ? '' : String(valor);
+}
+
+/**
+ * Describe cada alimento con sus porciones y su peso, no solo con el nombre: para el
+ * análisis, "Arroz (2 × 1 taza = 300 g)" y "Arroz (1 × 1 taza = 150 g)" son datos
+ * distintos, y el rótulo suelto los volvería indistinguibles.
+ */
+function describirAlimento(item: any): string {
+  const nombre = texto(item?.nombre) || texto(item?.slug) || 'sin nombre';
+  const porciones = Number(item?.porciones) || 0;
+  const unidad = texto(item?.unidad_display);
+  const gramos = Number(item?.peso_total_g) || 0;
+  const detalleUnidad = unidad ? ` × ${unidad}` : '';
+  return `${nombre} (${porciones}${detalleUnidad} = ${gramos} g)`;
+}
+
+export function buildExportRows(filas: FilaVista[]): ExportRow[] {
+  return (filas || []).map(fila => {
+    const alimentos = comoArreglo(fila.componentes_servidos);
+
+    const porTipo: Record<string, string[]> = { otro: [] };
+    for (const tipo of TIPOS_ALIMENTO) {
+      porTipo[tipo] = [];
+    }
+
+    for (const item of alimentos) {
+      const tipo = texto(item?.tipo).toLowerCase();
+      const destino = (TIPOS_ALIMENTO as readonly string[]).includes(tipo) ? (tipo as TipoAlimento) : 'otro';
+      porTipo[destino].push(describirAlimento(item));
+    }
+
+    return {
+      participante_id: fila.participante_id ?? '',
+      participante_edad: fila.participante_edad ?? '',
+      participante_genero: texto(fila.participante_genero),
+      participante_nivel_estudios: texto(fila.participante_nivel_estudios),
+      participante_semestre: texto(fila.participante_semestre),
+      participante_etnia: texto(fila.participante_etnia),
+      participante_region_origen: texto(fila.participante_region_origen),
+      participante_region_residencia: texto(fila.participante_region_residencia),
+      participante_peso_kg: fila.participante_peso_kg ?? '',
+      participante_altura_cm: fila.participante_altura_cm ?? '',
+      participante_imc: fila.participante_imc ?? '',
+      sesion_id: fila.sesion_id ?? '',
+      sesion_fecha_inicio: texto(fila.fecha_inicio),
+      sesion_fecha_fin: texto(fila.fecha_fin),
+      sesion_duracion_segundos: fila.duracion_total_segundos ?? '',
+      sesion_estado: texto(fila.sesion_estado),
+      sesion_dispositivo: texto(fila.dispositivo),
+      sesion_resolucion: texto(fila.resolucion_pantalla),
+      decision_id: fila.decision_id ?? '',
+      momento_dia: texto(fila.momento_dia),
+      personaje_id: fila.personaje_id ?? '',
+      personaje_nombre: texto(fila.personaje_nombre),
+      personaje_perfil_edad: texto(fila.personaje_perfil_edad),
+      personaje_edad_rango: texto(fila.personaje_edad_rango),
+      personaje_genero: texto(fila.personaje_genero),
+      tiempo_decision_segundos: fila.tiempo_decision_segundos ?? '',
+      total_plato_gramos: fila.total_plato_gramos ?? '',
+      total_bebida_ml: fila.total_bebida_ml ?? '',
+      bebida_slug: texto(fila.bebida_slug),
+      n_alimentos: alimentos.length,
+      proteinas: porTipo['proteina'].join(', '),
+      carbohidratos: porTipo['carbohidrato'].join(', '),
+      vegetales: porTipo['vegetal'].join(', '),
+      frutas: porTipo['fruta'].join(', '),
+      lacteos: porTipo['lacteo'].join(', '),
+      otros: porTipo['otro'].join(', '),
+      secuencia_clics_json: comoTextoJson(fila.secuencia_clics),
+      timestamp_decision: texto(fila.timestamp_decision)
+    };
+  });
+}
+
+export const ENCABEZADOS: Record<keyof ExportRow, string> = {
   participante_id: 'ID Participante',
   participante_edad: 'Edad Participante',
-  participante_sexo: 'Sexo Participante',
+  participante_genero: 'Género Participante',
+  participante_nivel_estudios: 'Nivel de Estudios',
+  participante_semestre: 'Semestre o Año',
+  participante_etnia: 'Etnia',
+  participante_region_origen: 'Región de Origen',
+  participante_region_residencia: 'Región de Residencia',
   participante_peso_kg: 'Peso (kg)',
   participante_altura_cm: 'Altura (cm)',
   participante_imc: 'IMC',
-  participante_lugar_nacimiento: 'Lugar de Nacimiento',
-  participante_lugar_residencia: 'Lugar de Residencia',
-  participante_ocupacion: 'Ocupación',
-  participante_nivel_socioeconomico: 'Nivel Socioeconómico',
-  participante_eat26_score: 'EAT-26 Score',
-  participante_fecha_registro: 'Fecha Registro Participante',
   sesion_id: 'ID Sesión',
   sesion_fecha_inicio: 'Fecha Inicio Sesión',
   sesion_fecha_fin: 'Fecha Fin Sesión',
   sesion_duracion_segundos: 'Duración Sesión (seg)',
-  tiempo_total_completacion_segundos: 'Tiempo Total Completación (seg)',
   sesion_estado: 'Estado Sesión',
+  sesion_dispositivo: 'Dispositivo',
+  sesion_resolucion: 'Resolución de Pantalla',
   decision_id: 'ID Decisión',
-  escenario: 'Escenario',
-  personaje_tipo: 'Tipo Personaje (Sujeto Servido)',
-  personaje_edad_rango: 'Rango Edad Personaje',
-  personaje_sexo: 'Sexo Personaje',
-  personaje_imc_representado: 'Figura IMC personaje (normopeso/sobrepeso/no_aplica)',
-  orden_servicio: 'Orden de Servicio',
-  tiempo_decision_ms: 'Tiempo Decisión (ms)',
-  cantidad_total_gramos: 'Cantidad Total (g)',
-  timestamp_decision: 'Timestamp Decisión',
+  momento_dia: 'Momento del Día',
+  personaje_id: 'ID Personaje',
+  personaje_nombre: 'Personaje Servido',
+  personaje_perfil_edad: 'Perfil de Edad del Personaje',
+  personaje_edad_rango: 'Rango de Edad del Personaje',
+  personaje_genero: 'Género del Personaje',
+  tiempo_decision_segundos: 'Tiempo de Decisión (seg)',
+  total_plato_gramos: 'Total del Plato (g)',
+  total_bebida_ml: 'Total de Bebida (ml)',
+  bebida_slug: 'Bebida Servida',
+  n_alimentos: 'Nº de Alimentos Servidos',
   proteinas: 'Proteínas',
   carbohidratos: 'Carbohidratos',
   vegetales: 'Vegetales',
   frutas: 'Frutas',
-  salsas: 'Salsas/Aderezos',
-  otros: 'Otros'
+  lacteos: 'Lácteos',
+  otros: 'Otros',
+  secuencia_clics_json: 'Secuencia de Clics (JSON)',
+  timestamp_decision: 'Timestamp Decisión'
 };
 
 export function generarCSV(datos: ExportRow[]): string {
-  if (!datos?.length) {
-    return '';
-  }
   const campos = Object.keys(ENCABEZADOS) as (keyof ExportRow)[];
+  // El BOM es lo que hace que Excel abra el archivo como UTF-8 y no rompa los acentos.
+  // Se escribe siempre, incluso con un estudio sin datos: un investigador que exporta
+  // con la BD en cero debe recibir un CSV valido con encabezados, no un archivo en blanco.
   let csv = '\uFEFF';
   csv += campos.map(c => `"${ENCABEZADOS[c]}"`).join(',') + '\n';
-  for (const fila of datos) {
+  for (const fila of datos ?? []) {
     const valores = campos.map(campo => {
-      let valor =
-        fila[campo] !== undefined && fila[campo] !== null ? String(fila[campo]) : '';
-      valor = valor.replace(/"/g, '""');
-      return `"${valor}"`;
+      const bruto = fila[campo];
+      const valor = bruto !== undefined && bruto !== null ? String(bruto) : '';
+      return `"${valor.replace(/"/g, '""')}"`;
     });
     csv += valores.join(',') + '\n';
   }

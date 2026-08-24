@@ -28,14 +28,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              {
-                "glob": "**/*",
-                "input": "src/assets/fonts/",
-                "output": "/assets/fonts/"
-              }
+              "src/assets"
             ],
             "styles": [
+              "node_modules/@fontsource/open-sans/400.css",
+              "node_modules/@fontsource/open-sans/600.css",
+              "node_modules/@fontsource/open-sans/700.css",
               "src/styles.scss"
             ],
             "scripts": [],
@@ -56,6 +54,7 @@
                 }
               ],
               "outputHashing": "all",
+              "baseHref": "./",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -84,10 +83,7 @@
               "buildTarget": "sirve-la-mesa:build:development"
             }
           },
-          "defaultConfiguration": "development",
-          "options": {
-            "proxyConfig": "src/proxy.conf.js"
-          }
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
