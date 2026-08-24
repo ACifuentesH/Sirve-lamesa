@@ -625,3 +625,26 @@ $fn$;
 
 COMMENT ON FUNCTION registrar_respuesta_experimento(JSONB) IS
   'Envio consolidado del experimento (ADR-0001). Valida el PayloadEnvio de docs/CONTRATO-DATOS.md, reconstruye el desglose del plato y sus gramos desde Catalogo_alimentos, y escribe participante, sesion y decision en una sola transaccion. Toda discrepancia con lo declarado por el cliente queda anotada en Decisiones_porcionamiento.notas.';
+
+---------------------------------------------------------------------------
+-- 3. Permisos
+--
+-- CREATE OR REPLACE FUNCTION conserva el ACL existente, así que sobre la base
+-- real —que ya tiene la 008 y la 015— esto no cambia nada. Se repite por la
+-- misma razón que lo repetía la 015: para que la migración valga por sí sola si
+-- alguien la aplica sobre una función recreada a mano. Sin esto, ese caso deja
+-- a `anon` sin EXECUTE y tumba en silencio todos los envíos del experimento.
+---------------------------------------------------------------------------
+REVOKE ALL ON FUNCTION registrar_respuesta_experimento(JSONB) FROM PUBLIC;
+
+DO $do$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    EXECUTE 'GRANT EXECUTE ON FUNCTION registrar_respuesta_experimento(JSONB) TO anon';
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    EXECUTE 'GRANT EXECUTE ON FUNCTION registrar_respuesta_experimento(JSONB) TO authenticated';
+  END IF;
+END
+$do$;
