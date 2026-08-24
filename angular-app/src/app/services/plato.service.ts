@@ -224,7 +224,7 @@ export class PlatoService {
       return;
     }
 
-    const cuadrante = elegirCuadrante(actuales);
+    const cuadrante = elegirCuadrante(actuales, alimento.slug);
     const nuevo: ItemPlato = {
       alimento_id: alimento.id,
       slug: alimento.slug,

@@ -12,9 +12,10 @@
           class="pestana"
           [class.pestana--activa]="grupo === pestanaActiva"
           [attr.aria-selected]="grupo === pestanaActiva"
+          [attr.title]="grupo"
           (click)="seleccionarPestana(grupo)"
         >
-          {{ grupo }}
+          {{ etiquetaPestana(grupo) }}
         </button>
       }
     </div>
@@ -25,6 +26,7 @@
           <button
             type="button"
             class="alimento"
+            [class.alimento--servido]="porcionesDe(alimento.id) > 0"
             [disabled]="enTope(alimento.id)"
             [attr.title]="enTope(alimento.id) ? 'Máximo 4 porciones de un mismo alimento' : alimento.nombre"
             (click)="onAgregar(alimento)"

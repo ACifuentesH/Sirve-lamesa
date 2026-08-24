@@ -1,16 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { InvestigadorService } from '../../services/investigador.service';
 
 // Vía A (issue #7): acceso al panel de análisis con sesión real de Supabase Auth.
-// Sustituye al stub de la Fase 0. No es una pantalla para el participante: se llega
-// solo por URL directa, y las cuentas las da de alta el equipo (migración 013).
+// El participante no la ve en el flujo; el equipo entra por el botón Admin del
+// registro o por URL directa. Las cuentas las da de alta el equipo (migración 013).
 @Component({
   selector: 'app-acceso-investigadores',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './acceso-investigadores.component.html',
   styleUrls: ['./acceso-investigadores.component.scss']
 })

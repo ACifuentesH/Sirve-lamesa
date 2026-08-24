@@ -1,233 +1,329 @@
-<div class="investigador-wrapper">
+<div class="panel">
 
-  <header class="investigador-header">
-    <button class="btn-back font-text" (click)="cerrarSesion()">← Salir</button>
-    <h1 class="font-title">Panel de análisis</h1>
-    <div class="header-meta font-text">
-      <span class="badge-count">{{ rawData.length }} registros totales</span>
+  <header class="cabecera">
+    <div class="cabecera__texto">
+      <p class="kicker">Investigación</p>
+      <h1>Panel de análisis</h1>
+      <p class="subtitulo">KPIs por perfil de edad y género del personaje, y el cruce de géneros — hipótesis central del estudio.</p>
+    </div>
+    <div class="cabecera__acciones">
+      <span class="contador">{{ rawData.length }} registros</span>
+      <button type="button" class="boton boton--secundario" (click)="loadData()" [disabled]="loading">
+        Actualizar
+      </button>
+      <button type="button" class="boton boton--secundario" (click)="cerrarSesion()">Salir</button>
     </div>
   </header>
 
-  <div class="loading-state" *ngIf="loading">
-    <div class="spinner"></div>
-    <p class="font-text">Cargando datos…</p>
+  <div class="estado" *ngIf="loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Cargando datos…</p>
   </div>
 
-  <div class="error-state font-text" *ngIf="error">
-    {{ error }}
-  </div>
+  <div class="estado estado--error" *ngIf="error">{{ error }}</div>
 
-  <div class="investigador-body" *ngIf="!loading && !error">
+  <div class="cuerpo" *ngIf="!loading && !error">
 
-    <div class="filters-bar">
-      <div class="filters-grid">
-
-        <div class="filter-item">
-          <label class="font-text">Género del participante</label>
-          <select class="font-text" [(ngModel)]="filters.participanteGenero" (change)="applyFilters()">
-            <option value="">Todos</option>
-            <option *ngFor="let g of generosParticipante" [value]="g">{{ generoPartLabel(g) }}</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label class="font-text">Edad del participante</label>
-          <select class="font-text" [(ngModel)]="filters.participanteEdad" (change)="applyFilters()">
-            <option value="">Todos</option>
-            <option *ngFor="let r of participanteEdadRangos" [value]="r">{{ r }} años</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label class="font-text">IMC del participante</label>
-          <select class="font-text" [(ngModel)]="filters.participanteIMC" (change)="applyFilters()">
-            <option value="">Todos</option>
-            <option value="bajo">Bajo peso (&lt;18.5)</option>
-            <option value="normal">Normal (18.5–24.9)</option>
-            <option value="sobrepeso">Sobrepeso (25–29.9)</option>
-            <option value="obesidad">Obesidad (≥30)</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label class="font-text">Momento del día</label>
-          <select class="font-text" [(ngModel)]="filters.momentoDia" (change)="applyFilters()">
-            <option value="">Todos</option>
-            <option *ngFor="let m of momentosPresentes" [value]="m">{{ momentoLabel(m) }}</option>
-          </select>
-        </div>
-
-        <div class="filter-actions">
-          <button class="btn-reset font-text" (click)="resetFilters()">
-            Limpiar
-            <span *ngIf="activeFiltersCount() > 0" class="badge-active">{{ activeFiltersCount() }}</span>
-          </button>
-          <span class="filter-count font-text">{{ filteredData.length }} decisiones</span>
-        </div>
-
+    <section class="filtros" aria-label="Filtros del estudio">
+      <div class="filtros__campo">
+        <label for="f-gen-part">Género del participante</label>
+        <select id="f-gen-part" [(ngModel)]="filters.participanteGenero" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option *ngFor="let g of generosParticipante" [value]="g">{{ generoPartLabel(g) }}</option>
+        </select>
       </div>
-    </div>
 
-    <div class="investigador-tabs">
-      <button *ngFor="let tab of tabs"
-              class="tab-btn font-text"
-              [class.active]="activeTab === tab.id"
-              (click)="setTab(tab.id)">
+      <div class="filtros__campo">
+        <label for="f-edad-part">Edad del participante</label>
+        <select id="f-edad-part" [(ngModel)]="filters.participanteEdad" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option *ngFor="let r of participanteEdadRangos" [value]="r">{{ r }} años</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-imc">IMC del participante</label>
+        <select id="f-imc" [(ngModel)]="filters.participanteIMC" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option value="bajo">Bajo peso (&lt;18.5)</option>
+          <option value="normal">Normal (18.5–24.9)</option>
+          <option value="sobrepeso">Sobrepeso (25–29.9)</option>
+          <option value="obesidad">Obesidad (≥30)</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-estudios">Nivel de estudios</label>
+        <select id="f-estudios" [(ngModel)]="filters.nivelEstudios" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option *ngFor="let n of nivelesPresentes" [value]="n">{{ nivelLabel(n) }}</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-etnia">Etnia</label>
+        <select id="f-etnia" [(ngModel)]="filters.etnia" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option *ngFor="let e of etniasPresentes" [value]="e">{{ etniaLabel(e) }}</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-region">Región de origen</label>
+        <select id="f-region" [(ngModel)]="filters.regionOrigen" (change)="applyFilters()">
+          <option value="">Todas</option>
+          <option *ngFor="let r of regionesPresentes" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-region-res">Región de residencia</label>
+        <select id="f-region-res" [(ngModel)]="filters.regionResidencia" (change)="applyFilters()">
+          <option value="">Todas</option>
+          <option *ngFor="let r of regionesResidenciaPresentes" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-perfil">Perfil de edad del personaje</label>
+        <select id="f-perfil" [(ngModel)]="filters.personajePerfil" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option *ngFor="let p of perfilesPresentes" [value]="p">{{ p }}</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-gen-pers">Género del personaje</label>
+        <select id="f-gen-pers" [(ngModel)]="filters.personajeGenero" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label for="f-momento">Momento del día</label>
+        <select id="f-momento" [(ngModel)]="filters.momentoDia" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option *ngFor="let m of momentosPresentes" [value]="m">{{ momentoLabel(m) }}</option>
+        </select>
+      </div>
+
+      <div class="filtros__acciones">
+        <button type="button" class="boton boton--secundario" (click)="resetFilters()">
+          Limpiar
+          <span *ngIf="activeFiltersCount() > 0" class="chip">{{ activeFiltersCount() }}</span>
+        </button>
+        <span class="filtros__conteo">{{ filteredData.length }} decisiones</span>
+      </div>
+    </section>
+
+    <nav class="pestanas" role="tablist">
+      <button
+        *ngFor="let tab of tabs"
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.pestana--activa]="activeTab === tab.id"
+        [attr.aria-selected]="activeTab === tab.id"
+        (click)="setTab(tab.id)"
+      >
         {{ tab.label }}
       </button>
-    </div>
+    </nav>
 
-    <div class="tab-panel" [hidden]="activeTab !== 'graficos'">
+    <div class="seccion" [hidden]="activeTab !== 'graficos'" role="tabpanel">
 
-      <div class="cards-row">
-        <div class="stat-card">
-          <div class="stat-value font-title">{{ stats.decisiones }}</div>
-          <div class="stat-label font-text">Decisiones</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value font-title">{{ stats.participantes }}</div>
-          <div class="stat-label font-text">Participantes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value font-title">{{ stats.sesiones }}</div>
-          <div class="stat-label font-text">Sesiones</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value font-title">{{ round(stats.promedioGramos) }} g</div>
-          <div class="stat-label font-text">Promedio por plato</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value font-title">{{ formatSeconds(stats.promedioTiempoDecisionSeg) }}</div>
-          <div class="stat-label font-text">Tiempo de decisión</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value font-title">{{ formatSeconds(stats.promedioDuracionSesionSeg) }}</div>
-          <div class="stat-label font-text">Duración de sesión</div>
-        </div>
+      <div class="kpis">
+        <article class="kpi">
+          <div class="kpi__valor">{{ stats.decisiones }}</div>
+          <div class="kpi__etiqueta">Decisiones</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi__valor">{{ stats.participantes }}</div>
+          <div class="kpi__etiqueta">Participantes</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi__valor">{{ stats.sesiones }}</div>
+          <div class="kpi__etiqueta">Sesiones</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi__valor">{{ round(stats.promedioGramos) }} g</div>
+          <div class="kpi__etiqueta">Promedio por plato</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi__valor">{{ formatSeconds(stats.promedioTiempoDecisionSeg) }}</div>
+          <div class="kpi__etiqueta">Tiempo de decisión</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi__valor">{{ formatSeconds(stats.promedioDuracionSesionSeg) }}</div>
+          <div class="kpi__etiqueta">Duración de sesión</div>
+        </article>
+        <article class="kpi">
+          <div class="kpi__valor">{{ round(stats.promedioBebidaMl) }} ml</div>
+          <div class="kpi__etiqueta">Bebida promedio</div>
+        </article>
       </div>
 
-      <div class="charts-grid cols-1">
-        <div class="chart-card chart-card--principal">
-          <h3 class="chart-title font-title">Hipótesis central — gramos servidos según género del participante × género del personaje</h3>
-          <div class="chart-box chart-box--xl"><canvas #cruceGeneroChart></canvas></div>
-        </div>
+      <h3 class="bloque">Hipótesis central</h3>
+      <div class="rejilla rejilla--1">
+        <article class="grafico grafico--principal">
+          <h2>Gramos servidos según género del participante × género del personaje</h2>
+          <div class="lienzo lienzo--xl"><canvas #cruceGeneroChart></canvas></div>
+        </article>
       </div>
 
-      <div class="charts-grid cols-3">
-        <div class="chart-card">
-          <h3 class="chart-title font-title">Promedio (g) por perfil de edad del personaje</h3>
-          <div class="chart-box"><canvas #perfilEdadChart></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3 class="chart-title font-title">Promedio (g) por género del personaje</h3>
-          <div class="chart-box"><canvas #generoPersChart></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3 class="chart-title font-title">Promedio (g) por momento del día</h3>
-          <div class="chart-box"><canvas #momentoChart></canvas></div>
-        </div>
+      <h3 class="bloque">Cantidad total servida por género y edad del personaje</h3>
+      <div class="rejilla rejilla--1">
+        <article class="grafico">
+          <h2>Promedio (g) por rango de edad × género del personaje</h2>
+          <div class="lienzo lienzo--xl"><canvas #perfilYGeneroChart></canvas></div>
+        </article>
+      </div>
+      <div class="rejilla rejilla--3">
+        <article class="grafico">
+          <h2>Promedio (g) por perfil de edad</h2>
+          <div class="lienzo"><canvas #perfilEdadChart></canvas></div>
+        </article>
+        <article class="grafico">
+          <h2>Promedio (g) por género del personaje</h2>
+          <div class="lienzo"><canvas #generoPersChart></canvas></div>
+        </article>
+        <article class="grafico">
+          <h2>Promedio (g) por momento del día</h2>
+          <div class="lienzo"><canvas #momentoChart></canvas></div>
+        </article>
+      </div>
+      <div class="rejilla rejilla--1">
+        <article class="grafico">
+          <h2>Cantidad servida a cada personaje</h2>
+          <div class="lienzo lienzo--alto"><canvas #rankingChart></canvas></div>
+        </article>
       </div>
 
-      <div class="charts-grid cols-3">
-        <div class="chart-card chart-card--span2">
-          <h3 class="chart-title font-title">Promedio (g) por categoría según género del personaje</h3>
-          <div class="chart-box"><canvas #catSexoPerChart></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3 class="chart-title font-title">Distribución por categoría (g)</h3>
-          <div class="chart-box"><canvas #catChart></canvas></div>
-        </div>
+      <h3 class="bloque">Tipos de alimento por género y edad del personaje</h3>
+      <p class="nota">¿Se da más proteína a los hombres? ¿Más verdura a las mujeres? ¿Cambia con la edad?</p>
+      <div class="rejilla rejilla--2">
+        <article class="grafico">
+          <h2>Gramos por tipo según género del personaje</h2>
+          <div class="lienzo lienzo--alto"><canvas #catSexoPerChart></canvas></div>
+        </article>
+        <article class="grafico">
+          <h2>Gramos por tipo según perfil de edad del personaje</h2>
+          <div class="lienzo lienzo--alto"><canvas #catPerfilChart></canvas></div>
+        </article>
+      </div>
+      <div class="rejilla rejilla--2">
+        <article class="grafico">
+          <h2>Distribución total por tipo (g)</h2>
+          <div class="lienzo"><canvas #catChart></canvas></div>
+        </article>
+        <article class="grafico">
+          <h2>Género de los participantes</h2>
+          <div class="lienzo"><canvas #partGeneroChart></canvas></div>
+        </article>
       </div>
 
-      <div class="charts-grid cols-3">
-        <div class="chart-card tall chart-card--span2">
-          <h3 class="chart-title font-title">Top 10 alimentos — frecuencia</h3>
-          <div class="chart-box chart-box--tall"><canvas #topCountChart></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3 class="chart-title font-title">Género del participante</h3>
-          <div class="chart-box"><canvas #partGeneroChart></canvas></div>
-        </div>
+      <h3 class="bloque">Tiempo de decisión y orden de servicio</h3>
+      <p class="nota">Cada sesión sirve a un solo personaje; el orden “quién primero” del protocolo original ya no aplica. Aquí se usa la secuencia de clics: qué tipo de alimento se pone primero, según el género del personaje.</p>
+      <div class="rejilla rejilla--3">
+        <article class="grafico">
+          <h2>Tiempo de decisión (s) por perfil de edad</h2>
+          <div class="lienzo"><canvas #tiempoPerfilChart></canvas></div>
+        </article>
+        <article class="grafico">
+          <h2>Tiempo de decisión (s) por género del personaje</h2>
+          <div class="lienzo"><canvas #tiempoGeneroChart></canvas></div>
+        </article>
+        <article class="grafico">
+          <h2>Primer alimento servido (secuencia de clics)</h2>
+          <div class="lienzo"><canvas #ordenServicioChart></canvas></div>
+        </article>
+      </div>
+      <div class="rejilla rejilla--1">
+        <article class="grafico">
+          <h2>Promedio (g) por IMC del participante</h2>
+          <div class="lienzo"><canvas #imcPartChart></canvas></div>
+        </article>
       </div>
 
-      <div class="charts-grid cols-2">
-        <div class="chart-card tall">
-          <h3 class="chart-title font-title">Ranking de personajes — promedio (g)</h3>
-          <div class="chart-box chart-box--tall"><canvas #rankingChart></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3 class="chart-title font-title">Promedio (g) por IMC del participante</h3>
-          <div class="chart-box"><canvas #imcPartChart></canvas></div>
-        </div>
-      </div>
-
-      <div class="empty-hint font-text" *ngIf="stats.decisiones === 0">
+      <p class="vacio" *ngIf="stats.decisiones === 0">
         No hay decisiones que coincidan con los filtros. Con la base vacía el panel carga igual: los gráficos quedan en cero.
-      </div>
+      </p>
     </div>
 
-    <div class="tab-panel" [hidden]="activeTab !== 'datos'">
+    <div class="seccion" [hidden]="activeTab !== 'datos'" role="tabpanel">
 
-      <div class="export-row font-text">
-        <span class="export-row__label">Exportar:</span>
-        <button class="btn-dl btn-dl--excel font-text" (click)="downloadExcel()">Excel</button>
-        <button class="btn-dl btn-dl--csv font-text" (click)="downloadCSV()">CSV</button>
-        <button class="btn-dl btn-dl--json font-text" (click)="downloadJSON()">JSON</button>
+      <div class="exportar">
+        <span>Exportar:</span>
+        <button type="button" class="boton boton--excel" (click)="downloadExcel()">Excel</button>
+        <button type="button" class="boton boton--primario" (click)="downloadCSV()">CSV</button>
+        <button type="button" class="boton boton--secundario" (click)="downloadJSON()">JSON</button>
       </div>
 
-      <div class="table-toolbar font-text">
-        <span class="toolbar-count">{{ filteredData.length }} registros</span>
-        <div class="pagination-controls">
-          <button class="btn-page font-text" (click)="prevPage()" [disabled]="tablePage === 0">Anterior</button>
+      <div class="tabla-barra">
+        <span>{{ filteredData.length }} registros</span>
+        <div class="paginacion">
+          <button type="button" class="boton boton--secundario" (click)="prevPage()" [disabled]="tablePage === 0">Anterior</button>
           <span>{{ tablePage + 1 }} / {{ totalPages }}</span>
-          <button class="btn-page font-text" (click)="nextPage()" [disabled]="tablePage >= totalPages - 1">Siguiente</button>
+          <button type="button" class="boton boton--secundario" (click)="nextPage()" [disabled]="tablePage >= totalPages - 1">Siguiente</button>
         </div>
       </div>
 
-      <div class="table-wrapper">
-        <table class="data-table">
+      <div class="tabla-caja">
+        <table class="tabla">
           <thead>
-            <tr class="font-text">
+            <tr>
               <th>ID</th>
               <th>Fecha</th>
               <th>Momento</th>
               <th>Personaje</th>
               <th>Perfil</th>
               <th>Género P.</th>
-              <th>Participante</th>
-              <th>Género Part.</th>
-              <th>IMC Part.</th>
-              <th>Total (g)</th>
+              <th>Part.</th>
+              <th>Género</th>
+              <th>Estudios</th>
+              <th>Etnia</th>
+              <th>Origen</th>
+              <th>Residencia</th>
+              <th>IMC</th>
+              <th>Tiempo (s)</th>
+              <th>Plato (g)</th>
               <th>Bebida (ml)</th>
               <th>Alimentos</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of tableData" class="font-text">
+            <tr *ngFor="let row of tableData">
               <td>{{ row.decision_id }}</td>
               <td>{{ formatFecha(row.timestamp_decision) }}</td>
-              <td><span class="badge-escenario" [attr.data-esc]="row.momento_dia">{{ momentoLabel(row.momento_dia) }}</span></td>
+              <td><span class="sello" [attr.data-esc]="row.momento_dia">{{ momentoLabel(row.momento_dia) }}</span></td>
               <td>{{ row.personaje_nombre || '—' }}</td>
               <td>{{ row.personaje_perfil_edad || row.personaje_edad_rango || '—' }}</td>
               <td>{{ generoPersLabel(row.personaje_genero) }}</td>
               <td>#{{ row.participante_id }}</td>
               <td>{{ generoPartLabel(row.participante_genero) }}</td>
+              <td>{{ nivelLabel(row.participante_nivel_estudios) }}</td>
+              <td>{{ etniaLabel(row.participante_etnia) }}</td>
+              <td>{{ row.participante_region_origen || '—' }}</td>
+              <td>{{ row.participante_region_residencia || '—' }}</td>
               <td>{{ row.participante_imc ? (+row.participante_imc).toFixed(1) : '—' }}</td>
-              <td class="col-gramos">{{ row.total_plato_gramos ? (+row.total_plato_gramos).toFixed(0) + ' g' : '—' }}</td>
+              <td>{{ formatSeconds(+(row.tiempo_decision_segundos || 0)) }}</td>
+              <td class="tabla__enfasis">{{ row.total_plato_gramos ? (+row.total_plato_gramos).toFixed(0) + ' g' : '—' }}</td>
               <td>{{ row.total_bebida_ml ? (+row.total_bebida_ml).toFixed(0) + ' ml' : '0' }}</td>
-              <td class="col-alimentos">{{ formatComps(row.componentes_servidos) }}</td>
+              <td class="tabla__alimentos">{{ formatComps(row.componentes_servidos) }}</td>
             </tr>
             <tr *ngIf="tableData.length === 0">
-              <td colspan="12" class="font-text empty-row">Sin datos para mostrar</td>
+              <td colspan="17" class="tabla__vacio">Sin datos para mostrar</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div class="pagination-controls bottom font-text">
-        <button class="btn-page font-text" (click)="prevPage()" [disabled]="tablePage === 0">Anterior</button>
+      <div class="paginacion paginacion--abajo">
+        <button type="button" class="boton boton--secundario" (click)="prevPage()" [disabled]="tablePage === 0">Anterior</button>
         <span>Página {{ tablePage + 1 }} de {{ totalPages }}</span>
-        <button class="btn-page font-text" (click)="nextPage()" [disabled]="tablePage >= totalPages - 1">Siguiente</button>
+        <button type="button" class="boton boton--secundario" (click)="nextPage()" [disabled]="tablePage >= totalPages - 1">Siguiente</button>
       </div>
     </div>
 
