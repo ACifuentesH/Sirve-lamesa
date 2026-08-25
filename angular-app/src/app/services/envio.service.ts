@@ -49,6 +49,17 @@ const CLAVE_RESPALDO = 'sirve.envio.pendiente';
  */
 type SobreRpc = PayloadEnvio & { envio_id: string };
 
+/**
+ * Lo que la RPC devuelve de verdad. `duplicado` es la respuesta del servidor a la
+ * clave de idempotencia: `true` cuando reconoció el `envio_id` y devolvió los ids
+ * de la escritura original en vez de insertar otra vez (migración 015).
+ *
+ * Vive aquí y no en `RespuestaEnvio` por la misma razón que `envio_id` no vive en
+ * `PayloadEnvio`: es metadato de transporte y el contrato de la Fase 0 (issue #2)
+ * está congelado. Opcional porque una RPC anterior a la 015 no lo mandaba.
+ */
+type RespuestaRpc = RespuestaEnvio & { duplicado?: boolean };
+
 /** Forma del respaldo en localStorage: el payload y la clave que lo identifica. */
 interface RespaldoEnvio {
   envio_id: string;
@@ -93,10 +104,19 @@ function nuevoEnvioId(): string {
 // Por eso cada respuesta lleva un `envio_id` estable que sobrevive al backoff, al
 // botón de reintento y a una recarga.
 //
-// La otra mitad es del servidor y NO está hecha: la RPC desplegada (migración 008)
-// inserta sin condiciones y no lee `envio_id`, así que hoy un reenvío tras un
-// timeout duplica participante + sesión + decisión. Cerrarlo exige tocar la RPC,
-// que es territorio del issue #6; el detalle está en el PR de este issue.
+// La otra mitad es del servidor y YA ESTÁ HECHA: la migración 015 (aplicada en
+// producción) añadió `Sesiones_juego.envio_id` con un índice UNIQUE, y la RPC
+// corta el circuito cuando ese UUID ya existe: devuelve los ids de la escritura
+// original con `duplicado: true` en lugar de insertar de nuevo. La carrera de dos
+// peticiones simultáneas con el mismo `envio_id` la absorbe el propio índice,
+// dentro de la RPC. Un reenvío tras un timeout ya NO duplica participante, sesión
+// ni decisión.
+//
+// Por eso este cliente NO lleva —ni debe llevar— una protección propia contra
+// duplicados: la deduplicación es del servidor, que es el único sitio donde puede
+// ser correcta. Reconstruirla aquí solo añadiría caminos por los que perder una
+// respuesta. Lo que sí hace el cliente es leer `duplicado` (ver `RespuestaRpc`)
+// para no confundir un reenvío absorbido con un fallo.
 @Injectable({ providedIn: 'root' })
 export class EnvioService {
   private readonly supabase = inject(SupabaseService);
@@ -119,6 +139,9 @@ export class EnvioService {
   /** Clave de idempotencia del envío pendiente. Vive tanto como el payload. */
   private envioId: string | null = null;
 
+  /** Ver `respuestaYaEstabaGuardada`. */
+  private duplicado = false;
+
   get isSubmitting(): boolean {
     return this.isSubmittingSubject.value;
   }
@@ -129,6 +152,25 @@ export class EnvioService {
 
   get errorEnvio(): FalloEnvio | null {
     return this.errorEnvioSubject.value;
+  }
+
+  /**
+   * `true` si la confirmación que cerró el último envío fue un reenvío absorbido:
+   * el servidor reconoció el `envio_id`, no insertó nada y devolvió los ids de la
+   * escritura original.
+   *
+   * Deliberadamente NO cambia nada de lo que ve el participante. Para él las dos
+   * confirmaciones significan lo mismo —su respuesta está guardada— y anunciarle
+   * "ya estaba guardada" solo le haría dudar de si envió dos veces, justo en el
+   * punto del flujo donde no puede comprobarlo. El estudio tampoco necesita la
+   * distinción: la fila registrada es la misma, con los mismos tiempos y la misma
+   * secuencia de clics del intento original, que es el dato válido.
+   *
+   * Se expone porque distinguir un alta real de un reenvío absorbido es lo que
+   * permite medir cuántos timeouts hubo en campo sin abrir la base.
+   */
+  get respuestaYaEstabaGuardada(): boolean {
+    return this.duplicado;
   }
 
   /**
@@ -182,6 +224,7 @@ export class EnvioService {
   limpiar(): void {
     this.pendiente = null;
     this.envioId = null;
+    this.duplicado = false;
     this.borrarRespaldo();
     this.isSubmittingSubject.next(false);
     this.isSuccessSubject.next(false);
@@ -193,7 +236,7 @@ export class EnvioService {
    * observable: si nadie se suscribe, `isSubmitting` no puede quedarse en true y
    * dejar la pantalla bloqueada para siempre.
    */
-  private despachar(payload: PayloadEnvio, envioId: string): Observable<RespuestaEnvio> {
+  private despachar(payload: PayloadEnvio, envioId: string): Observable<RespuestaRpc> {
     return defer(() => {
       this.pendiente = payload;
       this.envioId = envioId;
@@ -201,6 +244,7 @@ export class EnvioService {
       // mitad de la petición, el payload sigue en disco para ofrecer el reenvío.
       this.guardarRespaldo(payload, envioId);
 
+      this.duplicado = false;
       this.isSubmittingSubject.next(true);
       this.isSuccessSubject.next(false);
       this.errorEnvioSubject.next(null);
@@ -218,7 +262,16 @@ export class EnvioService {
         }
       }),
       tap({
-        next: () => {
+        next: (respuesta: RespuestaRpc) => {
+          // `duplicado: true` NO es un fallo ni una advertencia: es el servidor
+          // diciendo "esta respuesta ya está guardada, aquí tienes sus ids". Se
+          // trata exactamente igual que una inserción nueva —éxito, respaldo
+          // borrado, ningún mensaje de error— porque el estado final del estudio
+          // es el mismo y el respaldo ya no protege nada: lo que protegía está
+          // escrito. Tratarlo como error sería lo peligroso: dejaría el respaldo
+          // vivo e invitaría a un reenvío eterno de algo que ya se guardó.
+          this.duplicado = respuesta.duplicado === true;
+
           // El respaldo se borra solo con la confirmación del servidor en la mano.
           this.pendiente = null;
           this.envioId = null;
@@ -237,13 +290,14 @@ export class EnvioService {
    * petición abandonada seguiría viva y podría confirmarse en el servidor después
    * de que el reintento ya hubiera insertado la respuesta.
    */
-  private intento(payload: PayloadEnvio, envioId: string): Observable<RespuestaEnvio> {
-    // El `envio_id` viaja dentro del jsonb. La RPC desplegada solo lee las claves
-    // que conoce e ignora el resto, así que añadirlo no rompe nada hoy y deja el
-    // lado cliente listo para el día en que #6 lo use para deduplicar.
+  private intento(payload: PayloadEnvio, envioId: string): Observable<RespuestaRpc> {
+    // El `envio_id` viaja dentro del jsonb porque es metadato de transporte y
+    // `PayloadEnvio` está congelado. La RPC lo valida como UUID antes de nada; si
+    // no lo es, guarda NULL y sigue adelante. Un identificador mal formado degrada
+    // la protección contra duplicados, nunca cuesta una participación.
     const sobre: SobreRpc = { ...payload, envio_id: envioId };
 
-    return new Observable<RespuestaEnvio>(subscriber => {
+    return new Observable<RespuestaRpc>(subscriber => {
       const controlador = new AbortController();
 
       this.client
@@ -255,7 +309,7 @@ export class EnvioService {
               subscriber.error(this.clasificar(error));
               return;
             }
-            subscriber.next(data as RespuestaEnvio);
+            subscriber.next(data as RespuestaRpc);
             subscriber.complete();
           },
           (err: unknown) => subscriber.error(this.clasificarExcepcion(err))
@@ -326,9 +380,21 @@ export class EnvioService {
       }
 
       // Respaldo escrito antes de que existiera la clave de idempotencia: era el
-      // payload pelado. Se le acuña una ahora para no perder la respuesta; ese
-      // reenvío concreto no queda protegido contra duplicados, pero el caso solo
-      // se da si el despliegue pilla a un participante con un envío a medias.
+      // payload pelado. Se le acuña una ahora para no perder la respuesta.
+      //
+      // Revisado con la 015 ya aplicada: este reenvío concreto sigue sin
+      // protección contra duplicados y no la puede tener. Si el intento original
+      // llegó a escribir, lo hizo sin `envio_id` —columna NULL, que el índice
+      // UNIQUE no compara—, y ninguna clave acuñada después puede emparejarse
+      // retroactivamente con esa fila. No es un descuido del cliente: es la única
+      // grieta que la 015 no cierra, y cerrarla exigiría reconocer el reenvío por
+      // el contenido del payload, no por su clave.
+      //
+      // Se asume porque la ventana es de una sola recarga y de un solo despliegue:
+      // el primer despacho reescribe el respaldo ya en formato nuevo, así que
+      // desde ahí todos los reenvíos comparten clave. Perder la respuesta de un
+      // participante es peor que arriesgar una fila duplicada que el equipo puede
+      // detectar en la base.
       if (guardado?.participante && guardado?.resultado_plato) {
         return {
           envio_id: nuevoEnvioId(),
