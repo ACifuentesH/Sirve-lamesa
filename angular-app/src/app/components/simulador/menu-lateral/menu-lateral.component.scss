@@ -1,8 +1,10 @@
 :host {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   min-height: 0;
   height: 100%;
+  container-type: inline-size;
 }
 
 .menu {
@@ -37,7 +39,7 @@
   min-width: 0;
   padding: 0.8rem 0.35rem 0.65rem;
   font-family: var(--sm-font-sans);
-  font-size: 0.78rem;
+  font-size: clamp(0.65rem, 3cqi, 0.78rem);
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
@@ -95,12 +97,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .alimento {
   flex: 1;
+  min-width: 0;
   display: grid;
-  grid-template-columns: 64px 1fr;
+  grid-template-columns: clamp(2.5rem, 18cqi, 4rem) minmax(0, 1fr);
   grid-template-rows: auto auto;
   column-gap: 0.85rem;
   row-gap: 0.1rem;
@@ -129,8 +133,8 @@
 
 .foto {
   grid-row: 1 / span 2;
-  width: 64px;
-  height: 64px;
+  width: clamp(2.5rem, 18cqi, 4rem);
+  height: clamp(2.5rem, 18cqi, 4rem);
   border-radius: 0;
   background: transparent;
   display: grid;
@@ -146,9 +150,10 @@
 }
 
 .nombre {
-  font-size: 0.88rem;
+  font-size: clamp(0.75rem, 3.4cqi, 0.88rem);
   font-weight: 600;
   color: var(--sm-color-text);
+  overflow-wrap: anywhere;
 }
 
 .unidad {
@@ -193,13 +198,13 @@
   font-family: var(--sm-font-sans);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
   :host {
     height: auto;
-    min-height: 420px;
+    min-height: min(52dvh, 28rem);
   }
 
   .menu {
-    height: min(70vh, 560px);
+    height: min(52dvh, 28rem);
   }
 }

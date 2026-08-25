@@ -48,16 +48,23 @@ import { AlimentoCatalogo } from '../../../models/contrato';
   `,
   styles: [
     `
+      :host {
+        display: block;
+        min-width: 0;
+      }
+
       .contenedor {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 0.65rem;
+        max-width: 100%;
       }
 
       .vaso {
-        width: var(--vaso-ancho, clamp(160px, 18vw, 210px));
-        height: var(--vaso-alto, clamp(220px, 34vh, 300px));
+        width: var(--vaso-ancho, clamp(100px, 18vw, 210px));
+        height: var(--vaso-alto, clamp(140px, 34vh, 300px));
+        max-width: 100%;
         display: grid;
         place-items: center;
         border: 1px dashed color-mix(in srgb, var(--sm-color-border) 80%, transparent);
@@ -99,7 +106,7 @@ import { AlimentoCatalogo } from '../../../models/contrato';
       .etiqueta {
         text-align: center;
         font-family: var(--sm-font-sans);
-        max-width: 180px;
+        max-width: min(180px, 100%);
       }
 
       .nombre {
