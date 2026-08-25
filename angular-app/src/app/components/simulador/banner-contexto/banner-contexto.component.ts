@@ -45,6 +45,14 @@ import { TextoContexto, construirTextoContexto } from '../../../utils/texto-cont
         line-height: 1.45;
       }
 
+      @media (max-width: 900px) {
+        .banner {
+          padding: 0.45rem 0.85rem;
+          font-size: 0.8rem;
+          line-height: 1.35;
+        }
+      }
+
       .encabezado {
         font-weight: 700;
         margin-right: 0.25rem;

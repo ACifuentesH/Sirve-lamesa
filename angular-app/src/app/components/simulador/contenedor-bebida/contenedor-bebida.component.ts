@@ -51,6 +51,7 @@ import { AlimentoCatalogo } from '../../../models/contrato';
       :host {
         display: block;
         min-width: 0;
+        max-width: 100%;
       }
 
       .contenedor {
@@ -58,17 +59,19 @@ import { AlimentoCatalogo } from '../../../models/contrato';
         flex-direction: column;
         align-items: center;
         gap: 0.65rem;
+        width: 100%;
         max-width: 100%;
       }
 
       .vaso {
         width: var(--vaso-ancho, clamp(100px, 18vw, 210px));
-        height: var(--vaso-alto, clamp(140px, 34vh, 300px));
+        aspect-ratio: 1 / 1;
+        height: auto;
         max-width: 100%;
         display: grid;
         place-items: center;
         border: 1px dashed color-mix(in srgb, var(--sm-color-border) 80%, transparent);
-        border-radius: 999px 999px 28px 28px;
+        border-radius: 50%;
         background: color-mix(in srgb, var(--sm-color-bg-alt) 70%, transparent);
         transition: border-color 180ms ease, background 180ms ease;
       }
@@ -106,7 +109,8 @@ import { AlimentoCatalogo } from '../../../models/contrato';
       .etiqueta {
         text-align: center;
         font-family: var(--sm-font-sans);
-        max-width: min(180px, 100%);
+        max-width: 100%;
+        overflow-wrap: anywhere;
       }
 
       .nombre {

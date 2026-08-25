@@ -97,8 +97,12 @@ const TAMANOS_POR_TIPO: Record<string, number> = {
 
 const TAMANO_POR_DEFECTO = 34;
 
+/** Todas las raciones crecen igual: las proporciones entre alimentos no cambian. */
+const ESCALA_VISUAL = 1.22;
+
 export function tamanoVisualPct(slug: string, tipo = ''): number {
-  return TAMANOS_POR_SLUG[slug] ?? TAMANOS_POR_TIPO[tipo] ?? TAMANO_POR_DEFECTO;
+  const base = TAMANOS_POR_SLUG[slug] ?? TAMANOS_POR_TIPO[tipo] ?? TAMANO_POR_DEFECTO;
+  return base * ESCALA_VISUAL;
 }
 
 /** Cuántos alimentos distintos hay ya en cada cuadrante. */
@@ -138,12 +142,12 @@ export function slotEnCuadrante(items: ItemPlato[], cuadrante: Cuadrante): numbe
 }
 
 /**
- * Recorta un punto para que el elemento entero quepa en el círculo. Con 8 alimentos y
- * 4 porciones cada uno, el caso extremo de B7, los offsets acumulados se saldrían del
- * plato sin esto.
+ * Recorta un punto para que el alimento siga anclado al plato. El recorte deja
+ * asomar las esquinas (pan, huevo) por encima del borde, en vez de meter la
+ * imagen entera dentro del círculo.
  */
 function recortarAlPlato(x: number, y: number, tamano: number): { x: number; y: number } {
-  const radioMaximo = 50 - tamano / 2;
+  const radioMaximo = 50 - tamano * 0.32;
   const dx = x - 50;
   const dy = y - 50;
   const distancia = Math.hypot(dx, dy);

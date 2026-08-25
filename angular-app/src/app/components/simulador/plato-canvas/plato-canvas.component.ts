@@ -32,7 +32,8 @@ interface PorcionVista {
   imports: [CommonModule],
   template: `
     <div class="escena" aria-label="Plato de servicio">
-      <div class="plato">
+      <div class="plato" aria-hidden="true"></div>
+      <div class="alimentos">
         @for (porcion of porciones; track porcion.key) {
           <img
             class="porcion"
@@ -55,23 +56,31 @@ interface PorcionVista {
       :host {
         display: block;
         min-width: 0;
+        overflow: visible;
       }
 
       .escena {
-        display: grid;
-        place-items: center;
-      }
-
-      .plato {
         position: relative;
         width: var(--plato-lado, min(380px, 38vw, 56vh));
         max-width: 100%;
         aspect-ratio: 1 / 1;
+        overflow: visible;
+      }
+
+      .plato {
+        position: absolute;
+        inset: 0;
         border-radius: 50%;
         background:
           radial-gradient(circle at 50% 50%, #ffffff 58%, #f3f4f6 59%, #e5e7eb 72%, #d1d5db 73%, #f9fafb 74%);
         box-shadow: inset 0 0 0 10px #f3f4f6, 0 8px 24px rgba(0, 0, 0, 0.12);
-        overflow: hidden;
+      }
+
+      .alimentos {
+        position: absolute;
+        inset: 0;
+        overflow: visible;
+        z-index: 1;
       }
 
       .porcion {
@@ -82,7 +91,7 @@ interface PorcionVista {
         transform: translate(-50%, -50%) rotate(var(--giro));
         pointer-events: none;
         animation: aparecer 220ms cubic-bezier(0.22, 1, 0.36, 1);
-        filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.1));
+        filter: drop-shadow(0 3px 8px rgba(15, 23, 42, 0.18));
       }
 
       .porcion--recipiente {

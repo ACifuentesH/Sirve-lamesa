@@ -53,7 +53,7 @@ import { Personaje } from '../../../models/contrato';
 
       .avatar {
         margin: 0;
-        width: min(100%, 180px);
+        width: min(100%, 20rem);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -99,6 +99,57 @@ import { Personaje } from '../../../models/contrato';
         display: block;
         font-size: clamp(0.7rem, 1.1vw, 0.875rem);
         color: var(--sm-color-text-muted);
+      }
+
+      @media (max-width: 900px) {
+        :host {
+          display: flex;
+          width: 100%;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .avatar {
+          width: min(40vw, 8.75rem);
+          margin-inline: auto;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.3rem;
+        }
+
+        figcaption {
+          order: -1;
+          text-align: center;
+        }
+
+        .nombre {
+          font-size: 1rem;
+        }
+
+        .perfil {
+          font-size: 0.8rem;
+        }
+
+        img,
+        .marcador {
+          width: 100%;
+          max-width: none;
+          border-radius: 16px;
+        }
+
+        .marcador {
+          font-size: 2.5rem;
+        }
+      }
+
+      @media (max-width: 900px) and (max-height: 560px) {
+        .avatar {
+          width: min(28vw, 6.5rem);
+        }
+
+        .nombre {
+          font-size: 0.85rem;
+        }
       }
     `
   ]
