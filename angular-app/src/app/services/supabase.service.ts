@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
+// Regla de "¿esto sigue siendo el placeholder de .env.example?" compartida con el
+// script de build (scripts/inject-supabase-env.mjs, vía scripts/supabase-credentials.mjs).
+// Es JS puro sin dependencias de Node ni del navegador: se puede importar tal cual
+// desde TypeScript sin arrastrar nada del script de build al bundle. Ver issue #45.
+// @ts-expect-error -- .mjs sin declaración de tipos; JSDoc del propio archivo basta.
+import { credencialesSupabaseValidas } from '../../../scripts/supabase-credentials.mjs';
 
 // Vía A (issue #7): un único cliente de Supabase para toda la app.
 //
@@ -27,9 +33,10 @@ export class SupabaseService {
     const url = environment.supabaseUrl?.trim() ?? '';
     const key = environment.supabaseAnonKey?.trim() ?? '';
 
-    if (!url || !key || url.includes('TU-PROYECTO') || key === 'sb_publishable_...') {
+    if (!credencialesSupabaseValidas({ url, key })) {
       throw new Error(
-        'Faltan las credenciales de Supabase. Copia angular-app/.env.example a .env y vuelve a ejecutar npm start.'
+        'Faltan las credenciales de Supabase. Copia angular-app/.env.example a .env, rellena ' +
+          'los valores reales (panel de Supabase → Project Settings → Data API) y vuelve a ejecutar npm start.'
       );
     }
 

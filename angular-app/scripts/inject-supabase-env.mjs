@@ -7,10 +7,12 @@
  * Variables: SUPABASE_URL, SUPABASE_ANON_KEY, URL_FUNDACION. En local se pueden dejar
  * en angular-app/.env, que está fuera de git.
  *
- * Si faltan o siguen siendo el placeholder de .env.example (TU-PROYECTO /
- * sb_publishable_...), se usa la clave publicable del proyecto. Esa clave va en el
- * cliente a propósito; no es un secreto. Así `cp .env.example .env && npm start`
- * arranca la simulación en lugar de fallar al aceptar los términos.
+ * Hasta el issue #45, si faltaban o seguían siendo el placeholder de .env.example, este
+ * script rellenaba SUPABASE_URL/SUPABASE_ANON_KEY con una clave publicable real que
+ * traía versionada. Ese respaldo se retiró (quedaba en texto plano en el repo, y la
+ * clave ya no es válida: HTTP 401 contra el proyecto). Ahora, sin credenciales reales,
+ * el arranque FALLA aquí mismo, con un mensaje legible en vez de dejar que Angular
+ * arranque contra un backend inexistente y reviente más tarde con un stack trace.
  *
  * El archivo se sobrescribe completo, así que toda clave que consuma la app tiene que
  * salir de aquí: una que se omita desaparece del build y rompe la compilación de quien
@@ -19,7 +21,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { resolverCredencialesSupabase } from './supabase-credentials.mjs';
+import { credencialesSupabaseValidas } from './supabase-credentials.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -59,10 +61,8 @@ function cargarDotEnv() {
 
 cargarDotEnv();
 
-const credenciales = resolverCredencialesSupabase({
-  url: process.env.SUPABASE_URL ?? '',
-  key: process.env.SUPABASE_ANON_KEY ?? ''
-});
+const supabaseUrl = process.env.SUPABASE_URL ?? '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY ?? '';
 const urlFundacion = process.env.URL_FUNDACION ?? '';
 
 const destino = esDev ? 'environment.ts' : 'environment.prod.ts';
@@ -73,22 +73,34 @@ const out = join(envDir, destino);
 const contents = `/* Generado por scripts/inject-supabase-env.mjs. No editar a mano ni versionar. */
 export const environment = {
   production: ${esDev ? 'false' : 'true'},
-  supabaseUrl: ${JSON.stringify(credenciales.url)},
-  supabaseAnonKey: ${JSON.stringify(credenciales.key)},
+  supabaseUrl: ${JSON.stringify(supabaseUrl)},
+  supabaseAnonKey: ${JSON.stringify(supabaseAnonKey)},
   urlFundacion: ${JSON.stringify(urlFundacion)}
 };
 `;
 
 writeFileSync(out, contents, 'utf8');
 
-if (credenciales.usoRespaldo) {
-  console.warn(
-    `⚠️  ${destino}: SUPABASE_URL o SUPABASE_ANON_KEY vacíos o de plantilla; ` +
-      'se usa la clave publicable del proyecto Sirve la Mesa. ' +
-      (esDev
-        ? 'Para otro proyecto, copia .env.example a .env y rellénalo.'
-        : 'En el despliegue puedes sobreescribir las variables.')
+if (!credencialesSupabaseValidas({ url: supabaseUrl, key: supabaseAnonKey })) {
+  console.error(
+    [
+      '',
+      `❌ ${destino}: faltan credenciales de Supabase (SUPABASE_URL / SUPABASE_ANON_KEY).`,
+      '',
+      '   Copia la plantilla y rellénala con los valores reales:',
+      '',
+      '       cp angular-app/.env.example angular-app/.env',
+      '',
+      '   Sácalos del panel de Supabase del proyecto → Project Settings → Data API',
+      '   (Project URL y clave publicable/anon). Si no tienes acceso, pídeselos al equipo.',
+      '',
+      '   Cuando angular-app/.env tenga valores reales, vuelve a ejecutar:',
+      '',
+      '       npm start',
+      ''
+    ].join('\n')
   );
+  process.exitCode = 1;
 } else {
   console.log(`${destino} generado (SUPABASE_URL / SUPABASE_ANON_KEY / URL_FUNDACION).`);
 }
