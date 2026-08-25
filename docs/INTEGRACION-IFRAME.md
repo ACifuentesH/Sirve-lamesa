@@ -12,7 +12,7 @@ tarea A9).
   title="Simulador Sirve la Mesa"
   width="100%"
   height="100%"
-  style="min-width: 360px; min-height: 700px; border: 0;"
+  style="min-width: 372px; border: 0;"
   loading="eager"
 ></iframe>
 ```
@@ -33,9 +33,10 @@ Notas sobre cada pieza:
 - **`title`**: obligatorio por accesibilidad (lectores de pantalla). Ajustar el
   texto si la Fundación prefiere otro.
 - **`width` / `height`**: pensados para que el contenedor padre le dé al
-  `iframe` toda el área disponible. El `min-width`/`min-height` en `style`
-  evita que quede recortado en contenedores muy pequeños (ver "Dimensiones
-  mínimas" abajo).
+  `iframe` toda el área disponible. El `min-width` en `style` evita que quede
+  recortado en contenedores muy angostos (ver "Dimensiones mínimas" abajo). A
+  propósito **no lleva un `min-height` fijo** — la misma sección explica por
+  qué un número de alto fijo estaría mal para algún ancho.
 - **`allow`**: **no se incluye porque hoy no hace falta.** El simulador no usa
   cámara, micrófono, geolocalización ni portapapeles — solo `localStorage` (en
   el propio origen del `iframe`, sin relación con el origen de la página que lo
@@ -53,38 +54,154 @@ Notas sobre cada pieza:
 
 ## Dimensiones mínimas
 
-Las pantallas del simulador (registro, onboarding, servicio, salida) están
-maquetadas a `min-height: 100vh` sobre un `body` con `overflow: hidden` — es
-decir, el simulador asume que ocupa **todo el viewport que se le da** (dentro
-de un `iframe`, ese viewport es el del propio `iframe`, no el de la página que
-lo contiene). Si el `iframe` es más bajo que el contenido, el simulador no
-agrega scroll de página: el contenido puede quedar recortado.
+Las cinco pantallas que existen hoy en el flujo son `registro`, `onboarding`,
+`simulador`, `salida` e `investigadores` (rutas reales en
+`angular-app/src/app/app-routing.module.ts`, que está congelado y no se toca
+para este documento). Las medidas de esta sección salen de esas cinco, **no**
+de `admin`, `personajes` ni `login`: `personajes` y `login` se borraron en el
+PR #44 y `admin` se renombró a `investigadores` en el #34 (queda una
+redirección `/admin` → `/investigadores` para enlaces viejos, pero no es una
+pantalla).
 
-Los breakpoints internos (`admin`, `simulador`, `personajes`, `login`) bajan
-hasta los 400–480px de ancho, así que el simulador es usable en un `iframe`
-angosto (móvil), pero:
+Cuatro de las cinco (`registro`, `onboarding`, `simulador`, `salida`) están
+maquetadas a `min-height: 100vh` sobre un `body` con `height: 100vh; overflow:
+hidden` (`angular-app/src/styles.scss:33-37`) — el simulador asume que ocupa
+**todo el viewport que se le da** (dentro de un `iframe`, ese viewport es el
+del propio `iframe`, no el de la página que lo contiene) y **no hay scroll de
+página**: si el contenido no cabe, se recorta en silencio, sin barra de
+scroll. La excepción es `investigadores`, que abre su propio scroll interno
+(`investigador.component.scss:4-5`, `.investigador-wrapper { height: 100vh;
+overflow-y: auto; }`) y por eso tolera mejor un `iframe` bajo que las otras
+cuatro.
 
-- **Ancho mínimo recomendado: 360px** (el móvil más angosto que soportan los
-  breakpoints existentes).
-- **Alto mínimo recomendado: 700px.** Con menos altura, en pantallas donde el
-  contenido es más alto que ancho (el simulador de plato, por ejemplo) el
-  recorte es visible.
-- Lo ideal es que el `iframe` tome el 100% del ancho de su contenedor y una
-  altura ligada al viewport de la página anfitriona (`height: 100vh` o
-  `100dvh` en el `iframe`, o un contenedor flex que le dé todo el alto
-  disponible), no una altura fija pequeña.
+### Ancho mínimo: 372px
+
+A diferencia del alto, esto sí es un número exacto: sale de sumar reglas CSS
+declaradas, no de una estimación. La pantalla que más ancho pide es
+`registro` (el formulario de alta del participante):
+
+- `.registro { padding: t.$space-5; }` — `$space-5: 1.5rem` = 24px
+  (`angular-app/src/styles/_tokens.scss:40`) × 2 lados = **48px**
+  (`registro.component.scss:4-8`).
+- `.tarjeta { padding: t.$space-6; }` — `$space-6: 2rem` = 32px
+  (`_tokens.scss:41`) × 2 lados = **64px** (`registro.component.scss:11-17`).
+- `.grilla { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }`
+  (`registro.component.scss:33`) — cada columna del formulario pide al menos
+  **260px**.
+
+48 + 64 + 260 = **372px**. Por debajo de eso el navegador no tiene ancho para
+ni siquiera una columna de 260px y el formulario se recorta horizontalmente.
+
+Las otras cuatro piden menos ancho:
+
+- `onboarding` y `salida` comparten la misma tarjeta (padding 24px + 32px =
+  112px) pero no tienen ningún `min-width`/`minmax` propio dentro — el texto
+  simplemente envuelve, así que no imponen un piso por encima de esos 112px.
+- `simulador`: el único `min-width` explícito es el botón
+  `.finalizar { min-width: 220px; }` (`simulador.component.scss:97`), dentro
+  de `.tablero { padding: 1.25rem 1.5rem 2rem; }` (línea 15; 1.5rem = 24px ×
+  2 lados = 48px). 220 + 48 = 268px. El grid de tres columnas
+  (`minmax(140px,220px) minmax(0,1fr) minmax(280px,360px)`, línea 13) solo se
+  usa por encima de 1100px de ancho: por debajo, `@media (max-width: 1100px)`
+  (línea 121) lo colapsa a una sola columna, así que ese `minmax` de
+  280–360px no aplica al rango de anchos realista para un `iframe` embebido.
+- `investigadores`: `.filter-item { min-width: 140px; }`
+  (`investigador.component.scss:130`) dentro de
+  `.filters-bar { padding: 14px 18px; }` (línea 115, 18px × 2 = 36px) dentro
+  de `.investigador-body { padding: 12px 12px 28px; }` en
+  `@media (max-width: 768px)` (línea 556, 12px × 2 = 24px). 140 + 36 + 24 =
+  200px.
+
+372px es el mayor de los cinco, así que es el número que gobierna el ancho
+mínimo del `iframe`. **Sube 12px respecto a los 360px del documento
+anterior** — esos 360px no correspondían a ninguna regla CSS de las
+pantallas actuales (venían de pantallas ya borradas o renombradas).
+
+### Alto: no hay un piso fijo en el CSS
+
+A diferencia del ancho, ninguna de las cinco pantallas declara un
+`min-height` en píxeles: todas usan `min-height: 100vh`, que es relativo al
+propio `iframe`, no un número absoluto. Los 700px del documento anterior
+tampoco salían de una regla CSS — eran una cifra suelta, sin nada que la
+respalde en el código actual.
+
+Contando el contenido real de hoy sí se puede acotar el orden de magnitud:
+
+- **`registro` a 372px de ancho** (el piso de la sección anterior) solo deja
+  sitio para **una** columna en `.grilla`: 260px de columna no dejan lugar
+  para una segunda de 260px más el `gap` de `$space-4` (16px,
+  `registro.component.scss:34`). Con una sola columna, los **9 campos** del
+  formulario (`registro.component.html`: edad, peso, estatura, género, nivel
+  de estudios, semestre —condicional—, etnia, región de origen, región de
+  residencia) se apilan uno debajo del otro en vez de repartirse en 2–3
+  columnas. Sumando esos 9 campos más el título, la intro, el bloque de
+  consentimiento y el botón "Continuar", el alto para no recortar nada ronda
+  **1000–1100px**. No es un número exacto porque la altura de un
+  `<input>`/`<select>` la decide el navegador (el proyecto no fija
+  `line-height` ni `height` en esos elementos, solo `padding`), pero la
+  magnitud se puede verificar cargando el build a 372px de ancho.
+  - Si el `iframe` es más ancho (≥ ~648px = 2×260px + 16px de `gap` + 64px +
+    48px de los paddings de arriba), `.grilla` pasa a 2 columnas, el
+    formulario baja de 9 a 5 filas, y el alto necesario cae a **~700px** —
+    casualmente el número del documento anterior, pero solo es válido a ese
+    ancho, no a 360/372px.
+- **`simulador` a 372px de ancho** también pide bastante más de 700px, por
+  una combinación de piezas de tamaño fijo o casi fijo:
+  - Avatar del personaje: `max-width: 260px; aspect-ratio: 1 / 1;`
+    (`avatar-personaje.component.ts`, estilos inline del componente) — hasta
+    260px de alto, más el nombre y el perfil debajo.
+  - Contenedor de bebida: `.vaso { width: 110px; height: 150px; }`
+    (`contenedor-bebida.component.ts`) — tamaño fijo, no se achica con el
+    viewport.
+  - Plato: `.plato { width: min(420px, 42vw, 70vh); aspect-ratio: 1 / 1; }`
+    (`plato-canvas.component.ts`) — este sí se achica con el ancho y el alto
+    disponibles, por eso no es la pieza más restrictiva a anchos angostos.
+  - Menú lateral: en el peor caso, un grupo de alimentos trae **4
+    alimentos** (contado directo de
+    `database/seeds/seed_catalogo_alimentos.sql`; p. ej. "Proteínas y
+    Lácteos" en desayuno o "Proteínas y Legumbres" en almuerzo), cada fila
+    con una foto fija de 56×56px (`.foto`, `menu-lateral.component.scss`).
+  - Sumando el banner de contexto fijo arriba (`banner-contexto.component.ts`,
+    `position: sticky`) y los `padding`/`gap` de `.tablero` y `.servicio`, el
+    alto para no recortar nada en `simulador` a 372px de ancho también ronda
+    **1100–1200px**.
+- `onboarding` y `salida` tienen bastante menos texto que `registro` y no se
+  cuantificaron en detalle porque no son el caso más exigente.
+- `investigadores` no depende de esto de la misma forma: como scrollea
+  internamente (`.investigador-wrapper`, arriba), un `iframe` bajo no le
+  recorta contenido — solo le da menos alto visible antes de que aparezca su
+  propia barra de scroll.
+
+**Por eso el snippet de arriba no trae `min-height`.** Fijar un solo número
+(700px, 1100px o cualquier otro) va a estar mal para algún ancho: a 372px
+hace falta ~1100px, a ~650px alcanza con ~700px, y entre medio hay un rango
+continuo — el alto y el ancho mínimos no son independientes entre sí en este
+proyecto. La recomendación real es la que ya daba la sección siguiente: no
+fijar el alto, dejar que el `iframe` tome `height: 100%` (o `100vh`/`100dvh`)
+del contenedor de la Fundación, no una altura fija pequeña. Si el equipo de
+la Fundación necesita igual un valor estático de respaldo, que presupueste
+**al menos ~1100px** si usa el ancho mínimo de 372px, o **al menos ~700px**
+si usa un ancho de ~650px o más — y que lo valide contra el build real,
+porque esta cifra depende del contenido de hoy (número de campos del
+formulario, tamaño del catálogo de alimentos) y cambia si ese contenido
+cambia.
 
 ## Comportamiento responsive
 
-El simulador ya es responsive puertas adentro (cada pantalla tiene sus propios
-`@media` queries). Del lado del `iframe` no hace falta lógica adicional más
-allá de:
+El simulador ya es responsive puertas adentro, aunque no todas las pantallas
+lo resuelven de la misma forma: `registro`, `onboarding` y `salida` no
+declaran ningún `@media` — se ajustan solas con `grid`/`min()`/anchos en `%`.
+`simulador` tiene un único `@media (max-width: 1100px)` (colapsa su grid de
+tres columnas) e `investigadores` tiene dos, en 768px y 480px (ver
+"Dimensiones mínimas" arriba). Del lado del `iframe` no hace falta lógica
+adicional más allá de:
 
 1. Que el `iframe` mismo sea fluido (`width: 100%`) en vez de un ancho fijo en
    píxeles.
-2. Respetar los mínimos de la sección anterior — un `iframe` más angosto que
-   360px no tiene garantía de que el simulador se vea bien, porque ningún
-   breakpoint interno baja de ahí.
+2. Respetar el mínimo de la sección anterior — un `iframe` más angosto que
+   372px hace que el formulario de `registro` (la pantalla más exigente en
+   ancho) se recorte, porque `.grilla` ya no tiene sitio ni para una columna
+   de 260px.
 3. Nada de `transform: scale()` sobre el `iframe` para "encogerlo": eso rompe
    los cálculos de `vh` internos. Si hace falta más compacto, mejor angosto
    (el simulador ya responde a eso) que escalado.
@@ -151,3 +268,9 @@ el comportamiento responsive. Instrucciones de uso dentro del propio archivo.
   `CONFIGURACION.md`), así que ese backend no es parte del camino de
   despliegue de este entregable. Si sigue en uso para otra cosa, es un tema
   aparte de A9.
+- Los rangos de alto de "Dimensiones mínimas" (1000–1100px para `registro`,
+  1100–1200px para `simulador`, ambos a 372px de ancho) salen de contar
+  elementos y sumar sus reglas CSS, **no de medir en un navegador real**. Son
+  el orden de magnitud correcto, pero si alguien necesita el píxel exacto
+  para un caso concreto, hay que cargar el build a ese ancho y leer
+  `document.documentElement.scrollHeight`.
