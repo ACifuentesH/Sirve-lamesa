@@ -36,6 +36,12 @@
         <app-avatar-personaje [personaje]="asignacion.personaje" />
 
         <section class="servicio">
+          @if (totalAsignaciones > 1) {
+            <p class="progreso" role="status" aria-live="polite">
+              Plato {{ ordenServicio }} de {{ totalAsignaciones }}
+            </p>
+          }
+
           <div class="escena">
             <app-plato-canvas [items]="plato.items()" [alimentos]="alimentos" />
             <app-contenedor-bebida
