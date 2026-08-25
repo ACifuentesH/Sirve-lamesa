@@ -52,6 +52,11 @@ interface PorcionVista {
   `,
   styles: [
     `
+      :host {
+        display: block;
+        min-width: 0;
+      }
+
       .escena {
         display: grid;
         place-items: center;
@@ -60,6 +65,7 @@ interface PorcionVista {
       .plato {
         position: relative;
         width: var(--plato-lado, min(380px, 38vw, 56vh));
+        max-width: 100%;
         aspect-ratio: 1 / 1;
         border-radius: 50%;
         background:
