@@ -50,6 +50,21 @@
   flex-wrap: nowrap;
 }
 
+/**
+ * Solo se pinta cuando la secuencia tiene más de un plato (issue #17). Va dentro de
+ * la columna central, que es `minmax(0, 1fr)`: no puede ensanchar el tablero, y con
+ * la constante en 1 ni siquiera se renderiza.
+ */
+.progreso {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sm-color-text-muted);
+  text-align: center;
+}
+
 .alerta {
   margin: 0;
   color: var(--sm-color-error);
