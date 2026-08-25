@@ -20,6 +20,7 @@ anteriores.
 
 | Migración | Qué hace |
 |---|---|
+| `000_esquema_base.sql` | **Crea el esquema base**: las once tablas del diagrama. Idempotente y no destructiva |
 | `001_ampliar_campo_navegador.sql` | Amplía `navegador` para el user-agent completo |
 | `002_anonimizar_participantes.sql` | Retira los campos que identificaban al participante |
 | `003_personajes_retratos.sql` | Columnas de retrato en `personajes` |
@@ -33,14 +34,23 @@ anteriores.
 | `012_rls_solo_rpc.sql` | La escritura del participante solo entra por la RPC |
 | `013_investigadores_lista_blanca.sql` | Solo un investigador de la lista blanca lee el estudio |
 | `014_retirar_politicas_auth_obsoletas.sql` | Retira políticas que quedaron sin uso |
+| `015_rpc_pesos_autoritativos_y_notas.sql` | La RPC recalcula los pesos desde el catálogo y deja constancia; `envio_id` contra duplicados |
+| `016_rls_cerrar_legado_y_verificar.sql` | Cierra las tablas del esquema antiguo conservando la RPC |
+| `017_notas_decisiones_porcionamiento.sql` | Garantiza `Decisiones_porcionamiento.notas` en bases ya desplegadas |
 
 > No existe una migración `010`: el número se saltó y no falta nada.
+
+> Los ficheros sueltos de `database/` (`schema.sql`, `participantes.sql`,
+> `sesiones_juego.sql`, `decisiones_porcionamiento.sql`) son el origen histórico del
+> esquema y **ya no hay que aplicarlos**: su contenido vive ahora en la `000`, sin
+> los `DROP TABLE` que traía `schema.sql`. Se conservan como referencia.
 
 Aplícalas con el SQL editor del dashboard de Supabase, o con `psql`:
 
 ```bash
+psql "$DATABASE_URL" -f database/migrations/000_esquema_base.sql
 psql "$DATABASE_URL" -f database/migrations/001_ampliar_campo_navegador.sql
-# ...y así en orden hasta la 014
+# ...y así en orden hasta la última
 ```
 
 ## Seeds
