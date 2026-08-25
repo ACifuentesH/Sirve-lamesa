@@ -67,6 +67,21 @@ export class MenuLateralComponent implements OnChanges {
     return this.porcionesDe(id) >= 4;
   }
 
+  etiquetaPestana(grupo: string): string {
+    const cortos: Record<string, string> = {
+      'Carbohidratos y Acompañamientos': 'Harinas',
+      'Carbohidratos Ligeros / Acompañamientos': 'Harinas',
+      'Proteínas y Legumbres': 'Proteínas',
+      'Proteínas Ligeras': 'Proteínas',
+      'Proteínas y Lácteos': 'Proteínas',
+      'Vegetales y Ensaladas': 'Vegetales',
+      'Vegetales y Frutas': 'Vegetales',
+      'Frutas y Elementos Frescos': 'Frutas',
+      Bebidas: 'Bebidas'
+    };
+    return cortos[grupo] ?? grupo;
+  }
+
   seleccionarPestana(grupo: string): void {
     if (grupo === this.pestanaActiva) {
       return;

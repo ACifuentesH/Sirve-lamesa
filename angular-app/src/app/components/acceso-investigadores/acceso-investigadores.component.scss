@@ -93,3 +93,14 @@
     cursor: default;
   }
 }
+
+.volver {
+  text-align: center;
+  font-size: t.$font-size-sm;
+  color: t.$color-text-muted;
+  text-decoration: none;
+
+  &:hover {
+    color: t.$color-primary;
+  }
+}

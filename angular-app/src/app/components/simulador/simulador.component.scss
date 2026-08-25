@@ -1,20 +1,30 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 .pagina {
-  min-height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--sm-color-bg);
   color: var(--sm-color-text);
   font-family: var(--sm-font-sans);
+  overflow: hidden;
 }
 
 .tablero {
   flex: 1;
+  min-height: 0;
   display: grid;
-  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) minmax(280px, 360px);
-  gap: 1.5rem;
-  padding: 1.25rem 1.5rem 2rem;
-  align-items: start;
-  max-width: 1366px;
+  grid-template-columns: minmax(120px, 180px) minmax(0, 1fr) minmax(300px, 420px);
+  gap: 1.25rem 1.5rem;
+  padding: 1.25rem 1.75rem 1.5rem;
+  align-items: stretch;
+  max-width: 1440px;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
@@ -24,15 +34,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.25rem;
+  min-height: 0;
 }
 
 .escena {
+  --plato-lado: min(380px, 36vw, 52vh);
+  --vaso-alto: calc(var(--plato-lado) * 0.88);
+  --vaso-ancho: calc(var(--plato-lado) * 0.58);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-  flex-wrap: wrap;
+  gap: clamp(1rem, 2vw, 2rem);
+  flex-wrap: nowrap;
+}
+
+/**
+ * Solo se pinta cuando la secuencia tiene más de un plato (issue #17). Va dentro de
+ * la columna central, que es `minmax(0, 1fr)`: no puede ensanchar el tablero, y con
+ * la constante en 1 ni siquiera se renderiza.
+ */
+.progreso {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sm-color-text-muted);
+  text-align: center;
 }
 
 .alerta {
@@ -74,14 +104,16 @@
 
 .principal {
   font-family: var(--sm-font-sans);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   background: var(--sm-color-primary);
   color: var(--sm-color-bg);
   border: none;
-  border-radius: 4px;
-  padding: 0.7rem 1.25rem;
+  border-radius: 999px;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .principal:disabled {
@@ -91,10 +123,12 @@
 
 .principal:hover:not(:disabled) {
   background: var(--sm-color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(30, 95, 168, 0.22);
 }
 
 .finalizar {
-  min-width: 220px;
+  min-width: 200px;
 }
 
 .reintento {
@@ -119,7 +153,30 @@
 }
 
 @media (max-width: 1100px) {
+  .pagina {
+    height: auto;
+    overflow: auto;
+  }
+
   .tablero {
     grid-template-columns: 1fr;
+    align-items: start;
+    padding-bottom: 2rem;
+  }
+
+  .escena {
+    --plato-lado: min(340px, 72vw, 48vh);
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .tablero {
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .escena {
+    --plato-lado: min(280px, 78vw, 42vh);
   }
 }

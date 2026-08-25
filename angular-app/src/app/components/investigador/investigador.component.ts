@@ -15,6 +15,7 @@ import {
   ExportRow,
   FilaVista,
   buildExportRows,
+  comoArreglo,
   parseAlimentos
 } from '../../utils/research-export';
 
@@ -24,10 +25,16 @@ interface Filters {
   participanteGenero: string;
   participanteEdad: string;
   participanteIMC: string;
+  nivelEstudios: string;
+  etnia: string;
+  regionOrigen: string;
+  regionResidencia: string;
+  personajePerfil: string;
+  personajeGenero: string;
   momentoDia: string;
 }
 
-const PALETTE = ['#1e5fa8', '#EF6F3C', '#FF7BAC', '#6B9B7A', '#F5C842', '#9B8EC4', '#4A8CA6', '#8FBB9E'];
+const PALETTE = ['#1e5fa8', '#164a85', '#6b7280', '#2e7d32', '#b3261e', '#4b7bb8', '#9ca3af', '#1f2937'];
 
 const CAT_COLOR: Record<string, string> = {
   proteina: '#EF6F3C',
@@ -48,6 +55,7 @@ const CAT_LABEL: Record<string, string> = {
 };
 
 const PERFIL_ORDEN = ['Niño', 'Niña', 'Joven', 'Adulto', 'Adulto Mayor'];
+const BANDAS_EDAD = ['7-9', '14-16', '30-40', '70-75'];
 const EDAD_PART_RANGOS = ['<18', '18-25', '26-35', '36-50', '51+'];
 
 const GENERO_PART_LABEL: Record<string, string> = {
@@ -62,6 +70,21 @@ const GENERO_PART_LABEL: Record<string, string> = {
 const GENERO_PERS_LABEL: Record<string, string> = {
   M: 'Personaje masculino',
   F: 'Personaje femenino'
+};
+
+const NIVEL_LABEL: Record<string, string> = {
+  pregrado_curso: 'Pregrado en curso',
+  pregrado_completo: 'Pregrado completo',
+  posgrado: 'Posgrado',
+  otro: 'Otro'
+};
+
+const ETNIA_LABEL: Record<string, string> = {
+  latino_hispano: 'Latino o Hispano',
+  afrodescendiente: 'Afrodescendiente',
+  indigena: 'Indígena',
+  blanco: 'Blanco',
+  otro: 'Otro'
 };
 
 /**
@@ -96,11 +119,22 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
     participanteGenero: '',
     participanteEdad: '',
     participanteIMC: '',
+    nivelEstudios: '',
+    etnia: '',
+    regionOrigen: '',
+    regionResidencia: '',
+    personajePerfil: '',
+    personajeGenero: '',
     momentoDia: ''
   };
   participanteEdadRangos: string[] = [];
   generosParticipante: string[] = [];
   momentosPresentes: string[] = [];
+  nivelesPresentes: string[] = [];
+  etniasPresentes: string[] = [];
+  regionesPresentes: string[] = [];
+  regionesResidenciaPresentes: string[] = [];
+  perfilesPresentes: string[] = [];
 
   stats = {
     decisiones: 0,
@@ -108,7 +142,8 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
     sesiones: 0,
     promedioGramos: 0,
     promedioTiempoDecisionSeg: 0,
-    promedioDuracionSesionSeg: 0
+    promedioDuracionSesionSeg: 0,
+    promedioBebidaMl: 0
   };
 
   tablePage = 0;
@@ -122,13 +157,17 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('cruceGeneroChart') cruceGeneroRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('perfilEdadChart') perfilEdadRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('generoPersChart') generoPersRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('perfilYGeneroChart') perfilYGeneroRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('momentoChart') momentoRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('catSexoPerChart') catSexoPerRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('catPerfilChart') catPerfilRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('catChart') catRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('topCountChart') topCountRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('partGeneroChart') partGeneroRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('rankingChart') rankingRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('imcPartChart') imcPartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('tiempoPerfilChart') tiempoPerfilRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('tiempoGeneroChart') tiempoGeneroRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('ordenServicioChart') ordenServicioRef!: ElementRef<HTMLCanvasElement>;
 
   private charts: Record<string, Chart> = {};
 
@@ -148,16 +187,18 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadData(): void {
+    this.loading = true;
+    this.error = '';
     this.api.obtenerDatosInvestigador().subscribe({
       next: res => {
         this.rawData = res.data ?? [];
         this.buildFilterOptions();
         this.applyFilters();
         this.loading = false;
+        this.cdr.detectChanges();
         if (this.chartsReady) {
           this.renderCharts();
         }
-        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'No se pudieron cargar los datos. Inicia sesión como investigador autorizado.';
@@ -177,6 +218,23 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.momentosPresentes = MOMENTOS_DIA.filter(m =>
       this.rawData.some(d => d.momento_dia === m)
     );
+    this.nivelesPresentes = [...new Set(
+      this.rawData.map(d => d.participante_nivel_estudios).filter((n): n is string => !!n)
+    )].sort();
+    this.etniasPresentes = [...new Set(
+      this.rawData.map(d => d.participante_etnia).filter((e): e is string => !!e)
+    )].sort();
+    this.regionesPresentes = [...new Set(
+      this.rawData.map(d => d.participante_region_origen).filter((r): r is string => !!r)
+    )].sort();
+    this.regionesResidenciaPresentes = [...new Set(
+      this.rawData.map(d => d.participante_region_residencia).filter((r): r is string => !!r)
+    )].sort();
+    const perfiles = [...new Set(this.rawData.map(d => this.perfilDe(d)))];
+    this.perfilesPresentes = [
+      ...PERFIL_ORDEN.filter(p => perfiles.includes(p)),
+      ...perfiles.filter(p => !PERFIL_ORDEN.includes(p) && p !== 'Sin perfil')
+    ];
   }
 
   applyFilters(): void {
@@ -197,6 +255,24 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
         if (f.participanteIMC === 'sobrepeso' && (imc < 25 || imc >= 30)) return false;
         if (f.participanteIMC === 'obesidad' && imc < 30) return false;
       }
+      if (f.nivelEstudios && d.participante_nivel_estudios !== f.nivelEstudios) {
+        return false;
+      }
+      if (f.etnia && d.participante_etnia !== f.etnia) {
+        return false;
+      }
+      if (f.regionOrigen && d.participante_region_origen !== f.regionOrigen) {
+        return false;
+      }
+      if (f.regionResidencia && d.participante_region_residencia !== f.regionResidencia) {
+        return false;
+      }
+      if (f.personajePerfil && this.perfilDe(d) !== f.personajePerfil) {
+        return false;
+      }
+      if (f.personajeGenero && d.personaje_genero !== f.personajeGenero) {
+        return false;
+      }
       if (f.momentoDia && d.momento_dia !== f.momentoDia) {
         return false;
       }
@@ -214,6 +290,12 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
       participanteGenero: '',
       participanteEdad: '',
       participanteIMC: '',
+      nivelEstudios: '',
+      etnia: '',
+      regionOrigen: '',
+      regionResidencia: '',
+      personajePerfil: '',
+      personajeGenero: '',
       momentoDia: ''
     };
     this.applyFilters();
@@ -247,6 +329,13 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.stats.promedioDuracionSesionSeg = duraciones.length
       ? duraciones.reduce((a, b) => a + b, 0) / duraciones.length
       : 0;
+
+    const bebidas = d
+      .map(x => Number(x.total_bebida_ml))
+      .filter(n => Number.isFinite(n) && n > 0);
+    this.stats.promedioBebidaMl = bebidas.length
+      ? bebidas.reduce((a, b) => a + b, 0) / bebidas.length
+      : 0;
   }
 
   private groupBy(data: FilaVista[], key: keyof FilaVista): Map<string, FilaVista[]> {
@@ -276,9 +365,8 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
     return d.personaje_perfil_edad || d.personaje_edad_rango || 'Sin perfil';
   }
 
-  private foodStats(): { categorias: { cat: string; count: number; total: number }[]; topCount: { n: string; v: number }[] } {
+  private foodStats(): { categorias: { cat: string; count: number; total: number }[] } {
     const catMap = new Map<string, { count: number; total: number }>();
-    const compCount = new Map<string, number>();
 
     this.filteredData.forEach(d => {
       parseAlimentos(d.componentes_servidos).forEach(c => {
@@ -286,16 +374,11 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
         e.count++;
         e.total += c.gramos;
         catMap.set(c.tipo, e);
-        compCount.set(c.nombre, (compCount.get(c.nombre) ?? 0) + 1);
       });
     });
 
     return {
-      categorias: [...catMap.entries()].map(([cat, v]) => ({ cat, ...v })),
-      topCount: [...compCount.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10)
-        .map(([n, v]) => ({ n, v }))
+      categorias: [...catMap.entries()].map(([cat, v]) => ({ cat, ...v }))
     };
   }
 
@@ -314,14 +397,18 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chartCruceGenero();
     this.chartPerfilEdad();
     this.chartGeneroPersonaje();
+    this.chartPerfilYGenero();
     this.chartMomento();
     this.chartCatPorSexoPersonaje();
-    const { categorias, topCount } = this.foodStats();
+    this.chartCatPorPerfil();
+    const { categorias } = this.foodStats();
     this.chartCategorias(categorias);
-    this.chartTopCount(topCount);
     this.chartPartGenero();
     this.chartRankingPersonajes();
     this.chartImcParticipante();
+    this.chartTiempoPerfil();
+    this.chartTiempoGenero();
+    this.chartOrdenServicio();
   }
 
   /** Hipótesis central: cuánto se sirve según el cruce de géneros. */
@@ -466,23 +553,6 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private chartTopCount(top: { n: string; v: number }[]): void {
-    this.upsert('topCount', this.topCountRef, {
-      type: 'bar',
-      data: {
-        labels: top.map(t => t.n),
-        datasets: [{ label: 'Veces servido', data: top.map(t => t.v), backgroundColor: PALETTE[1] }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { beginAtZero: true } }
-      }
-    } as ChartConfiguration);
-  }
-
   private chartPartGenero(): void {
     const g = this.groupBy(this.filteredData, 'participante_genero');
     const keys = [...g.keys()];
@@ -547,6 +617,179 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
         scales: { y: { beginAtZero: true } }
       }
     });
+  }
+
+  private chartTiempoPerfil(): void {
+    const presentes = [...new Set(this.filteredData.map(d => this.perfilDe(d)))];
+    const labels = [
+      ...PERFIL_ORDEN.filter(p => presentes.includes(p)),
+      ...presentes.filter(p => !PERFIL_ORDEN.includes(p))
+    ];
+    this.upsert('tiempoPerfil', this.tiempoPerfilRef, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Segundos',
+          data: labels.map(r => Math.round(this.avgTiempo(this.filteredData.filter(d => this.perfilDe(d) === r)))),
+          backgroundColor: PALETTE[4]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: 's' } } }
+      }
+    });
+  }
+
+  private chartPerfilYGenero(): void {
+    const presentes = [...new Set(this.filteredData.map(d => this.bandaEdad(d)))];
+    const labels = [
+      ...BANDAS_EDAD.filter(b => presentes.includes(b)),
+      ...presentes.filter(b => !BANDAS_EDAD.includes(b))
+    ];
+    this.upsert('perfilYGenero', this.perfilYGeneroRef, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Personaje masculino',
+            data: labels.map(b => Math.round(this.avgGramos(
+              this.filteredData.filter(d => this.bandaEdad(d) === b && d.personaje_genero === 'M')
+            ))),
+            backgroundColor: PALETTE[0]
+          },
+          {
+            label: 'Personaje femenino',
+            data: labels.map(b => Math.round(this.avgGramos(
+              this.filteredData.filter(d => this.bandaEdad(d) === b && d.personaje_genero === 'F')
+            ))),
+            backgroundColor: PALETTE[2]
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'g promedio / decisión' } } }
+      }
+    });
+  }
+
+  private chartCatPorPerfil(): void {
+    const perfiles = this.perfilesEnFiltro();
+    const datasets = perfiles.map((perfil, i) => {
+      const filas = this.filteredData.filter(d => this.perfilDe(d) === perfil);
+      const n = filas.length || 1;
+      const tot: Record<string, number> = Object.fromEntries(TIPOS_ALIMENTO.map(c => [c, 0]));
+      filas.forEach(d => {
+        parseAlimentos(d.componentes_servidos).forEach(c => {
+          if (c.tipo in tot) tot[c.tipo] += c.gramos;
+        });
+      });
+      return {
+        label: perfil,
+        data: TIPOS_ALIMENTO.map(c => Math.round(tot[c] / n)),
+        backgroundColor: PALETTE[i % PALETTE.length]
+      };
+    });
+    this.upsert('catPerfil', this.catPerfilRef, {
+      type: 'bar',
+      data: {
+        labels: TIPOS_ALIMENTO.map(c => CAT_LABEL[c]),
+        datasets: datasets.length ? datasets : [{ label: 'Sin datos', data: TIPOS_ALIMENTO.map(() => 0), backgroundColor: PALETTE[0] }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  private chartTiempoGenero(): void {
+    const labels = ['M', 'F'];
+    this.upsert('tiempoGenero', this.tiempoGeneroRef, {
+      type: 'bar',
+      data: {
+        labels: labels.map(g => GENERO_PERS_LABEL[g]),
+        datasets: [{
+          label: 'Segundos',
+          data: labels.map(g => Math.round(this.avgTiempo(this.filteredData.filter(d => d.personaje_genero === g)))),
+          backgroundColor: [PALETTE[0], PALETTE[2]]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: 's' } } }
+      }
+    });
+  }
+
+  private chartOrdenServicio(): void {
+    const tipos = TIPOS_ALIMENTO.map(c => CAT_LABEL[c]);
+    const totM: Record<string, number> = Object.fromEntries(tipos.map(t => [t, 0]));
+    const totF: Record<string, number> = Object.fromEntries(tipos.map(t => [t, 0]));
+    this.filteredData.forEach(d => {
+      const tipo = this.primerTipoServido(d);
+      if (!(tipo in totM)) return;
+      if (d.personaje_genero === 'M') totM[tipo]++;
+      else if (d.personaje_genero === 'F') totF[tipo]++;
+    });
+    this.upsert('ordenServicio', this.ordenServicioRef, {
+      type: 'bar',
+      data: {
+        labels: tipos,
+        datasets: [
+          { label: 'Personaje masculino', data: tipos.map(t => totM[t]), backgroundColor: PALETTE[0] },
+          { label: 'Personaje femenino', data: tipos.map(t => totF[t]), backgroundColor: PALETTE[2] }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'decisiones' } } }
+      }
+    });
+  }
+
+  private primerTipoServido(d: FilaVista): string {
+    const eventos = comoArreglo(d.secuencia_clics);
+    const primero = eventos.find(e => e?.accion === 'agregar' && e?.alimento_slug);
+    if (!primero) {
+      const alimentos = parseAlimentos(d.componentes_servidos);
+      return alimentos[0] ? (CAT_LABEL[alimentos[0].tipo] ?? alimentos[0].tipo) : 'Sin datos';
+    }
+    const item = comoArreglo(d.componentes_servidos).find(
+      a => a?.slug === primero.alimento_slug || a?.alimento_slug === primero.alimento_slug
+    );
+    const tipo = String(item?.tipo || '').toLowerCase();
+    return CAT_LABEL[tipo] ?? (tipo || 'Sin datos');
+  }
+
+  private bandaEdad(d: FilaVista): string {
+    return d.personaje_edad_rango || this.perfilDe(d);
+  }
+
+  private perfilesEnFiltro(): string[] {
+    const presentes = [...new Set(this.filteredData.map(d => this.perfilDe(d)))];
+    return [
+      ...PERFIL_ORDEN.filter(p => presentes.includes(p)),
+      ...presentes.filter(p => !PERFIL_ORDEN.includes(p))
+    ];
+  }
+
+  private avgTiempo(items: FilaVista[]): number {
+    const v = items.map(d => Number(d.tiempo_decision_segundos)).filter(n => Number.isFinite(n) && n >= 0);
+    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0;
   }
 
   private generosEnDatos(): string[] {
@@ -621,6 +864,22 @@ export class InvestigadorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setTab(id: string): void {
     this.activeTab = id;
+    if (id === 'graficos') {
+      setTimeout(() => {
+        this.renderCharts();
+        Object.values(this.charts).forEach(c => c.resize());
+      });
+    }
+  }
+
+  nivelLabel(valor: string | null): string {
+    if (!valor) return '—';
+    return NIVEL_LABEL[valor] ?? valor;
+  }
+
+  etniaLabel(valor: string | null): string {
+    if (!valor) return '—';
+    return ETNIA_LABEL[valor] ?? valor;
   }
 
   generoPartLabel(g: string | null): string {

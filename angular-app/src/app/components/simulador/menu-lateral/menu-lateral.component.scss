@@ -1,11 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
 .menu {
   display: flex;
   flex-direction: column;
   min-height: 0;
   height: 100%;
-  background: var(--sm-color-bg);
-  border: 1px solid var(--sm-color-border);
-  border-radius: 8px;
+  background: transparent;
+  border: none;
   overflow: hidden;
 }
 
@@ -20,118 +26,158 @@
 }
 
 .pestanas {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
+  flex-shrink: 0;
   border-bottom: 1px solid var(--sm-color-border);
-  background: var(--sm-color-bg-alt);
 }
 
 .pestana {
-  flex: 1 1 0;
   min-width: 0;
-  padding: 0.65rem 0.5rem;
+  padding: 0.8rem 0.35rem 0.65rem;
   font-family: var(--sm-font-sans);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   line-height: 1.2;
   color: var(--sm-color-text-muted);
   background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.pestana:hover {
+  color: var(--sm-color-text);
 }
 
 .pestana--activa {
   color: var(--sm-color-primary);
   border-bottom-color: var(--sm-color-primary);
-  background: var(--sm-color-bg);
 }
 
 .lista {
   list-style: none;
   margin: 0;
-  padding: 0.75rem;
+  padding: 0.85rem 0.15rem 1rem;
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.35rem;
+  scrollbar-width: auto;
+  scrollbar-color: var(--sm-color-primary) var(--sm-color-primary-light);
+}
+
+.lista::-webkit-scrollbar {
+  width: 10px;
+}
+
+.lista::-webkit-scrollbar-track {
+  background: var(--sm-color-primary-light);
+  border-radius: 999px;
+}
+
+.lista::-webkit-scrollbar-thumb {
+  background: var(--sm-color-primary);
+  border-radius: 999px;
 }
 
 .item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .alimento {
   flex: 1;
   display: grid;
-  grid-template-columns: 56px 1fr;
+  grid-template-columns: 64px 1fr;
   grid-template-rows: auto auto;
-  column-gap: 0.75rem;
-  row-gap: 0.15rem;
-  padding: 0.4rem;
+  column-gap: 0.85rem;
+  row-gap: 0.1rem;
+  padding: 0.45rem 0.5rem;
   text-align: left;
   font-family: var(--sm-font-sans);
-  background: var(--sm-color-bg-alt);
-  border: 1px solid transparent;
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
+  transition: background 160ms ease, transform 160ms ease;
 }
 
 .alimento:hover:not(:disabled) {
-  border-color: var(--sm-color-info-border);
+  background: var(--sm-color-bg-alt);
+}
+
+.alimento--servido {
+  background: color-mix(in srgb, var(--sm-color-primary-light) 70%, transparent);
 }
 
 .alimento:disabled {
   cursor: not-allowed;
-  opacity: 0.65;
+  opacity: 0.55;
 }
 
 .foto {
   grid-row: 1 / span 2;
-  width: 56px;
-  height: 56px;
-  border-radius: 6px;
-  background: var(--sm-color-bg);
+  width: 64px;
+  height: 64px;
+  border-radius: 0;
+  background: transparent;
   display: grid;
   place-items: center;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .foto img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.12));
 }
 
 .nombre {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--sm-color-text);
 }
 
 .unidad {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--sm-color-text-muted);
 }
 
 .contador {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.15rem;
 }
 
 .paso {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 4px;
-  border: 1px solid var(--sm-color-border);
-  background: var(--sm-color-bg);
-  font-size: 1.1rem;
-  font-weight: 700;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--sm-color-bg-alt);
+  color: var(--sm-color-text);
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.paso:hover:not(:disabled) {
+  background: var(--sm-color-primary);
+  color: #fff;
 }
 
 .paso:disabled {
@@ -140,8 +186,20 @@
 }
 
 .cantidad {
-  min-width: 1.5rem;
+  min-width: 1.25rem;
   text-align: center;
   font-weight: 700;
+  font-size: 0.85rem;
   font-family: var(--sm-font-sans);
+}
+
+@media (max-width: 1100px) {
+  :host {
+    height: auto;
+    min-height: 420px;
+  }
+
+  .menu {
+    height: min(70vh, 560px);
+  }
 }

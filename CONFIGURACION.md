@@ -84,8 +84,9 @@ Falta `database/seeds/seed_personajes.sql`. El simulador toma el pool de los
 personajes que tienen `slug`; los personajes viejos no lo tienen a propósito.
 
 **Los alimentos salen sin imagen**
-Las 34 imágenes del catálogo son marcadores provisionales mientras llega el material
-definitivo (issue #15). Ver `angular-app/src/assets/foods/README.md`.
+Falta el archivo en `angular-app/src/assets/foods/{momento}/{slug}.webp`, o la ruta
+en `catalogo_alimentos.imagen` no coincide con el slug. Ver
+`angular-app/src/assets/foods/README.md`.
 
 **El panel de investigadores devuelve cero filas sin error**
 O el estudio está vacío, o la cuenta no está en la lista blanca de investigadores

@@ -71,10 +71,20 @@ distintas:
 - **`DATABASE_URL`** — solo para aplicar migraciones y seeds contra Postgres.
 - **`SUPABASE_URL` / `SUPABASE_ANON_KEY` / `URL_FUNDACION`** — los inyecta
   `angular-app/scripts/inject-supabase-env.mjs` en `src/environments/`, que están
-  fuera de git a propósito: las claves no se versionan.
+  fuera de git a propósito: **las claves no se versionan** (ni siquiera de respaldo:
+  issue #45).
+
+`SUPABASE_URL` y `SUPABASE_ANON_KEY` salen del panel de Supabase del proyecto →
+**Project Settings → Data API** (Project URL y clave publicable/anon). Si no tienes
+acceso, pídeselas al equipo.
 
 La inyección corre sola antes de `start` y de `build`, así que no hay que invocarla a
 mano. Si el `.env` cambia, el siguiente `npm start` la vuelve a aplicar.
+
+> **Sin `.env` con valores reales, la app no arranca contra Supabase.** La inyección
+> falla con un mensaje que dice qué copiar y qué comando volver a correr, en vez de
+> dejar que Angular arranque contra un backend inexistente y falle más adelante con un
+> stack trace.
 
 > Comprueba que el ref del proyecto en `DATABASE_URL` es **el mismo** que el de
 > `SUPABASE_URL`. Ya ocurrió una vez que el `.env` apuntaba a un proyecto viejo y las

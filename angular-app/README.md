@@ -51,7 +51,7 @@ src/app/
 
 src/assets/
 ├── characters/                  # los 8 retratos del estudio (.webp 500×500)
-├── foods/                       # catálogo (.webp 256×256) — hoy, marcadores
+├── foods/                       # catálogo (.webp 256×256, fondo transparente)
 └── images/ingredientes/         # PNG de la escena vieja, aún sin retirar
 ```
 
@@ -65,7 +65,7 @@ src/assets/
 
 ## Notas
 
-- Las imágenes de `assets/foods/` son **marcadores provisionales** hasta que llegue el
-  material definitivo (issue #15). Ver `src/assets/foods/README.md`.
+- Las 34 fotografías del catálogo están en `assets/foods/{momento}/{slug}.webp`
+  (issue #15). Ver `src/assets/foods/README.md`.
 - `assets/images/ingredientes/` son los PNG del juego anterior. Se conservan a
-  propósito mientras el catálogo nuevo no tenga imágenes reales.
+  propósito; el simulador nuevo no los usa.
