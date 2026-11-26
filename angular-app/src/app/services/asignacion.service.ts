@@ -28,8 +28,10 @@ export interface Asignacion {
  * participante. Si la constante supera el tamaño del pool se sirve el pool entero y se
  * para ahí — se recorta en silencio en vez de repetir.
  *
- * El momento del día se sortea POR ASIGNACIÓN, no una vez por sesión: cada plato es una
- * decisión independiente y fijar el momento acoplaría todos los platos al mismo catálogo.
+ * El momento del día NO se sortea: lo fija la posición del plato en la secuencia y sigue
+ * el ciclo del día (`MOMENTOS_DIA`: desayuno, almuerzo, cena). Así todos los
+ * participantes pasan por los tres momentos en el mismo orden. Si la constante supera
+ * tres, el ciclo vuelve a empezar.
  *
  * La secuencia se cachea mientras viva la pestaña, no se persiste: recargar sortea de
  * nuevo, que es el comportamiento que pide B4.
@@ -150,9 +152,9 @@ export class AsignacionService {
       [barajado[i], barajado[j]] = [barajado[j], barajado[i]];
     }
 
-    return barajado.slice(0, cuantas).map(personaje => ({
+    return barajado.slice(0, cuantas).map((personaje, i) => ({
       personaje,
-      momento_dia: MOMENTOS_DIA[Math.floor(Math.random() * MOMENTOS_DIA.length)]
+      momento_dia: MOMENTOS_DIA[i % MOMENTOS_DIA.length]
     }));
   }
 }

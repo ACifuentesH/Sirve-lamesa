@@ -46,7 +46,7 @@ La franja vital que un personaje representa: Niño, Joven, Adulto o Adulto Mayor
 _Avoid_: rango de edad (para el perfil), tipo
 
 **Asignación**:
-El personaje y el momento del día sorteados a un participante para su sesión. Cuántos personajes recibe cada participante lo gobierna una constante de configuración (por defecto, uno).
+El personaje y el momento del día sorteados a un participante para su sesión. Cada participante recorre el ciclo del día: sirve tres platos, desayuno, almuerzo y cena en ese orden, cada uno a un personaje distinto sorteado. El número lo gobierna una constante de configuración.
 _Avoid_: escenario
 
 **IMC representado**:
